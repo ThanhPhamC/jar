@@ -10,12 +10,7 @@ import java.util.List;
 @Data
 @Table(name = "catalog")
 @Entity
-public class Catalog {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int catalogId;
-    private String catalogName;
-    private boolean catalogStatus;
+public class Catalog extends BaseEntity{
     @OneToMany (mappedBy = "catalog")
     @JsonIgnore
     private List<Product> productList= new ArrayList<>();

@@ -7,13 +7,10 @@ import javax.persistence.*;
 @Data
 @Table(name = "review")
 @Entity
-public class Review {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int reviewId;
+public class Review extends BaseEntity{
     private int starPoint;
+    @Column(columnDefinition = "text")
     private String commentContent;
-    private boolean reviewStatus;
     @ManyToOne (fetch =  FetchType.EAGER)
     @JoinColumn(name = "userId")
     private Users users;

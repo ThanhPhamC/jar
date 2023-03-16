@@ -7,10 +7,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "wish")
-public class Wish {
-    @Id
-    @GeneratedValue
-    private  int wishId;
+public class Wish extends BaseEntity{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "productId")
     private Product product;
