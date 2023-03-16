@@ -11,15 +11,18 @@ import project.model.dto.response.CatalogResponse;
 import project.model.entity.Catalog;
 import project.repository.CatalogRepository;
 
+import java.util.List;
 import java.util.Map;
+
 @Service
 public class CatalogIpml implements CatalogService {
     @Autowired
     CatalogRepository catalogRepo;
+
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
-        Page<Catalog> page= catalogRepo.findAll(pageable);
-        Map<String,Object> result= Utility.returnResponse(page);
+        Page<Catalog> page = catalogRepo.findAll(pageable);
+        Map<String, Object> result = Utility.returnResponse(page);
         return result;
     }
 
@@ -29,12 +32,22 @@ public class CatalogIpml implements CatalogService {
     }
 
     @Override
-    public Boolean delete(Integer id) {
+    public boolean delete(Integer id) {
+        return false;
+    }
+
+    @Override
+    public List<Catalog> findAll() {
         return null;
     }
 
     @Override
-    public Map<String, Object> findByName(String name,Pageable pageable) {
+    public Catalog findById(Integer id) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> findByName(String name, Pageable pageable) {
         return null;
     }
 
@@ -45,6 +58,10 @@ public class CatalogIpml implements CatalogService {
 
     @Override
     public CatalogResponse mapPoJoToResponse(Catalog catalog) {
-        return null;
+        CatalogResponse response = new CatalogResponse();
+        response.setCatalogId(catalog.getId());
+        response.setCatalogName(catalog.getName());
+        response.setCatalogStatus(catalog.getStatus());
+        return response;
     }
 }
