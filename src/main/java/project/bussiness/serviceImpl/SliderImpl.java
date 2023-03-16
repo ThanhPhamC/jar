@@ -45,8 +45,6 @@ public class SliderImpl implements SliderService {
         Slider slider = sliderRepository.save(sliderUpdate);
         return mapPoJoToResponse(slider);
     }
-
-
     @Override
     public boolean delete(Integer id) {
         try {
@@ -57,9 +55,7 @@ public class SliderImpl implements SliderService {
         } catch (Exception ex) {
             return false;
         }
-
     }
-
     @Override
     public List<Slider> findAll() {
         return sliderRepository.findAll();

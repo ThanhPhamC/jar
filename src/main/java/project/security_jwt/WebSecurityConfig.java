@@ -69,15 +69,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                User
                 .antMatchers("/api/v1/users/register").permitAll()// Cho phép tất cả mọi người truy cập vào địa chỉ này
                 .antMatchers("/api/v1/users/signIn").permitAll()
-
+                .antMatchers("/api/v1/test/**").permitAll()
 //                Category
                 .antMatchers("/api/v1/catalog/**").permitAll()
                 .antMatchers("/api/v1/slider/**").permitAll()
                 .antMatchers("/api/v1/category/sortByName").permitAll()
                 .antMatchers("/api/v1/category/getPagging").permitAll()
+                .antMatchers("/api/v1/catalog/**").permitAll()
 
 //                Reset Password
-                .antMatchers("/api/v1/passReset/**").permitAll()
 
 //                Book
                 .antMatchers("/api/v1/book/search").permitAll()

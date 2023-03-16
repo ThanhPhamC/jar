@@ -5,12 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.CatalogService;
+import project.model.dto.request.CatalogRequest;
+import project.model.dto.response.CatalogResponse;
 import project.model.utility.Utility;
 import project.model.shopMess.Message;
+import java.util.List;
 import java.util.Map;
-
 @RestController
-@CrossOrigin("https://localhost8080")
+@CrossOrigin("http://localhost:8080")
 @RequestMapping("/api/v1/catalog")
 @AllArgsConstructor
 public class CatalogController {
@@ -27,6 +29,21 @@ public class CatalogController {
     }
     @GetMapping("/get_feature_catalog")
     public ResponseEntity<?> getFeatureCatalog(){
-        return null;
+        try {
+            List<CatalogResponse> result= catalogService.getListFeatured();
+            return new ResponseEntity<>(result,HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity(Message.ERROR_400,HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PostMapping
+    public ResponseEntity<?>creatNewCatalog(@RequestBody CatalogRequest request){
+        try {
+            CatalogResponse result= catalogService.saveOrUpdate(request);
+            return  new ResponseEntity<>(result,HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity(Message.ERROR_400,HttpStatus.BAD_REQUEST);
+        }
+
     }
 }

@@ -7,5 +7,5 @@ public class SliderRequest {
     private String name;
     private String sliderDescription;
     private String sliderBackground;
-    protected int status;
+    private int status;
 }

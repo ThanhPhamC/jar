@@ -11,8 +11,11 @@ import project.model.dto.response.CatalogResponse;
 import project.model.entity.Catalog;
 import project.repository.CatalogRepository;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class CatalogIpml implements CatalogService {
@@ -44,6 +47,9 @@ public class CatalogIpml implements CatalogService {
 
     @Override
     public List<Catalog> findAll() {
+        List<CatalogResponse> responses = catalogRepo.findAll().stream()
+                .map(this::mapPoJoToResponse)
+                .collect(Collectors.toList());
         return null;
     }
 
@@ -65,9 +71,20 @@ public class CatalogIpml implements CatalogService {
     @Override
     public CatalogResponse mapPoJoToResponse(Catalog catalog) {
         CatalogResponse response = new CatalogResponse();
-        response.setCatalogId(catalog.getId());
-        response.setCatalogName(catalog.getName());
-        response.setCatalogStatus(catalog.getStatus());
+        response.setId(catalog.getId());
+        response.setName(catalog.getName());
+        response.setStatus(catalog.getStatus());
         return response;
+    }
+    @Override
+    public List<CatalogResponse> getListFeatured() {
+        List<CatalogResponse> responses = catalogRepo.findAll().stream()
+                .sorted(Comparator.comparingInt(catalog -> catalog.getProductList().size()))
+                .map(this::mapPoJoToResponse)
+                .collect(Collectors.toList());
+        List<CatalogResponse> result= responses.stream()
+                .skip(Math.max(0, responses.size() - 6))
+                .collect(Collectors.toList());
+        return result;
     }
 }
