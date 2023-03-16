@@ -7,11 +7,7 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-public class Coupon {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int couponId;
-    private boolean couponStatus;
+public class Coupon extends BaseEntity{
     private String couponCode;
     @OneToOne(targetEntity = Users.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "userId")

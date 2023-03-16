@@ -8,13 +8,9 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "cartDetail")
-public class CartDetail {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int cartDetailId;
+public class CartDetail extends BaseEntity{
     private int quantity;
     private float price;
-    private boolean cartDetailStatus;
     @ManyToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name = "productId")
     private Product product;
