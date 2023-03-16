@@ -6,5 +6,5 @@ import lombok.Data;
 public class CatalogRequest {
     private int catalogId;
     private String catalogName;
-    private boolean catalogStatus;
+    private int catalogStatus;
 }
