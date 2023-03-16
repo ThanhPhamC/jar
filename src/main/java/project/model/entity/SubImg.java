@@ -8,12 +8,9 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "subImg")
-public class SubImg {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int subImgId;
+public class SubImg extends BaseEntity{
+    @Column(columnDefinition = "text")
     private String subLink;
-    private boolean subImgStatus;
     @ManyToOne (fetch =  FetchType.EAGER)
     @JoinColumn( name = "productId")
     @JsonIgnore

@@ -10,11 +10,7 @@ import java.util.List;
 @Entity
 @Data
 @Table (name = "cart")
-public class Cart {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int cartId;
-    private String cartName;
+public class Cart extends BaseEntity{
     private String firstName;
     private String lastName;
     private  String email;
@@ -23,11 +19,11 @@ public class Cart {
     private String country;
     private String city;
     private  String state;
+    @Column(columnDefinition = "text")
     private String note;
     private LocalDate creatDate;
     private float total;
     private int discount;
-    private int cartStatus;
     private float shipping;
     private float tax;
     @ManyToOne(fetch =  FetchType.EAGER)
@@ -35,5 +31,4 @@ public class Cart {
     private Users users;
     @OneToMany(mappedBy = "cart")
     private List<CartDetail> cartDetailList= new ArrayList<>();
-
 }

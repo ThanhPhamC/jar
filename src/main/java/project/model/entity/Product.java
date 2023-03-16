@@ -11,19 +11,16 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "product")
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int productId;
-    private String productName;
+public class Product extends BaseEntity{
+    @Column(columnDefinition = "text")
     private String productDescriptions;
     private String title;
     private int discount;
     private int productQuantity;
+    @Column(columnDefinition = "text")
     private String productImg;
     private float importPrice;
     private float exportPrice;
-    private boolean productStatus;
     private LocalDate creatDate;
     @ManyToOne (fetch =  FetchType.EAGER)
     @JoinColumn(name = "catalogId")

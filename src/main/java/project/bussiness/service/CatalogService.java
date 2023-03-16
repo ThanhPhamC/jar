@@ -5,4 +5,5 @@ import project.model.dto.response.CatalogResponse;
 import project.model.entity.Catalog;
 
 public interface CatalogService extends RootService<Catalog,Integer, CatalogRequest, CatalogResponse>{
+
 }
