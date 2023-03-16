@@ -52,14 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(customUserDetailsService) // Cung cap customUserDetailService cho spring security
                 .passwordEncoder(passwordEncoder()); // cung cấp password encoder
     }
-//    @Bean
-//    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService() {
-//        final DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-//        return (userRequest) -> {
-//            OAuth2User oAuth2User = delegate.loadUser(userRequest);
-//            return oAuth2User;
-//        };
-//    }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -75,12 +68,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
 
-//                .anyRequest().authenticated().and()
-//                .oauth2Login()
-//                .loginPage("/signIn")
-//                .defaultSuccessUrl("/api/v1/users/success/profile")
-//                .userInfoEndpoint()
-//                .userService(oAuth2UserService());
+
 
         // Thêm một lớp Filter kiểm tra jwt
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
