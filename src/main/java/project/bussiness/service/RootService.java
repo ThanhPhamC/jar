@@ -8,6 +8,7 @@ import java.util.Map;
 public interface RootService<T,V,H,K> {
     Map<String,Object> getPagingAndSort(Pageable pageable);
     K saveOrUpdate(H h);
+    K update(V id, H h);
     boolean delete (V id);
     List<T> findAll();
     T findById(V id);

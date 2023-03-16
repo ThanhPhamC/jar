@@ -52,7 +52,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(customUserDetailsService) // Cung cap customUserDetailService cho spring security
                 .passwordEncoder(passwordEncoder()); // cung cấp password encoder
     }
-
+//    @Bean
+//    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService() {
+//        final DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
+//        return (userRequest) -> {
+//            OAuth2User oAuth2User = delegate.loadUser(userRequest);
+//            return oAuth2User;
+//        };
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -64,11 +71,31 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/v1/users/signIn").permitAll()
                 .antMatchers("/api/v1/test/**").permitAll()
 //                Category
-                .antMatchers("/api/v1/catalog/**").permitAll();
+                .antMatchers("/api/v1/catalog/**").permitAll()
+                .antMatchers("/api/v1/slider/**").permitAll()
+                .antMatchers("/api/v1/category/sortByName").permitAll()
+                .antMatchers("/api/v1/category/getPagging").permitAll()
+                .antMatchers("/api/v1/catalog/**").permitAll()
 
+//                Reset Password
 
+//                Book
+                .antMatchers("/api/v1/book/search").permitAll()
+                .antMatchers("/api/v1/book/get_pagging_and_sortBy").permitAll()
 
+//                Author
+                .antMatchers("/api/v1/author/search").permitAll()
+                .antMatchers("/api/v1/author/get_paging_and_sortBy").permitAll()
 
+//                Tag
+                .antMatchers("/api/v1/tag/search_by_name").permitAll();
+
+//                .anyRequest().authenticated().and()
+//                .oauth2Login()
+//                .loginPage("/signIn")
+//                .defaultSuccessUrl("/api/v1/users/success/profile")
+//                .userInfoEndpoint()
+//                .userService(oAuth2UserService());
 
         // Thêm một lớp Filter kiểm tra jwt
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
