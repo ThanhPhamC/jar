@@ -1,7 +1,7 @@
 package project.model.dto.response;
 
-import project.model.dto.RootDto;
+import lombok.Data;
 
-public class CatalogResponse extends RootDto {
-
+@Data
+public class CatalogResponse extends RootResponse {
 }
