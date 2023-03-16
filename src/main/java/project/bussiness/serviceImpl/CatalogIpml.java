@@ -27,9 +27,15 @@ public class CatalogIpml implements CatalogService {
     }
 
     @Override
-    public CatalogResponse saveOrUpdate(Catalog catalog) {
+    public CatalogResponse saveOrUpdate(CatalogRequest catalogRequest) {
         return null;
     }
+
+    @Override
+    public CatalogResponse update(Integer id, CatalogRequest catalogRequest) {
+        return null;
+    }
+
 
     @Override
     public boolean delete(Integer id) {
