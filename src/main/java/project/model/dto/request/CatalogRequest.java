@@ -1,10 +1,6 @@
 package project.model.dto.request;
 
 import lombok.Data;
-
-@Data
-public class CatalogRequest {
-    private int catalogId;
-    private String catalogName;
-    private int catalogStatus;
+import project.model.dto.RootDto;
+public class CatalogRequest extends RootDto {
 }

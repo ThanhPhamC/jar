@@ -1,10 +1,7 @@
 package project.model.dto.response;
 
-import lombok.Data;
+import project.model.dto.RootDto;
 
-@Data
-public class CatalogResponse {
-    private int catalogId;
-    private String catalogName;
-    private int catalogStatus;
+public class CatalogResponse extends RootDto {
+
 }
