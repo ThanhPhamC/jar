@@ -72,6 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 //                Category
                 .antMatchers("/api/v1/catalog/**").permitAll()
+                .antMatchers("/api/v1/slider/**").permitAll()
                 .antMatchers("/api/v1/category/sortByName").permitAll()
                 .antMatchers("/api/v1/category/getPagging").permitAll()
 
