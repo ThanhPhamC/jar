@@ -16,7 +16,7 @@ import java.util.Map;
 public class CatalogController {
     private CatalogService catalogService;
     @GetMapping
-    public ResponseEntity<?> get_paging_and_sort(@RequestParam Map<String, String> headers) {
+    public ResponseEntity<?> get_paging_and_sort(@RequestParam Map<String,String> headers) {
         try {
             Pageable pageable = Utility.sort_order(headers);
             Map<String, Object> result = catalogService.getPagingAndSort(pageable);
@@ -24,5 +24,9 @@ public class CatalogController {
         } catch (Exception e) {
             return new ResponseEntity(Message.ERROR_400,HttpStatus.BAD_REQUEST);
         }
+    }
+    @GetMapping("/get_feature_catalog")
+    public ResponseEntity<?> getFeatureCatalog(){
+        return null;
     }
 }
