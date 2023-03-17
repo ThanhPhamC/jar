@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import project.model.entity.Cart;
 import project.model.entity.Users;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +32,7 @@ public class CustomUserDetails implements UserDetails {
     private String county;
     private String phone;
     private String avatar;
-    private LocalDate birtDate;
+    private LocalDateTime birtDate;
     private boolean statusUser;
     private int ranks;
     private List<Cart> cart;
@@ -41,7 +42,6 @@ public class CustomUserDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.authorities;
     }
-
     public static CustomUserDetails mapUserToUserDetail(Users users) {
         List<GrantedAuthority> listAuthority = users.getListRoles().stream()
                 .map(roles -> new SimpleGrantedAuthority(roles.getRoleName().name()))

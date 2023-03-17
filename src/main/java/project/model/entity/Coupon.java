@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -14,6 +15,6 @@ public class Coupon extends BaseEntity{
     private Users users;
     private int couponType;
     private float couponValue;
-    private LocalDate startDate;
+    private LocalDateTime startDate;
     private LocalDate endDate;
 }
