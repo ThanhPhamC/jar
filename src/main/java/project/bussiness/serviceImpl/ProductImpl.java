@@ -10,6 +10,7 @@ import project.model.dto.response.ProductResponse;
 import project.model.entity.Cart;
 import project.model.entity.CartDetail;
 import project.model.entity.Product;
+import project.model.entity.Review;
 import project.repository.CartDetailRepository;
 import project.repository.CartRepository;
 import project.repository.ProductRepository;
@@ -75,7 +76,9 @@ public class ProductImpl implements ProductService {
     @Override
     public List<ProductResponse> getFeatureProduct(LocalDateTime startDate, LocalDateTime endDate) {
         List<Cart> listCart = cartRepository.findByCreatDateBetween(startDate, endDate);
-        List<CartDetail> listCartDetail = cartDetailRepository.findByCartIn(listCart);
+        List<Cart> listCartFilter = listCart.stream().filter(cart -> cart.getStatus() == 1)
+                .collect(Collectors.toList());
+        List<CartDetail> listCartDetail = cartDetailRepository.findByCartIn(listCartFilter);
         Map<Integer, Integer> maxMap = new HashMap<>();
         for (int i = 0; i < listCartDetail.size(); i++) {
             int quantity = listCartDetail.get(i).getQuantity();
@@ -111,6 +114,28 @@ public class ProductImpl implements ProductService {
     }
 
     @Override
+    public List<Product> findByCartDetailListIn(List<CartDetail> listCartDetail) {
+        return productRepo.findByCartDetailListIn(listCartDetail);
+    }
+
+    @Override
+    public List<ProductResponse> getTopRatedProduct(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Cart> listCart = cartRepository.findByCreatDateBetween(startDate, endDate);
+        List<Cart> listCartFilter = listCart.stream().filter(cart -> cart.getStatus() == 1)
+                .collect(Collectors.toList());
+        List<CartDetail> listCartDetail = cartDetailRepository.findByCartIn(listCartFilter);
+        List<Product> listProduct = findByCartDetailListIn(listCartDetail);
+        List<ProductResponse> listProductRes = listProduct.stream()
+                .map(this::mapPoJoToResponse).collect(Collectors.toList());
+        List<ProductResponse> responses = listProductRes.stream()
+                .sorted(Comparator.comparingDouble(response -> response.getStarPoint()))
+                .skip(listProductRes.size()-2)
+                .limit(2)
+                .collect(Collectors.toList());
+        return responses;
+    }
+
+    @Override
     public Product mapRequestToPoJo(ProductRequest productRequest) {
         Product product = new Product();
         if (productRequest.getStatus() > 0) {
@@ -131,6 +156,7 @@ public class ProductImpl implements ProductService {
         product.setBrand(brandRepo.findById(productRequest.getBrandId()).get());
         return product;
     }
+
     @Override
     public ProductResponse mapPoJoToResponse(Product pro) {
         ProductResponse rp = new ProductResponse();
@@ -147,10 +173,17 @@ public class ProductImpl implements ProductService {
         rp.setTitle(pro.getTitle());
         rp.setBrandName(pro.getBrand().getName());
         rp.setCatalogName(pro.getCatalog().getName());
-        rp.setReviewList(pro.getReviewList());
+//        rp.setReviewList(pro.getReviewList());
         rp.setSubImgList(pro.getSubImgList());
+        List<Integer> list = new ArrayList<>();
+        for (Review rw : pro.getReviewList()) {
+            list.add(rw.getStarPoint());
+        }
+        double average = list.stream().mapToDouble(num -> num).average().orElse(0.0);
+        rp.setStarPoint(average);
         return rp;
     }
+
     @Override
     public List<ProductResponse> topNewProduct() {
         List<ProductResponse> responses = productRepo.findAll().stream().sorted(Comparator.comparing(Product::getCreatDate)).map(this::mapPoJoToResponse).collect(Collectors.toList());
