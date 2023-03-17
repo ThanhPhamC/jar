@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class Product extends BaseEntity{
     private String productImg;
     private float importPrice;
     private float exportPrice;
-    private LocalDate creatDate;
+    private LocalDateTime creatDate;
     @ManyToOne (fetch =  FetchType.EAGER)
     @JoinColumn(name = "catalogId")
     private Catalog catalog;

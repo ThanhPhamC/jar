@@ -59,7 +59,8 @@ public class SliderImpl implements SliderService {
     }
     @Override
     public List<Slider> findAll() {
-        return sliderRepository.findAll();
+        List<Slider> responses= sliderRepository.findAll();
+        return responses;
     }
 
     @Override
