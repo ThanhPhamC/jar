@@ -14,6 +14,7 @@ import project.model.utility.Utility;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin("https://localhost8080")
@@ -88,6 +89,19 @@ public class SliderController {
             Map<String,Object> result = sliderService.findByName(headers.get("searchName"),pageable);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
+    @GetMapping("getFeatureSlider")
+    public ResponseEntity<?> getFeatureSlider(){
+        try {
+            List<SliderResponse> sliderResponseList = sliderService.getAllForClient();
+            List<SliderResponse> responses = sliderResponseList.stream()
+                    .skip(Math.max(0, sliderResponseList.size()-6))
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(responses, HttpStatus.OK);
+        } catch (Exception ex){
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
