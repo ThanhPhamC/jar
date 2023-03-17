@@ -23,7 +23,7 @@ public class CatalogImpl implements CatalogService {
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
-        Page<Catalog> page = catalogRepo.findAll(pageable);
+        Page<CatalogResponse> page = catalogRepo.findAll(pageable).map(this::mapPoJoToResponse);
         Map<String, Object> result = Utility.returnResponse(page);
         return result;
     }
@@ -70,7 +70,10 @@ public class CatalogImpl implements CatalogService {
 
     @Override
     public Catalog mapRequestToPoJo(CatalogRequest catalogRequest) {
-        return null;
+        Catalog catalog = new Catalog();
+        catalog.setName(catalogRequest.getName());
+        catalog.setStatus(catalogRequest.getStatus());
+        return catalog;
     }
 
     @Override
