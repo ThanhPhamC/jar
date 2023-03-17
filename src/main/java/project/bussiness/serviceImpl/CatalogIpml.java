@@ -54,6 +54,14 @@ public class CatalogIpml implements CatalogService {
     }
 
     @Override
+    public List<CatalogResponse> getAllForClient() {
+        List<CatalogResponse> responses = catalogRepo.findAll().stream()
+                .map(this::mapPoJoToResponse)
+                .collect(Collectors.toList());
+        return responses;
+    }
+
+    @Override
     public Catalog findById(Integer id) {
         return null;
     }

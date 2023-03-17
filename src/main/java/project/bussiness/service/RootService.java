@@ -11,6 +11,7 @@ public interface RootService<T,V,H,K> {
     K update(V id, H h);
     boolean delete (V id);
     List<T> findAll();
+    List<K> getAllForClient();
     T findById(V id);
     Map<String,Object> findByName(String name,Pageable pageable);
     T mapRequestToPoJo(H h);
