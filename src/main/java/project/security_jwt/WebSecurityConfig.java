@@ -73,22 +73,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                Category
                 .antMatchers("/api/v1/catalog/**").permitAll()
                 .antMatchers("/api/v1/slider/**").permitAll()
-                .antMatchers("/api/v1/category/sortByName").permitAll()
-                .antMatchers("/api/v1/category/getPagging").permitAll()
-                .antMatchers("/api/v1/catalog/**").permitAll()
+                .antMatchers("/api/v1/product/**").permitAll();
 
-//                Reset Password
 
-//                Book
-                .antMatchers("/api/v1/book/search").permitAll()
-                .antMatchers("/api/v1/book/get_pagging_and_sortBy").permitAll()
-
-//                Author
-                .antMatchers("/api/v1/author/search").permitAll()
-                .antMatchers("/api/v1/author/get_paging_and_sortBy").permitAll()
-
-//                Tag
-                .antMatchers("/api/v1/tag/search_by_name").permitAll();
 
 //                .anyRequest().authenticated().and()
 //                .oauth2Login()
