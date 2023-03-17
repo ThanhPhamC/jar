@@ -93,7 +93,7 @@ public class SliderController {
         }
     }
 
-    @GetMapping("getFeatureSlider")
+    @GetMapping("getNewestSlider")
     public ResponseEntity<?> getFeatureSlider(){
         try {
             List<SliderResponse> sliderResponseList = sliderService.getAllForClient();

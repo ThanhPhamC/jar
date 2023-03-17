@@ -1,23 +1,30 @@
 package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.ProductService;
 import project.model.dto.request.ProductRequest;
 import project.model.dto.response.ProductResponse;
-import project.model.entity.Brand;
+import project.model.entity.Cart;
+import project.model.entity.CartDetail;
 import project.model.entity.Product;
+import project.repository.CartDetailRepository;
+import project.repository.CartRepository;
+import project.repository.ProductRepository;
 import project.repository.BrandRepository;
 import project.repository.CatalogRepository;
-import project.repository.ProductRepository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class ProductImpl implements ProductService {
+    private CartRepository cartRepository;
+    private CartDetailRepository cartDetailRepository;
     private ProductRepository productRepo;
     private CatalogRepository catalogRepo;
     private BrandRepository brandRepo;
@@ -44,23 +51,65 @@ public class ProductImpl implements ProductService {
 
     @Override
     public List<Product> findAll() {
-        List<Product> responses = productRepo.findAll();
-        return responses;
+        return productRepo.findAll();
     }
 
     @Override
     public List<ProductResponse> getAllForClient() {
-        List<ProductResponse> responses = productRepo.findAll().stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
-        return responses;
+        List<ProductResponse> productResponseList = findAll().stream()
+                .map(this::mapPoJoToResponse)
+                .collect(Collectors.toList());
+        return productResponseList;
     }
+
     @Override
     public Product findById(Integer id) {
         return productRepo.findById(id).get();
     }
+
     @Override
     public Map<String, Object> findByName(String name, Pageable pageable) {
         return null;
     }
+
+    @Override
+    public List<ProductResponse> getFeatureProduct(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Cart> listCart = cartRepository.findByCreatDateBetween(startDate, endDate);
+        List<CartDetail> listCartDetail = cartDetailRepository.findByCartIn(listCart);
+        Map<Integer, Integer> maxMap = new HashMap<>();
+        for (int i = 0; i < listCartDetail.size(); i++) {
+            int quantity = listCartDetail.get(i).getQuantity();
+            int key = listCartDetail.get(i).getProduct().getId();
+            if (maxMap.containsKey(key)) {
+                int value = maxMap.get(key);
+                maxMap.put(key, value + quantity);
+            } else {
+                maxMap.put(key, quantity);
+            }
+        }
+
+        Map<Integer, Integer> result = maxMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
+                .skip(maxMap.size() - 3)
+                .limit(3)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                ));
+
+        List<Product> listProduct = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : result.entrySet()) {
+            listProduct.add(findById(entry.getKey()));
+        }
+
+        List<ProductResponse> responses = listProduct.stream()
+                .map(this::mapPoJoToResponse)
+                .collect(Collectors.toList());
+
+        return responses;
+    }
+
     @Override
     public Product mapRequestToPoJo(ProductRequest productRequest) {
         Product product = new Product();
