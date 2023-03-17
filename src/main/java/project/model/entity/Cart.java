@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class Cart extends BaseEntity{
     private  String state;
     @Column(columnDefinition = "text")
     private String note;
-    private LocalDate creatDate;
+    private LocalDateTime creatDate;
     private float total;
     private int discount;
     private float shipping;

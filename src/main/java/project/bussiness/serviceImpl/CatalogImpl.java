@@ -11,14 +11,13 @@ import project.model.dto.response.CatalogResponse;
 import project.model.entity.Catalog;
 import project.repository.CatalogRepository;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class CatalogIpml implements CatalogService {
+public class CatalogImpl implements CatalogService {
     @Autowired
     CatalogRepository catalogRepo;
 
@@ -46,7 +45,7 @@ public class CatalogIpml implements CatalogService {
     }
 
     @Override
-    public List<Catalog> findAll() {
+    public List<CatalogResponse> findAll() {
         List<CatalogResponse> responses = catalogRepo.findAll().stream()
                 .map(this::mapPoJoToResponse)
                 .collect(Collectors.toList());

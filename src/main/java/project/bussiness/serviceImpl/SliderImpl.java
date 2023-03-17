@@ -14,6 +14,7 @@ import project.repository.SliderRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class SliderImpl implements SliderService {
@@ -57,8 +58,10 @@ public class SliderImpl implements SliderService {
         }
     }
     @Override
-    public List<Slider> findAll() {
-        return sliderRepository.findAll();
+    public List<SliderResponse> findAll() {
+        List<SliderResponse> responses= sliderRepository.findAll().stream()
+                .map(this::mapPoJoToResponse).collect(Collectors.toList());
+        return responses;
     }
 
     @Override

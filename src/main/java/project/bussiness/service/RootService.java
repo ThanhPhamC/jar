@@ -8,9 +8,10 @@ import java.util.Map;
 public interface RootService<T,V,H,K> {
     Map<String,Object> getPagingAndSort(Pageable pageable);
     K saveOrUpdate(H h);
+//    Object saveOrUpdate(Object o);
     K update(V id, H h);
     boolean delete (V id);
-    List<T> findAll();
+    List<K> findAll();
     T findById(V id);
     Map<String,Object> findByName(String name,Pageable pageable);
     T mapRequestToPoJo(H h);
