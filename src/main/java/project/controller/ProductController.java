@@ -1,14 +1,15 @@
 package project.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.ProductService;
 import project.model.dto.request.ProductFeatureRequest;
 import project.model.dto.response.ProductResponse;
+import project.model.entity.Review;
 import project.model.shopMess.Message;
+
 import java.util.List;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/product")
 @AllArgsConstructor
 public class ProductController {
-    @Autowired
     private ProductService productService;
 
     @GetMapping("getFeatureProduct")
@@ -36,17 +36,26 @@ public class ProductController {
     }
 
     @GetMapping("/top_new_product")
-    public ResponseEntity<?> topNewProduct(){
+    public ResponseEntity<?> topNewProduct() {
         try {
-            List<ProductResponse> responses=productService.topNewProduct();
-                if (responses.isEmpty()){
-                    return ResponseEntity.badRequest().body(Message.ERROR_NULL);
-                }else {
-                    return new ResponseEntity<>(responses,HttpStatus.OK);
-                }
-        }catch (Exception e){
+            List<ProductResponse> responses = productService.topNewProduct();
+            if (responses.isEmpty()) {
+                return ResponseEntity.badRequest().body(Message.ERROR_NULL);
+            } else {
+                return new ResponseEntity<>(responses, HttpStatus.OK);
+            }
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
 
+    @GetMapping("top_rated_product")
+    public ResponseEntity<?> topRatedProduct(@RequestBody ProductFeatureRequest productFeatureRequest) {
+        try {
+            List<ProductResponse> responses = productService.getTopRatedProduct(productFeatureRequest.getStartDate(), productFeatureRequest.getEndDate());
+            return new ResponseEntity<>(responses, HttpStatus.OK);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
 }

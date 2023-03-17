@@ -21,4 +21,5 @@ public class ProductResponse extends RootResponse{
     private String brandName;
     private List<Review> reviewList = new ArrayList<>();
     private List<SubImg> subImgList= new ArrayList<>();
+    private double starPoint;
 }
