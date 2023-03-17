@@ -45,11 +45,9 @@ public class CatalogImpl implements CatalogService {
     }
 
     @Override
-    public List<CatalogResponse> findAll() {
-        List<CatalogResponse> responses = catalogRepo.findAll().stream()
-                .map(this::mapPoJoToResponse)
-                .collect(Collectors.toList());
-        return null;
+    public List<Catalog> findAll() {
+        List<Catalog> responses = catalogRepo.findAll();
+        return responses;
     }
 
     @Override

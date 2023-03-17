@@ -43,7 +43,13 @@ public class ProductImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> findAll() {
+    public List<Product> findAll() {
+        List<Product> responses = productRepo.findAll();
+        return responses;
+    }
+
+    @Override
+    public List<ProductResponse> getAllForClient() {
         List<ProductResponse> responses = productRepo.findAll().stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
         return responses;
     }

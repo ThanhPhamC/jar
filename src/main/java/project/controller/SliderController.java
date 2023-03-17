@@ -26,7 +26,7 @@ public class SliderController {
     @GetMapping
     public ResponseEntity<?> getAllSlider() {
         try {
-            List<SliderResponse> responses = sliderService.findAll();
+            List<Slider> responses = sliderService.findAll();
             return new ResponseEntity<>(responses, HttpStatus.OK);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(Message.ERROR_400);

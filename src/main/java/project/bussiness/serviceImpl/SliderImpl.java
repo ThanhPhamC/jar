@@ -58,9 +58,8 @@ public class SliderImpl implements SliderService {
         }
     }
     @Override
-    public List<SliderResponse> findAll() {
-        List<SliderResponse> responses= sliderRepository.findAll().stream()
-                .map(this::mapPoJoToResponse).collect(Collectors.toList());
+    public List<Slider> findAll() {
+        List<Slider> responses= sliderRepository.findAll();
         return responses;
     }
 
