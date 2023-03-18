@@ -135,6 +135,11 @@ public class ProductImpl implements ProductService {
         return responses;
     }
 
+    @Override
+    public int countByCatalog_Id(int catalogId) {
+        return productRepo.countByCatalog_Id(catalogId);
+    }
+
 
     @Override
     public Product mapRequestToPoJo(ProductRequest productRequest) {

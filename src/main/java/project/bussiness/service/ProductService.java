@@ -12,4 +12,5 @@ public interface ProductService extends RootService<Product,Integer, ProductRequ
     List<ProductResponse> getFeatureProduct(LocalDateTime startDate, LocalDateTime endDate, int size);
     List<Product> findByCartDetailListIn(List<CartDetail> listCartDetail);
     List<ProductResponse> getTopRatedProduct(LocalDateTime startDate, LocalDateTime endDate, int size);
+    int countByCatalog_Id(int catalogId);
 }
