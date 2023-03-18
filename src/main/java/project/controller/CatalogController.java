@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.CatalogService;
 import project.model.dto.request.CatalogRequest;
+import project.model.dto.request.ProductFeatureRequest;
 import project.model.dto.response.CatalogResponse;
 import project.model.utility.Utility;
 import project.model.shopMess.Message;
@@ -46,4 +47,15 @@ public class CatalogController {
         }
 
     }
+
+    @GetMapping("/get_feature_catalog_for_screen_2")
+    public ResponseEntity<?> getFeatureCatalogForScreen2(@RequestBody ProductFeatureRequest productFeatureRequest){
+        try {
+            List<CatalogResponse> result= catalogService.getFeatureCatalogForScreen2(productFeatureRequest.getStartDate(),productFeatureRequest.getEndDate(), productFeatureRequest.getSize());
+            return new ResponseEntity<>(result,HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity(Message.ERROR_400,HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }
