@@ -74,7 +74,7 @@ public class ProductImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getFeatureProduct(LocalDateTime startDate, LocalDateTime endDate) {
+    public List<ProductResponse> getFeatureProduct(LocalDateTime startDate, LocalDateTime endDate, int size) {
         List<Cart> listCart = cartRepository.findByCreatDateBetween(startDate, endDate);
         List<Cart> listCartFilter = listCart.stream().filter(cart -> cart.getStatus() == 1)
                 .collect(Collectors.toList());
@@ -93,8 +93,8 @@ public class ProductImpl implements ProductService {
 
         Map<Integer, Integer> result = maxMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
-                .skip(maxMap.size() - 3)
-                .limit(3)
+                .skip(maxMap.size() - size)
+                .limit(size)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
@@ -119,7 +119,7 @@ public class ProductImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getTopRatedProduct(LocalDateTime startDate, LocalDateTime endDate) {
+    public List<ProductResponse> getTopRatedProduct(LocalDateTime startDate, LocalDateTime endDate, int size) {
         List<Cart> listCart = cartRepository.findByCreatDateBetween(startDate, endDate);
         List<Cart> listCartFilter = listCart.stream().filter(cart -> cart.getStatus() == 1)
                 .collect(Collectors.toList());
@@ -129,11 +129,12 @@ public class ProductImpl implements ProductService {
                 .map(this::mapPoJoToResponse).collect(Collectors.toList());
         List<ProductResponse> responses = listProductRes.stream()
                 .sorted(Comparator.comparingDouble(response -> response.getStarPoint()))
-                .skip(listProductRes.size()-2)
-                .limit(2)
+                .skip(listProductRes.size()-size)
+                .limit(size)
                 .collect(Collectors.toList());
         return responses;
     }
+
 
     @Override
     public Product mapRequestToPoJo(ProductRequest productRequest) {

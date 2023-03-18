@@ -8,4 +8,5 @@ import java.time.LocalDateTime;
 public class ProductFeatureRequest {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private int size;
 }

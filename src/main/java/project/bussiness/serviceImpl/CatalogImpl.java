@@ -5,12 +5,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.CatalogService;
+import project.bussiness.service.ProductService;
+import project.model.dto.response.ProductResponse;
+import project.model.entity.Product;
 import project.model.utility.Utility;
 import project.model.dto.request.CatalogRequest;
 import project.model.dto.response.CatalogResponse;
 import project.model.entity.Catalog;
 import project.repository.CatalogRepository;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +25,8 @@ import java.util.stream.Collectors;
 public class CatalogImpl implements CatalogService {
     @Autowired
     CatalogRepository catalogRepo;
+    @Autowired
+    private ProductService productService;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -84,15 +91,29 @@ public class CatalogImpl implements CatalogService {
         response.setStatus(catalog.getStatus());
         return response;
     }
+
     @Override
     public List<CatalogResponse> getListFeatured() {
         List<CatalogResponse> responses = catalogRepo.findAll().stream()
                 .sorted(Comparator.comparingInt(catalog -> catalog.getProductList().size()))
                 .map(this::mapPoJoToResponse)
                 .collect(Collectors.toList());
-        List<CatalogResponse> result= responses.stream()
+        List<CatalogResponse> result = responses.stream()
                 .skip(Math.max(0, responses.size() - 6))
                 .collect(Collectors.toList());
         return result;
+    }
+
+    @Override
+    public List<CatalogResponse> getFeatureCatalogForScreen2(LocalDateTime startDate, LocalDateTime endDate, int size) {
+        List<ProductResponse> productResponseList = productService.getFeatureProduct(startDate, endDate, size);
+        List<Product> productList = new ArrayList<>();
+        for (ProductResponse pro : productResponseList) {
+            productList.add(productService.findById(pro.getId()));
+        }
+        List<Catalog> catalogList = catalogRepo.findByProductListIn(productList);
+        List<CatalogResponse> responses = catalogList.stream()
+                .map(this::mapPoJoToResponse).collect(Collectors.toList());
+        return responses;
     }
 }

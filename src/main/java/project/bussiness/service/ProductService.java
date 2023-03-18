@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ProductService extends RootService<Product,Integer, ProductRequest, ProductResponse> {
     List<ProductResponse> topNewProduct();
-    List<ProductResponse> getFeatureProduct(LocalDateTime startDate, LocalDateTime endDate);
+    List<ProductResponse> getFeatureProduct(LocalDateTime startDate, LocalDateTime endDate, int size);
     List<Product> findByCartDetailListIn(List<CartDetail> listCartDetail);
-    List<ProductResponse> getTopRatedProduct(LocalDateTime startDate, LocalDateTime endDate);
+    List<ProductResponse> getTopRatedProduct(LocalDateTime startDate, LocalDateTime endDate, int size);
 }
