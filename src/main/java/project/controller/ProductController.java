@@ -28,7 +28,7 @@ public class ProductController {
     @GetMapping("getFeatureProduct")
     public ResponseEntity<?> getFeatureSlider(@RequestBody ProductFeatureRequest productFeatureRequest) {
         try {
-            List<ProductResponse> responses = productService.getFeatureProduct(productFeatureRequest.getStartDate(), productFeatureRequest.getEndDate());
+            List<ProductResponse> responses = productService.getFeatureProduct(productFeatureRequest.getStartDate(), productFeatureRequest.getEndDate(), productFeatureRequest.getSize());
             return new ResponseEntity<>(responses, HttpStatus.OK);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
@@ -52,7 +52,7 @@ public class ProductController {
     @GetMapping("top_rated_product")
     public ResponseEntity<?> topRatedProduct(@RequestBody ProductFeatureRequest productFeatureRequest) {
         try {
-            List<ProductResponse> responses = productService.getTopRatedProduct(productFeatureRequest.getStartDate(), productFeatureRequest.getEndDate());
+            List<ProductResponse> responses = productService.getTopRatedProduct(productFeatureRequest.getStartDate(), productFeatureRequest.getEndDate(), productFeatureRequest.getSize());
             return new ResponseEntity<>(responses, HttpStatus.OK);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
