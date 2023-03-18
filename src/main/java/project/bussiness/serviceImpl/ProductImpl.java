@@ -8,16 +8,9 @@ import org.springframework.stereotype.Service;
 import project.bussiness.service.ProductService;
 import project.model.dto.request.ProductRequest;
 import project.model.dto.response.ProductResponse;
-import project.model.entity.Cart;
-import project.model.entity.CartDetail;
-import project.model.entity.Product;
-import project.model.entity.Review;
+import project.model.entity.*;
 import project.model.utility.Utility;
-import project.repository.CartDetailRepository;
-import project.repository.CartRepository;
-import project.repository.ProductRepository;
-import project.repository.BrandRepository;
-import project.repository.CatalogRepository;
+import project.repository.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -31,6 +24,7 @@ public class ProductImpl implements ProductService {
     private ProductRepository productRepo;
     private CatalogRepository catalogRepo;
     private BrandRepository brandRepo;
+    private LocationRepository locationRepository;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -134,7 +128,7 @@ public class ProductImpl implements ProductService {
                 .map(this::mapPoJoToResponse).collect(Collectors.toList());
         List<ProductResponse> responses = listProductRes.stream()
                 .sorted(Comparator.comparingDouble(response -> response.getStarPoint()))
-                .skip(listProductRes.size()-size)
+                .skip(listProductRes.size() - size)
                 .limit(size)
                 .collect(Collectors.toList());
         return responses;
@@ -143,6 +137,32 @@ public class ProductImpl implements ProductService {
     @Override
     public int countByCatalog_Id(int catalogId) {
         return productRepo.countByCatalog_Id(catalogId);
+    }
+
+    @Override
+    public List<ProductResponse> filterProductByPriceLocationStar(List<Integer> listLocationId, float max, float min, List<Integer> starPoint) {
+        List<Location> locationList = new ArrayList<>();
+        if (listLocationId.size()==0){
+            locationList = locationRepository.findAll();
+        }
+        for (Integer locationId : listLocationId) {
+            locationList.add(locationRepository.findById(locationId).get());
+        }
+        List<Product> listProduct = productRepo.findByLocationIn(locationList);
+        List<ProductResponse> listProductResponse = listProduct.stream()
+                .filter(product -> product.getExportPrice()>= min && product.getExportPrice() <= max)
+                .map(this::mapPoJoToResponse)
+                .collect(Collectors.toList());
+        if (starPoint.size()==0){
+            return listProductResponse;
+        } else {
+            Collections.sort(starPoint);
+            List<ProductResponse> responses = listProductResponse.stream()
+                    .filter(response -> response.getStarPoint()>=starPoint.get(0) && response.getStarPoint()<= starPoint.get(starPoint.size()-1))
+                    .collect(Collectors.toList());
+            return responses;
+        }
+
     }
 
 
