@@ -19,15 +19,13 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
-
-
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter();
@@ -73,8 +71,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                Category
                 .antMatchers("/api/v1/catalog/**").permitAll()
                 .antMatchers("/api/v1/slider/**").permitAll()
-                .antMatchers("/api/v1/product/**").permitAll();
-
+                .antMatchers("/api/v1/product/**").permitAll()
+                .antMatchers("/api/v1/flashSale/**").permitAll();
 
 
 //                .anyRequest().authenticated().and()
