@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import project.model.entity.CartDetail;
+import project.model.entity.Location;
 import project.model.entity.Product;
 
 import java.util.List;
@@ -15,4 +16,5 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findByCartDetailListIn(List<CartDetail> listCartDetail);
     Page<Product> findByNameContaining(String searchName, Pageable pageable);
     int countByCatalog_Id(int catalogId);
+    List<Product> findByLocationIn(List<Location> listLocation);
 }

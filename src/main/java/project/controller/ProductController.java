@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.ProductService;
+import project.model.dto.request.FilterProductRequest;
 import project.model.dto.request.ProductFeatureRequest;
 import project.model.dto.response.ProductResponse;
 import project.model.entity.Review;
@@ -63,12 +64,27 @@ public class ProductController {
     }
 
     @GetMapping("search_sort_newest_product")
-    public ResponseEntity<?> searchAndSortNewestProductByName(@RequestParam Map<String,String> headers){
+    public ResponseEntity<?> searchAndSortNewestProductByName(@RequestParam Map<String, String> headers) {
         try {
             Pageable pageable = Utility.sort_order(headers);
-            Map<String,Object> result = productService.findByName(headers.get("searchName"),pageable);
+            Map<String, Object> result = productService.findByName(headers.get("searchName"), pageable);
             return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception e){
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
+    @GetMapping("filter_product_by_Price_Location_Rating")
+    public ResponseEntity<?> filterProductByPriceLocationAndStar(@RequestBody FilterProductRequest filterProductRequest) {
+        try {
+            List<ProductResponse> responses = productService.filterProductByPriceLocationStar(
+                    filterProductRequest.getLocationId(),
+                    filterProductRequest.getMax(),
+                    filterProductRequest.getMin(),
+                    filterProductRequest.getStarPoint()
+            );
+            return new ResponseEntity<>(responses, HttpStatus.OK);
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
