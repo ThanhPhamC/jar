@@ -11,4 +11,5 @@ import java.util.Set;
 @Repository
 public interface CatalogRepository extends JpaRepository<Catalog,Integer> {
     Set<Catalog> findByProductListIn(List<Product> listProduct);
+
 }

@@ -6,10 +6,12 @@ import project.model.entity.Catalog;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface CatalogService extends RootService<Catalog,Integer, CatalogRequest, CatalogResponse>{
 
     List<CatalogResponse> getListFeatured();
     List<CatalogResponse> getFeatureCatalogForScreen2(LocalDateTime startDate, LocalDateTime endDate, int size);
+    List<CatalogResponse> countTypeOfProduct();
 
 }

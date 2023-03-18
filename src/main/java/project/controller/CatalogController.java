@@ -58,4 +58,13 @@ public class CatalogController {
         }
     }
 
+    @GetMapping("countTypesOfProduct")
+    public ResponseEntity<?> countTypeOfProductInCatalog(){
+        try {
+            List<CatalogResponse> result = catalogService.countTypeOfProduct();
+            return new ResponseEntity<>(result,HttpStatus.OK);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
 }
