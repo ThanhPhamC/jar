@@ -40,5 +40,7 @@ public class Product extends BaseEntity{
     @OneToMany (mappedBy = "product")
     @JsonIgnore
     private List<CartDetail > cartDetailList = new ArrayList<>();
-
+    @OneToMany (mappedBy = "product")
+    @JsonIgnore
+    private List<FlashSale> saleList= new ArrayList<>();
 }
