@@ -15,10 +15,7 @@ import project.model.entity.Catalog;
 import project.repository.CatalogRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -111,7 +108,7 @@ public class CatalogImpl implements CatalogService {
         for (ProductResponse pro : productResponseList) {
             productList.add(productService.findById(pro.getId()));
         }
-        List<Catalog> catalogList = catalogRepo.findByProductListIn(productList);
+        Set<Catalog> catalogList = catalogRepo.findByProductListIn(productList);
         List<CatalogResponse> responses = catalogList.stream()
                 .map(this::mapPoJoToResponse).collect(Collectors.toList());
         return responses;
