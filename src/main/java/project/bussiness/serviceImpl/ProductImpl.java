@@ -2,6 +2,7 @@ package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.ProductService;
@@ -11,6 +12,7 @@ import project.model.entity.Cart;
 import project.model.entity.CartDetail;
 import project.model.entity.Product;
 import project.model.entity.Review;
+import project.model.utility.Utility;
 import project.repository.CartDetailRepository;
 import project.repository.CartRepository;
 import project.repository.ProductRepository;
@@ -70,7 +72,10 @@ public class ProductImpl implements ProductService {
 
     @Override
     public Map<String, Object> findByName(String name, Pageable pageable) {
-        return null;
+        Page<Product> page = productRepo.findByNameContaining(name, pageable);
+        Map<String, Object> result = Utility.returnResponse(page);
+        result.get(page.getTotalElements());
+        return result;
     }
 
     @Override
