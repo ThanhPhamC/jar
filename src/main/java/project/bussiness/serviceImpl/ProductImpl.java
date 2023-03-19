@@ -149,10 +149,17 @@ public class ProductImpl implements ProductService {
             locationList.add(locationRepository.findById(locationId).get());
         }
         List<Product> listProduct = productRepo.findByLocationIn(locationList);
-        List<ProductResponse> listProductResponse = listProduct.stream()
-                .filter(product -> product.getExportPrice()>= min && product.getExportPrice() <= max)
-                .map(this::mapPoJoToResponse)
-                .collect(Collectors.toList());
+        List<ProductResponse> listProductResponse = new ArrayList<>();
+        if (max==0 || min ==0) {
+            listProductResponse = listProduct.stream()
+                    .map(this::mapPoJoToResponse)
+                    .collect(Collectors.toList());
+        } else {
+            listProductResponse = listProduct.stream()
+                    .filter(product -> product.getExportPrice()>= min && product.getExportPrice() <= max)
+                    .map(this::mapPoJoToResponse)
+                    .collect(Collectors.toList());
+        }
         if (starPoint.size()==0){
             return listProductResponse;
         } else {
@@ -163,6 +170,11 @@ public class ProductImpl implements ProductService {
             return responses;
         }
 
+    }
+
+    @Override
+    public ProductResponse getProductResponseById(int id) {
+        return mapPoJoToResponse(findById(id));
     }
 
 

@@ -88,4 +88,14 @@ public class ProductController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+    @GetMapping("getProductResponseById")
+    public ResponseEntity<?> getProductResponseById(@RequestParam int productId){
+        try {
+            ProductResponse response = productService.getProductResponseById(productId);
+            return new ResponseEntity<>(response,HttpStatus.OK);
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
 }
