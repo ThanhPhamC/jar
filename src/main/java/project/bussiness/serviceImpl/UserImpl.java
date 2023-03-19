@@ -1,14 +1,19 @@
 package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.UserService;
+import project.model.dto.request.LogInRequest;
 import project.model.dto.request.UserRequest;
+import project.model.dto.response.JwtResponse;
 import project.model.dto.response.UserResponse;
 import project.model.entity.Cart;
 import project.model.entity.ERole;
@@ -19,11 +24,14 @@ import project.model.shopMess.Message;
 import project.repository.CartRepository;
 import project.repository.RoleRepository;
 import project.repository.UserRepository;
+import project.security_jwt.CustomUserDetails;
+import project.security_jwt.JwtTokenProvider;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -32,6 +40,8 @@ public class UserImpl implements UserService {
     private PasswordEncoder encoder;
     private RoleRepository roleRepository;
     private CartRepository cartRepository;
+    private AuthenticationManager authenticationManager;
+    private JwtTokenProvider tokenProvider;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -172,5 +182,29 @@ public class UserImpl implements UserService {
     @Override
     public Users saveUpdate(Users users) {
         return userRepository.save(users);
+    }
+
+    @Override
+    public ResponseEntity<?> logIn(LogInRequest logInRequest) {
+        Users users = userRepository.findUsersByUserName(logInRequest.getUserName());
+        if (users.isUserStatus()) {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(logInRequest.getUserName(), logInRequest.getPassword())
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            CustomUserDetails customUserDetail = (CustomUserDetails) authentication.getPrincipal();
+            //Sinh JWT tra ve client
+            String jwt = tokenProvider.generateToken(customUserDetail);
+            //Lay cac quyen cua user
+            List<String> listRoles = customUserDetail.getAuthorities().stream()
+                    .map(item -> item.getAuthority()).collect(Collectors.toList());
+            JwtResponse response = new JwtResponse(jwt, customUserDetail.getUserId(), customUserDetail.getUsername(), customUserDetail.getFirstName(), customUserDetail.getLastName(),
+                    customUserDetail.getEmail(), customUserDetail.getAddress(), customUserDetail.getState(), customUserDetail.getCity(), customUserDetail.getCounty(),
+                    customUserDetail.getPhone(), customUserDetail.getAvatar(), customUserDetail.getBirtDate(), customUserDetail.isUserStatus(), customUserDetail.getRanking(),
+                    listRoles, customUserDetail.getListCart().get(customUserDetail.getListCart().size() - 1));
+            return new ResponseEntity<>(response,HttpStatus.OK);
+        } else {
+            return ResponseEntity.badRequest().body(Message.ERROR_LOCKED_USER);
+        }
     }
 }

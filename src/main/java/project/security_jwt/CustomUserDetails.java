@@ -33,9 +33,9 @@ public class CustomUserDetails implements UserDetails {
     private String phone;
     private String avatar;
     private LocalDateTime birtDate;
-    private boolean statusUser;
-    private int ranks;
-    private List<Cart> cart;
+    private boolean userStatus;
+    private int ranking;
+    private List<Cart> listCart;
     private Collection<? extends GrantedAuthority> authorities;
 
     @Override
