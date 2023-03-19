@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.UserService;
+import project.model.dto.request.LogInRequest;
 import project.model.dto.request.UserRequest;
 import project.model.shopMess.Message;
 
@@ -19,6 +20,15 @@ public class UserController {
         try {
             return userService.register(userRequest);
         } catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
+    @PostMapping("logIn")
+    public ResponseEntity<?> logIn (@RequestBody LogInRequest logInRequest) {
+        try {
+            return userService.logIn(logInRequest);
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
