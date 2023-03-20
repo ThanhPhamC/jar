@@ -3,11 +3,14 @@ package project.bussiness.serviceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.SliderService;
 import project.model.dto.request.SliderRequest;
 import project.model.dto.response.SliderResponse;
 import project.model.entity.Slider;
+import project.model.shopMess.Message;
 import project.model.utility.Utility;
 import project.repository.SliderRepository;
 
@@ -47,14 +50,14 @@ public class SliderImpl implements SliderService {
         return mapPoJoToResponse(slider);
     }
     @Override
-    public boolean delete(Integer id) {
+    public ResponseEntity<?> delete(Integer id) {
         try {
             Slider sliderDelete = findById(id);
             sliderDelete.setStatus(0);
             sliderRepository.save(sliderDelete);
-            return true;
+           return ResponseEntity.ok().body(Message.SUCCESS);
         } catch (Exception ex) {
-            return false;
+          return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
     @Override

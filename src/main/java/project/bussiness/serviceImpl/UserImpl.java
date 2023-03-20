@@ -59,8 +59,8 @@ public class UserImpl implements UserService {
     }
 
     @Override
-    public boolean delete(Integer id) {
-        return false;
+    public ResponseEntity<?> delete(Integer id) {
+      return null   ;
     }
 
     @Override

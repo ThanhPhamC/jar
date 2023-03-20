@@ -2,6 +2,7 @@ package project.bussiness.serviceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.CartService;
 import project.model.dto.request.CartRequest;
@@ -33,10 +34,9 @@ public class CartImpl implements CartService {
     }
 
     @Override
-    public boolean delete(Integer id) {
-        return false;
+    public ResponseEntity<?> delete(Integer id) {
+        return null;
     }
-
     @Override
     public List<Cart> findAll() {
         return null;
