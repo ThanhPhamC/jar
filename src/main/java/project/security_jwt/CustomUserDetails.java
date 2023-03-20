@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import project.model.entity.Cart;
+import project.model.entity.Coupon;
 import project.model.entity.Users;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ public class CustomUserDetails implements UserDetails {
     private boolean userStatus;
     private int ranking;
     private List<Cart> listCart;
+    private List<Coupon> listCoupon;
     private Collection<? extends GrantedAuthority> authorities;
 
     @Override
@@ -47,7 +49,7 @@ public class CustomUserDetails implements UserDetails {
                 .map(roles -> new SimpleGrantedAuthority(roles.getRoleName().name()))
                 .collect(Collectors.toList());
         return new CustomUserDetails(users.getUserId(), users.getUserName(), users.getFirstName(), users.getLastName(), users.getEmail(), users.getPassword(), users.getAddress(),
-                users.getState(), users.getCity(), users.getCountry(), users.getPhone(), users.getAvatar(),users.getBirtDate(),users.isUserStatus(),users.getRanking(),users.getCartList(),listAuthority);
+                users.getState(), users.getCity(), users.getCountry(), users.getPhone(), users.getAvatar(),users.getBirtDate(),users.isUserStatus(),users.getRanking(),users.getCartList(),users.getCouponList(),listAuthority);
     }
     @Override
     public String getPassword() {

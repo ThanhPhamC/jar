@@ -7,9 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import project.bussiness.service.CartDetailService;
 import project.bussiness.service.CartService;
 import project.model.dto.request.CartDetailRequest;
 import project.model.dto.request.CartRequest;
+import project.model.dto.response.CartDetailResponse;
 import project.model.dto.response.CartResponse;
 import project.model.entity.Cart;
 import project.model.entity.CartDetail;
@@ -25,6 +27,7 @@ import project.security_jwt.CustomUserDetails;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -33,6 +36,8 @@ public class CartImpl implements CartService {
     private UserRepository userRepository;
     private ProductRepository productRepository;
     private CartDetailRepository cartDetailRepository;
+    private CartDetailService cartDetailService;
+
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -81,7 +86,16 @@ public class CartImpl implements CartService {
 
     @Override
     public CartResponse mapPoJoToResponse(Cart cart) {
-        return null;
+        CartResponse response = new CartResponse();
+        response.setId(cart.getId());
+        response.setName(cart.getName());
+        response.setStatus(cart.getStatus());
+        List<CartDetailResponse> responseList=cart.getCartDetailList().stream().map(cartDetail -> {
+            CartDetailResponse rp= cartDetailService.mapPoJoToResponse(cartDetail);
+            return rp;
+        }).collect(Collectors.toList());
+        response.setDetailResponses(responseList);
+        return response;
     }
 
     @Override

@@ -12,4 +12,5 @@ import java.util.List;
 public interface CartService extends RootService<Cart,Integer, CartRequest, CartResponse> {
     List<Cart> findByCreatDateBetween(LocalDateTime startDate, LocalDateTime endDate);
     ResponseEntity<?> addToCart(CartDetailRequest cartDetailRequest, String action);
+
 }

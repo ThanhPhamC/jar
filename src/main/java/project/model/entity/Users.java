@@ -44,5 +44,6 @@ public class Users {
     @OneToMany(mappedBy = "users")
     @JsonIgnore
     private List<Blog> blogList=new ArrayList<>();
-
+    @OneToMany(mappedBy = "users")
+    private List<Coupon> couponList= new ArrayList<>();
 }
