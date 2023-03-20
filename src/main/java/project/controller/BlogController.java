@@ -36,6 +36,16 @@ public class BlogController {
             return new ResponseEntity<>(Message.ERROR_400, HttpStatus.BAD_REQUEST);
         }
     }
+    @GetMapping("byId/{id}")
+    public ResponseEntity<?> findById(@PathVariable("id") int blogId){
+        try {
+            Blog blog = blogService.findById(blogId);
+            return new ResponseEntity<>(blog, HttpStatus.OK);
+        } catch (Exception ex){
+            return ResponseEntity.accepted().body(Message.ERROR_400);
+        }
+    }
+
     @GetMapping
     public ResponseEntity<?>getAll_blog(){
         List<BlogResponse>listblog = blogService.getAllForClient();
