@@ -29,6 +29,9 @@ public class Product extends BaseEntity{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "brandId")
     private Brand brand;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "locationId")
+    private Location location;
     @OneToMany (mappedBy = "product")
     @JsonIgnore
     private List<Review> reviewList = new ArrayList<>();

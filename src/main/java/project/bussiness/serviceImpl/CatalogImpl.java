@@ -64,7 +64,7 @@ public class CatalogImpl implements CatalogService {
 
     @Override
     public Catalog findById(Integer id) {
-        return null;
+        return catalogRepo.findById(id).get();
     }
 
     @Override
@@ -111,6 +111,23 @@ public class CatalogImpl implements CatalogService {
         Set<Catalog> catalogList = catalogRepo.findByProductListIn(productList);
         List<CatalogResponse> responses = catalogList.stream()
                 .map(this::mapPoJoToResponse).collect(Collectors.toList());
+        return responses;
+    }
+
+    @Override
+    public List<CatalogResponse> countTypeOfProduct() {
+        Map<Integer, Integer> newMap = new HashMap<>();
+        List<Catalog> listCatalog = findAll();
+        for (Catalog cat : listCatalog) {
+            int quantity = productService.countByCatalog_Id(cat.getId());
+            newMap.put(cat.getId(), quantity);
+        }
+        List<CatalogResponse> responses = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : newMap.entrySet()) {
+            CatalogResponse cat = mapPoJoToResponse(findById(entry.getKey()));
+            cat.setQuantityTypeOfProduct(entry.getValue());
+            responses.add(cat);
+        }
         return responses;
     }
 }
