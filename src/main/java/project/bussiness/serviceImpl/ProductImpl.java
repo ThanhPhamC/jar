@@ -126,7 +126,8 @@ public class ProductImpl implements ProductService {
         List<CartDetail> listCartDetail = cartDetailRepository.findByCartIn(listCartFilter);
         List<Product> listProduct = findByCartDetailListIn(listCartDetail);
         List<ProductResponse> listProductRes = listProduct.stream()
-                .map(this::mapPoJoToResponse).collect(Collectors.toList());
+                .map(this::mapPoJoToResponse)
+                .collect(Collectors.toList());
         List<ProductResponse> responses = listProductRes.stream()
                 .sorted(Comparator.comparingDouble(response -> response.getStarPoint()))
                 .skip(listProductRes.size() - size)

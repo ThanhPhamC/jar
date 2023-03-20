@@ -3,7 +3,7 @@ package project.model.dto.request;
 import lombok.Data;
 
 @Data
-public class CartDetailRequest {
+public class WishRequest {
     private int productId;
-    private int quantity;
+    private int userId;
 }

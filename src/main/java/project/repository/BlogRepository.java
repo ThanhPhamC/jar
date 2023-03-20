@@ -9,4 +9,5 @@ import project.model.entity.Blog;
 @Repository
 public interface BlogRepository extends JpaRepository<Blog,Integer> {
     Page<Blog>findByNameContaining(String searchName, Pageable pageable);
+
 }
