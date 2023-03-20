@@ -6,8 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.ProductService;
+import project.bussiness.service.ReviewService;
 import project.model.dto.request.ProductRequest;
 import project.model.dto.response.ProductResponse;
+import project.model.dto.response.ReviewResponse;
 import project.model.entity.*;
 import project.model.utility.Utility;
 import project.repository.*;
@@ -25,6 +27,7 @@ public class ProductImpl implements ProductService {
     private CatalogRepository catalogRepo;
     private BrandRepository brandRepo;
     private LocationRepository locationRepository;
+    private ReviewService reviewService;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -143,7 +146,7 @@ public class ProductImpl implements ProductService {
     @Override
     public List<ProductResponse> filterProductByPriceLocationStar(List<Integer> listLocationId, float max, float min, List<Integer> starPoint) {
         List<Location> locationList = new ArrayList<>();
-        if (listLocationId.size()==0){
+        if (listLocationId.size() == 0) {
             locationList = locationRepository.findAll();
         }
         for (Integer locationId : listLocationId) {
@@ -151,22 +154,25 @@ public class ProductImpl implements ProductService {
         }
         List<Product> listProduct = productRepo.findByLocationIn(locationList);
         List<ProductResponse> listProductResponse = new ArrayList<>();
-        if (max==0 || min ==0) {
+        if (max == 0 || min == 0) {
             listProductResponse = listProduct.stream()
                     .map(this::mapPoJoToResponse)
+                    .sorted(Comparator.comparing(ProductResponse::getCreatDate).reversed())
                     .collect(Collectors.toList());
         } else {
             listProductResponse = listProduct.stream()
-                    .filter(product -> product.getExportPrice()>= min && product.getExportPrice() <= max)
+                    .filter(product -> product.getExportPrice() >= min && product.getExportPrice() <= max)
                     .map(this::mapPoJoToResponse)
+                    .sorted(Comparator.comparing(ProductResponse::getCreatDate).reversed())
                     .collect(Collectors.toList());
         }
-        if (starPoint.size()==0){
+        if (starPoint.size() == 0) {
             return listProductResponse;
         } else {
             Collections.sort(starPoint);
             List<ProductResponse> responses = listProductResponse.stream()
-                    .filter(response -> response.getStarPoint()>=starPoint.get(0) && response.getStarPoint()<= starPoint.get(starPoint.size()-1))
+                    .filter(response -> response.getStarPoint() >= starPoint.get(0) && response.getStarPoint() <= starPoint.get(starPoint.size() - 1))
+                    .sorted(Comparator.comparing(ProductResponse::getCreatDate).reversed())
                     .collect(Collectors.toList());
             return responses;
         }
@@ -217,7 +223,11 @@ public class ProductImpl implements ProductService {
         rp.setTitle(pro.getTitle());
         rp.setBrandName(pro.getBrand().getName());
         rp.setCatalogName(pro.getCatalog().getName());
-//        rp.setReviewList(pro.getReviewList());
+        List<ReviewResponse> listReviewRes = new ArrayList<>();
+        for (Review rv : pro.getReviewList()) {
+            listReviewRes.add(reviewService.mapPoJoToResponse(rv));
+        }
+        rp.setReviewList(listReviewRes);
         rp.setSubImgList(pro.getSubImgList());
         List<Integer> list = new ArrayList<>();
         for (Review rw : pro.getReviewList()) {
@@ -225,6 +235,7 @@ public class ProductImpl implements ProductService {
         }
         double average = list.stream().mapToDouble(num -> num).average().orElse(0.0);
         rp.setStarPoint(average);
+        rp.setCountAllReview(pro.getReviewList().size());
         return rp;
     }
 
