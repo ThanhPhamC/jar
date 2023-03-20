@@ -1,5 +1,6 @@
 package project.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -8,13 +9,13 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
+@Table(name = "Coupon")
 public class Coupon extends BaseEntity{
-    private String couponCode;
-    @OneToOne(targetEntity = Users.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "userId")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId")
+    @JsonIgnore
     private Users users;
-    private int couponType;
     private float couponValue;
     private LocalDateTime startDate;
-    private LocalDate endDate;
+    private LocalDateTime endDate;
 }

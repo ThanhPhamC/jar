@@ -75,7 +75,6 @@ public class BlogController {
 
         }catch (Exception e){
             return ResponseEntity.badRequest().body(Message.ERROR_400);
-
         }
     }
     @PutMapping("/update_blog/{id}")
