@@ -20,4 +20,10 @@ public class Blog extends BaseEntity{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId")
     private Users users;
+    @OneToMany(mappedBy = "blog")
+    private List<CommentBlog> commentBlogList = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable( name = "Tag_Blog", joinColumns = @JoinColumn(name = "blogId"), inverseJoinColumns = @JoinColumn(name = "tagId"))
+    private List<Tags> tagList= new ArrayList<>();
+
 }

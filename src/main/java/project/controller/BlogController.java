@@ -4,11 +4,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.BlogService;
 import project.model.dto.response.BlogResponse;
+import project.model.entity.Blog;
 import project.model.shopMess.Message;
 
 import java.util.List;
@@ -32,4 +31,14 @@ public class BlogController {
             return new ResponseEntity<>(Message.ERROR_400, HttpStatus.BAD_REQUEST);
         }
     }
+    @GetMapping("byId/{id}")
+    public ResponseEntity<?> findById(@PathVariable("id") int blogId){
+        try {
+            Blog blog = blogService.findById(blogId);
+            return new ResponseEntity<>(blog, HttpStatus.OK);
+        } catch (Exception ex){
+            return ResponseEntity.accepted().body(Message.ERROR_400);
+        }
+    }
+
 }

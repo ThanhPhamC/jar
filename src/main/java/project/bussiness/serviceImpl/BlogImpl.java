@@ -53,7 +53,7 @@ public class BlogImpl implements BlogService {
 
     @Override
     public Blog findById(Integer id) {
-        return null;
+        return blogRepo.findById(id).get();
     }
 
     @Override
