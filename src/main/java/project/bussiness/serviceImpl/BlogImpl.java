@@ -14,6 +14,7 @@ import project.model.utility.Utility;
 import project.repository.BlogRepository;
 import project.repository.UserRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -112,8 +113,7 @@ public class BlogImpl implements BlogService {
         Blog blog = new Blog();
         blog.setName(rq.getName());
         blog.setContent(rq.getContent());
-        LocalDateTime now = LocalDateTime.now();
-        blog.setCreatDate(now);
+        blog.setCreatDate(LocalDate.now());
         blog.setBlogImg(rq.getBlogImg());
         blog.setStatus(rq.getStatus());
         blog.setUsers(userRepo.findById(rq.getUserId()).get());
