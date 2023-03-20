@@ -9,4 +9,5 @@ public class BlogResponse extends RootResponse{
     private String blogImg;
     private String content;
     private String userName;
+    private String catalognName;
 }

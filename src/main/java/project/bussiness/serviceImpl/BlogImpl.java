@@ -9,9 +9,11 @@ import project.bussiness.service.BlogService;
 import project.model.dto.request.BlogRequest;
 import project.model.dto.response.BlogResponse;
 import project.model.entity.Blog;
+import project.model.entity.CatalogOfBlog;
 import project.model.shopMess.Message;
 import project.model.utility.Utility;
 import project.repository.BlogRepository;
+import project.repository.CatalogOfBlogRepository;
 import project.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class BlogImpl implements BlogService {
      private BlogRepository blogRepo;
      private UserRepository userRepo;
+     private CatalogOfBlogRepository catalogOfBlogRepository;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -116,6 +119,8 @@ public class BlogImpl implements BlogService {
         blog.setCreatDate(now);
         blog.setBlogImg(rq.getBlogImg());
         blog.setStatus(rq.getStatus());
+        CatalogOfBlog cat = catalogOfBlogRepository.findById(rq.getCatalogOfBlogId()).get();
+        blog.setCatalogOfBlog(cat);
         blog.setUsers(userRepo.findById(rq.getUserId()).get());
         if (blog.getUsers()==null){
             return null;
@@ -132,6 +137,7 @@ public class BlogImpl implements BlogService {
         response.setStatus(blog.getStatus());
         response.setContent(blog.getContent());
         response.setBlogImg(blog.getBlogImg());
+        response.setCatalognName(blog.getCatalogOfBlog().getName());
         return  response;
     }
 

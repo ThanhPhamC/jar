@@ -9,4 +9,5 @@ public class BlogRequest {
     private String content;
     private int userId;
     private int status;
+    private int catalogOfBlogId;
 }
