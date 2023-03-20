@@ -11,4 +11,5 @@ public class Message {
     public static final String ERROR_INVALID_PASSWORD = "Please enter password contains a digit, a lower case letter, an upper case letter, a special character at least once and length at least eight places though";
     public static final String ERROR_ROLE_NOT_FOUND = "Role is not found";
     public static final String ERROR_LOCKED_USER = "Your account is locked";
+    public static final String ADD_TO_CART_SUCCESS = "Add to cart success";
 }
