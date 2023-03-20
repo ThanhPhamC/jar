@@ -2,6 +2,7 @@ package project.bussiness.serviceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.SubcribeService;
 import project.model.dto.request.SubcribeRequest;
@@ -32,8 +33,8 @@ public class SubcribeImpl implements SubcribeService {
     }
 
     @Override
-    public boolean delete(Integer id) {
-        return false;
+    public ResponseEntity<?> delete(Integer id) {
+      return null  ;
     }
 
     @Override

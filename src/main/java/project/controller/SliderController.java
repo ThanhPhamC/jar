@@ -65,10 +65,7 @@ public class SliderController {
 
     @DeleteMapping("/{sliderId}")
     public ResponseEntity<?> deleteSlider(@PathVariable("sliderId") int sliderId) {
-        if (sliderService.delete(sliderId)){
-            return ResponseEntity.ok().body(Message.SUCCESS);
-        }
-        return ResponseEntity.badRequest().body(Message.ERROR_400);
+        return sliderService.delete(sliderId);
     }
 
     @GetMapping("getPaging")

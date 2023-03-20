@@ -1,18 +1,15 @@
 package project.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Table(name = "blog")
 public class Blog extends BaseEntity{
-    private LocalDate creatDate;
+    private LocalDateTime creatDate;
     @Column(columnDefinition = "text")
     private String blogImg;
     @Column(columnDefinition = "text")

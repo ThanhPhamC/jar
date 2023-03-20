@@ -3,6 +3,7 @@ package project.bussiness.serviceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.CatalogService;
 import project.bussiness.service.ProductService;
@@ -44,8 +45,8 @@ public class CatalogImpl implements CatalogService {
 
 
     @Override
-    public boolean delete(Integer id) {
-        return false;
+    public ResponseEntity<?> delete(Integer id) {
+        return null;
     }
 
     @Override
