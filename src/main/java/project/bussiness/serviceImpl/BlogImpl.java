@@ -1,15 +1,21 @@
 package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.BlogService;
 import project.model.dto.request.BlogRequest;
 import project.model.dto.response.BlogResponse;
 import project.model.entity.Blog;
+import project.model.shopMess.Message;
+import project.model.utility.Utility;
 import project.repository.BlogRepository;
 import project.repository.UserRepository;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -23,32 +29,69 @@ public class BlogImpl implements BlogService {
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
-        return null;
+        Page<Blog> blogPage=blogRepo.findAll(pageable);
+        Map<String,Object> result= Utility.returnResponse(blogPage);
+        return result;
     }
 
     @Override
     public BlogResponse saveOrUpdate(BlogRequest blogRequest) {
-        return null;
+            Blog blog= mapRequestToPoJo(blogRequest);
+            Blog blog1 =blogRepo.save(blog);
+            BlogResponse blogResponse =mapPoJoToResponse(blog1);
+
+        return blogResponse;
     }
 
     @Override
     public BlogResponse update(Integer id, BlogRequest blogRequest) {
-        return null;
+        Blog blog = mapRequestToPoJo(blogRequest);
+        blog.setId(id);
+        Blog blogUpdate = blogRepo.save(blog);
+        BlogResponse blogResponse = mapPoJoToResponse(blogUpdate);
+        return blogResponse;
     }
 
     @Override
-    public boolean delete(Integer id) {
-        return false;
+    public ResponseEntity<?> delete(Integer id) {
+        try{
+            Blog blogDelete = blogRepo.findById(id).get();
+            blogDelete.setStatus(0);
+            blogRepo.save(blogDelete);
+            return ResponseEntity.ok().body(Message.SUCCESS);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+
     }
+
 
     @Override
     public List<Blog> findAll() {
-        return null;
+        List<Blog> blogList =blogRepo.findAll();
+
+        return blogList;
     }
 
     @Override
     public List<BlogResponse> getAllForClient() {
-        return null;
+        List<BlogResponse> blogResponses= blogRepo.findAll().stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
+//        List<Blog>listBlog = blogRepo.findAll();
+//        List<BlogResponse>blogResponseList=new ArrayList<>();
+//
+//        for (Blog b:listBlog) {
+//            BlogResponse blogResponse=new BlogResponse();
+//            blogResponse.setBlogImg(b.getBlogImg());
+//            blogResponse.setName(b.getName());
+//            blogResponse.setContent(b.getContent());
+//            blogResponse.setStatus(b.getStatus());
+//            blogResponse.setCreatDate(b.getCreatDate());
+//            blogResponse.setUserName(b.getName());
+//            blogResponse.setId(b.getId());
+//            blogResponseList.add(blogResponse);
+//        }
+//        return blogResponseList;
+        return blogResponses;
     }
 
     @Override
@@ -58,7 +101,10 @@ public class BlogImpl implements BlogService {
 
     @Override
     public Map<String, Object> findByName(String name, Pageable pageable) {
-        return null;
+        Page<Blog>blogPage=blogRepo.findByNameContaining(name,pageable);
+        Map<String,Object>result= Utility.returnResponse(blogPage);
+        return result;
+
     }
 
     @Override
@@ -66,7 +112,8 @@ public class BlogImpl implements BlogService {
         Blog blog = new Blog();
         blog.setName(rq.getName());
         blog.setContent(rq.getContent());
-        blog.setCreatDate(rq.getCreatDate());
+        LocalDateTime now = LocalDateTime.now();
+        blog.setCreatDate(now);
         blog.setBlogImg(rq.getBlogImg());
         blog.setStatus(rq.getStatus());
         blog.setUsers(userRepo.findById(rq.getUserId()).get());
@@ -94,4 +141,6 @@ public class BlogImpl implements BlogService {
         List<BlogResponse> result=responses.stream().skip(Math.max(0, responses.size())-3).collect(Collectors.toList());
         return result;
     }
+
+
 }
