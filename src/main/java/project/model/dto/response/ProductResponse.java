@@ -19,7 +19,8 @@ public class ProductResponse extends RootResponse{
     private LocalDateTime creatDate;
     private String catalogName;
     private String brandName;
-    private List<Review> reviewList = new ArrayList<>();
+    private List<ReviewResponse> reviewList = new ArrayList<>();
     private List<SubImg> subImgList= new ArrayList<>();
     private double starPoint;
+    private int countAllReview;
 }
