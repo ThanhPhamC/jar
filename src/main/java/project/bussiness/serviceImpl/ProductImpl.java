@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.ProductService;
 import project.bussiness.service.ReviewService;
@@ -45,8 +46,8 @@ public class ProductImpl implements ProductService {
     }
 
     @Override
-    public boolean delete(Integer id) {
-        return false;
+    public ResponseEntity<?> delete(Integer id) {
+        return null;
     }
 
     @Override

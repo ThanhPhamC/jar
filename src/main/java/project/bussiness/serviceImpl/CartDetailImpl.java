@@ -2,6 +2,7 @@ package project.bussiness.serviceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.CartDetailService;
 import project.model.dto.request.CartDetailRequest;
@@ -34,8 +35,8 @@ public class CartDetailImpl implements CartDetailService {
     }
 
     @Override
-    public boolean delete(Integer id) {
-        return false;
+    public ResponseEntity<?> delete(Integer id) {
+        return null;
     }
 
     @Override
@@ -65,7 +66,12 @@ public class CartDetailImpl implements CartDetailService {
 
     @Override
     public CartDetailResponse mapPoJoToResponse(CartDetail cartDetail) {
-        return null;
+        CartDetailResponse rp=new CartDetailResponse();
+        rp.setId(cartDetail.getId());
+        rp.setName(cartDetail.getName());
+        rp.setQuantity(cartDetail.getQuantity());
+        rp.setPrice(cartDetail.getPrice());
+        return rp;
     }
 
     @Override

@@ -2,6 +2,7 @@ package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.ReviewService;
@@ -44,8 +45,8 @@ public class ReviewImpl implements ReviewService {
     }
 
     @Override
-    public boolean delete(Integer id) {
-        return false;
+    public ResponseEntity<?> delete(Integer id) {
+        return null;
     }
 
     @Override

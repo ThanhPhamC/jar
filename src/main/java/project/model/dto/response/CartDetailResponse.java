@@ -1,4 +1,9 @@
 package project.model.dto.response;
 
-public class CartDetailResponse {
+import lombok.Data;
+
+@Data
+public class CartDetailResponse extends RootResponse{
+    private int quantity;
+    private float price;
 }
