@@ -2,6 +2,7 @@ package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity;
@@ -90,8 +91,8 @@ public class CartImpl implements CartService {
         response.setId(cart.getId());
         response.setName(cart.getName());
         response.setStatus(cart.getStatus());
-        List<CartDetailResponse> responseList=cart.getCartDetailList().stream().map(cartDetail -> {
-            CartDetailResponse rp= cartDetailService.mapPoJoToResponse(cartDetail);
+        List<CartDetailResponse> responseList = cart.getCartDetailList().stream().map(cartDetail -> {
+            CartDetailResponse rp = cartDetailService.mapPoJoToResponse(cartDetail);
             return rp;
         }).collect(Collectors.toList());
         response.setDetailResponses(responseList);
@@ -134,8 +135,23 @@ public class CartImpl implements CartService {
                 cartDetailRepository.save(cartDetailNew);
                 return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
             }
-        } catch (Exception e){
-            return  ResponseEntity.badRequest().body(Message.ERROR_400);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
+    }
+
+    @Override
+    public Page<CartResponse> findByStatusIn(Integer status, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public CartResponse showCartPending() {
+        CustomUserDetails customUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        CartResponse response = cartRepository.findByStatusAndUsers_UserId(0, customUser.getUserId())
+                .stream().map(this::mapPoJoToResponse)
+                .collect(Collectors.toList())
+                .get(0);
+        return response;
     }
 }

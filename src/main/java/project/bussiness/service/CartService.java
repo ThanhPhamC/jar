@@ -1,5 +1,7 @@
 package project.bussiness.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import project.model.dto.request.CartDetailRequest;
 import project.model.dto.request.CartRequest;
@@ -12,5 +14,6 @@ import java.util.List;
 public interface CartService extends RootService<Cart,Integer, CartRequest, CartResponse> {
     List<Cart> findByCreatDateBetween(LocalDateTime startDate, LocalDateTime endDate);
     ResponseEntity<?> addToCart(CartDetailRequest cartDetailRequest, String action);
-
+   Page<CartResponse> findByStatusIn(Integer status, Pageable pageable);
+   CartResponse showCartPending();
 }
