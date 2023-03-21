@@ -39,8 +39,8 @@ public class BlogController {
     @GetMapping("byId/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") int blogId){
         try {
-            Blog blog = blogService.findById(blogId);
-            return new ResponseEntity<>(blog, HttpStatus.OK);
+            BlogResponse blogResponse = blogService.getBlogForClient(blogId);
+            return new ResponseEntity<>(blogResponse, HttpStatus.OK);
         } catch (Exception ex){
             return ResponseEntity.accepted().body(Message.ERROR_400);
         }
