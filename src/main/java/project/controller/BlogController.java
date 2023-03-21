@@ -117,4 +117,14 @@ public class BlogController {
         }
     }
 
+    @GetMapping("/search_blog_by_catalog_and_tag")
+    public ResponseEntity<?>search_By_Catalog_And_Tag(@RequestBody BlogRequest blogRequest ){
+        try {
+            List<BlogResponse> blogResponseList = blogService.searchByCatalogAndTag(blogRequest.getCatalogId(), blogRequest.getTagId());
+            return new ResponseEntity<>(blogResponseList,HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
 }
