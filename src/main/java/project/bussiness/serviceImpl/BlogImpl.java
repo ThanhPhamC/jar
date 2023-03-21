@@ -23,10 +23,7 @@ import project.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,7 +76,7 @@ public class BlogImpl implements BlogService {
 
     @Override
     public List<Blog> findAll() {
-        List<Blog> blogList = blogRepo.findAll();
+        List<Blog> blogList =blogRepo.findAll();
 
         return blogList;
     }
@@ -173,6 +170,20 @@ public class BlogImpl implements BlogService {
     public BlogResponse getBlogResponseForClient(int blogId) {
         Blog blog = findById(blogId);
         return mapPoJoToResponse(blog);
+    }
+
+    @Override
+    public List<BlogResponse> getRelatedBlog(int catId) {
+        List<Blog> blogList = blogRepo.findByCatalogOfBlog_Id(catId);
+        List<BlogResponse> responses = new ArrayList<>();
+        if (blogList.size()!=0) {
+            responses = blogList.stream()
+                    .skip(blogList.size() - 3)
+                    .limit(3)
+                    .map(this::mapPoJoToResponse)
+                    .collect(Collectors.toList());
+        }
+        return responses;
     }
 
     @Override
