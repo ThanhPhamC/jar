@@ -1,16 +1,13 @@
 package project.controller;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.CatalogOfBlogService;
 import project.model.dto.request.CatalogOfBlogRequest;
-import project.model.dto.response.BlogResponse;
 import project.model.dto.response.CatalogOfBlogReponse;
 import project.model.entity.CatalogOfBlog;
 import project.model.shopMess.Message;
@@ -19,19 +16,19 @@ import project.model.utility.Utility;
 import java.util.List;
 import java.util.Map;
 
-@Configuration("http://localhost:8080")
-@RequestMapping("/api/v1/catalogOfBlog")
 @RestController
-
-public class CatalogOfBlogController {
+@CrossOrigin("http://localhost:8080")
+@RequestMapping("/api/v1/catalogBlog")
+@AllArgsConstructor
+public class CatalogBlog {
     @Autowired
     private CatalogOfBlogService catalogOfBlogService;
     @GetMapping
-    public List<CatalogOfBlog>getAll(){
+    public List<CatalogOfBlog> getAll(){
         return catalogOfBlogService.findAll();
     }
     @GetMapping("/getALL_client")
-    public ResponseEntity<?>getALl_Client(){
+    public ResponseEntity<?> getALl_Client(){
         List<CatalogOfBlogReponse>catalogOfBlogReponseList=catalogOfBlogService.getAllForClient();
         return new ResponseEntity<>(catalogOfBlogReponseList, HttpStatus.OK);
     }

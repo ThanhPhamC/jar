@@ -78,23 +78,24 @@ public class BlogImpl implements BlogService {
 
     @Override
     public List<BlogResponse> getAllForClient() {
-        List<BlogResponse> blogResponses= blogRepo.findAll().stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
-//        List<Blog>listBlog = blogRepo.findAll();
-//        List<BlogResponse>blogResponseList=new ArrayList<>();
-//
-//        for (Blog b:listBlog) {
-//            BlogResponse blogResponse=new BlogResponse();
-//            blogResponse.setBlogImg(b.getBlogImg());
-//            blogResponse.setName(b.getName());
-//            blogResponse.setContent(b.getContent());
-//            blogResponse.setStatus(b.getStatus());
-//            blogResponse.setCreatDate(b.getCreatDate());
-//            blogResponse.setUserName(b.getName());
-//            blogResponse.setId(b.getId());
-//            blogResponseList.add(blogResponse);
-//        }
-//        return blogResponseList;
-        return blogResponses;
+//        List<BlogResponse> blogResponses= blogRepo.findAll().stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
+        List<Blog>listBlog = blogRepo.findAll();
+        List<BlogResponse>blogResponseList=new ArrayList<>();
+
+        for (Blog b:listBlog) {
+            BlogResponse blogResponse=new BlogResponse();
+            blogResponse.setBlogImg(b.getBlogImg());
+            blogResponse.setName(b.getName());
+            blogResponse.setContent(b.getContent());
+            blogResponse.setStatus(b.getStatus());
+            blogResponse.setCreatDate(b.getCreatDate());
+            blogResponse.setUserName(b.getName());
+            blogResponse.setId(b.getId());
+            blogResponse.setCatalogBlogName(b.getCatalogOfBlog().getName());
+            blogResponseList.add(blogResponse);
+        }
+        return blogResponseList;
+//        return blogResponses;
     }
 
     @Override
@@ -119,8 +120,8 @@ public class BlogImpl implements BlogService {
         blog.setCreatDate(now);
         blog.setBlogImg(rq.getBlogImg());
         blog.setStatus(rq.getStatus());
-        CatalogOfBlog cat = catalogOfBlogRepository.findById(rq.getCatalogOfBlogId()).get();
-        blog.setCatalogOfBlog(cat);
+//        CatalogOfBlog cat = catalogOfBlogRepository.findById(rq.getCatalogBlogId()).get();
+        blog.setCatalogOfBlog(catalogOfBlogRepository.findById(rq.getCatalogBlogId()).get());
         blog.setUsers(userRepo.findById(rq.getUserId()).get());
         if (blog.getUsers()==null){
             return null;
@@ -137,7 +138,8 @@ public class BlogImpl implements BlogService {
         response.setStatus(blog.getStatus());
         response.setContent(blog.getContent());
         response.setBlogImg(blog.getBlogImg());
-        response.setCatalognName(blog.getCatalogOfBlog().getName());
+        response.setCatalogBlogName(blog.getCatalogOfBlog().getName());
+
         return  response;
     }
 
