@@ -20,7 +20,7 @@ import java.util.Map;
 @CrossOrigin("http://localhost:8080")
 @RequestMapping("/api/v1/catalogBlog")
 @AllArgsConstructor
-public class CatalogBlog {
+public class CatalogBlogController {
     @Autowired
     private CatalogOfBlogService catalogOfBlogService;
     @GetMapping
