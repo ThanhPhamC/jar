@@ -2,6 +2,7 @@ package project.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.UserService;
 import project.model.dto.request.LogInRequest;
@@ -29,6 +30,26 @@ public class UserController {
         try {
             return userService.logIn(logInRequest);
         } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
+    @PutMapping("/{userId}")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
+    public ResponseEntity<?> blockedUser(@PathVariable int userId, @RequestParam int blockedDays){
+        try {
+            return userService.blockedUser(userId, blockedDays);
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
+    @PutMapping("/unblockUser/{userId}")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
+    public ResponseEntity<?> unBlockedUser(@PathVariable int userId){
+        try {
+            return userService.unBlockedUser(userId);
+        } catch (Exception e){
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }

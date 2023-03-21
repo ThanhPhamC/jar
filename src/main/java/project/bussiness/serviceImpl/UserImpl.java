@@ -1,6 +1,8 @@
 package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,7 @@ import project.repository.UserRepository;
 import project.security_jwt.CustomUserDetails;
 import project.security_jwt.JwtTokenProvider;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,13 +40,21 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class UserImpl implements UserService {
+
     private UserRepository userRepository;
+
     private PasswordEncoder encoder;
+
     private RoleRepository roleRepository;
+
     private CartRepository cartRepository;
+
     private AuthenticationManager authenticationManager;
+
     private JwtTokenProvider tokenProvider;
+
     private CartService cartService;
+
     private CouponService couponService;
 
     @Override
@@ -63,7 +74,7 @@ public class UserImpl implements UserService {
 
     @Override
     public ResponseEntity<?> delete(Integer id) {
-      return null   ;
+        return null;
     }
 
     @Override
@@ -188,8 +199,32 @@ public class UserImpl implements UserService {
     }
 
     @Override
+    public ResponseEntity<?> blockedUser(int userId, int blockedDays) {
+        Users users = userRepository.findById(userId).get();
+        LocalDate blockDate = LocalDate.now().plusDays(blockedDays);
+        users.setBlockedDate(blockDate);
+        users.setUserStatus(false);
+        userRepository.save(users);
+        return ResponseEntity.ok().body("Blocked in " + blockedDays + " days");
+    }
+
+    @Override
+    public ResponseEntity<?> unBlockedUser(int userId) {
+        Users users = userRepository.findById(userId).get();
+        users.setUserStatus(true);
+        users.setBlockedDate(null);
+        userRepository.save(users);
+        return ResponseEntity.ok().body(Message.UNBLOCK_USER_SUCCESS);
+    }
+
+    @Override
     public ResponseEntity<?> logIn(LogInRequest logInRequest) {
         Users users = userRepository.findUsersByUserName(logInRequest.getUserName());
+        LocalDate now = LocalDate.now();
+        if (users.getBlockedDate()!=null && now.isAfter(users.getBlockedDate())) {
+            users.setUserStatus(true);
+            userRepository.save(users);
+        }
         if (users.isUserStatus()) {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(logInRequest.getUserName(), logInRequest.getPassword())
@@ -201,16 +236,17 @@ public class UserImpl implements UserService {
             //Lay cac quyen cua user
             List<String> listRoles = customUserDetail.getAuthorities().stream()
                     .map(item -> item.getAuthority()).collect(Collectors.toList());
-            Cart cart=customUserDetail.getListCart().get(customUserDetail.getListCart().size() - 1);
-            CartResponse cartResponse=cartService.mapPoJoToResponse(cart);
-            List<CouponResponse> couponResponses=couponService.getAllForClient();
+            Cart cart = customUserDetail.getListCart().get(customUserDetail.getListCart().size() - 1);
+            CartResponse cartResponse = cartService.mapPoJoToResponse(cart);
+            List<CouponResponse> couponResponses = couponService.getAllForClient();
             JwtResponse response = new JwtResponse(jwt, customUserDetail.getUserId(), customUserDetail.getUsername(), customUserDetail.getFirstName(), customUserDetail.getLastName(),
                     customUserDetail.getEmail(), customUserDetail.getAddress(), customUserDetail.getState(), customUserDetail.getCity(), customUserDetail.getCounty(),
                     customUserDetail.getPhone(), customUserDetail.getAvatar(), customUserDetail.getBirtDate(), customUserDetail.isUserStatus(), customUserDetail.getRanking(),
                     listRoles, cartResponse/*,couponResponses*/);
-            return new ResponseEntity<>(response,HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return ResponseEntity.badRequest().body(Message.ERROR_LOCKED_USER);
         }
     }
+
 }
