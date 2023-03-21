@@ -66,7 +66,12 @@ public class CartDetailImpl implements CartDetailService {
 
     @Override
     public CartDetailResponse mapPoJoToResponse(CartDetail cartDetail) {
-        return null;
+        CartDetailResponse rp=new CartDetailResponse();
+        rp.setId(cartDetail.getId());
+        rp.setName(cartDetail.getName());
+        rp.setQuantity(cartDetail.getQuantity());
+        rp.setPrice(cartDetail.getPrice());
+        return rp;
     }
 
     @Override

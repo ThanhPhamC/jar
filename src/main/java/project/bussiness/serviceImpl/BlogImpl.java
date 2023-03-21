@@ -9,11 +9,14 @@ import project.bussiness.service.BlogService;
 import project.model.dto.request.BlogRequest;
 import project.model.dto.response.BlogResponse;
 import project.model.entity.Blog;
+import project.model.entity.CatalogOfBlog;
 import project.model.shopMess.Message;
 import project.model.utility.Utility;
 import project.repository.BlogRepository;
+import project.repository.CatalogOfBlogRepository;
 import project.repository.UserRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,6 +29,7 @@ import java.util.stream.Collectors;
 public class BlogImpl implements BlogService {
      private BlogRepository blogRepo;
      private UserRepository userRepo;
+     private CatalogOfBlogRepository catalogOfBlogRepository;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -39,6 +43,7 @@ public class BlogImpl implements BlogService {
             Blog blog= mapRequestToPoJo(blogRequest);
             Blog blog1 =blogRepo.save(blog);
             BlogResponse blogResponse =mapPoJoToResponse(blog1);
+
         return blogResponse;
     }
 
@@ -74,23 +79,24 @@ public class BlogImpl implements BlogService {
 
     @Override
     public List<BlogResponse> getAllForClient() {
-        List<BlogResponse> blogResponses= blogRepo.findAll().stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
-//        List<Blog>listBlog = blogRepo.findAll();
-//        List<BlogResponse>blogResponseList=new ArrayList<>();
-//
-//        for (Blog b:listBlog) {
-//            BlogResponse blogResponse=new BlogResponse();
-//            blogResponse.setBlogImg(b.getBlogImg());
-//            blogResponse.setName(b.getName());
-//            blogResponse.setContent(b.getContent());
-//            blogResponse.setStatus(b.getStatus());
-//            blogResponse.setCreatDate(b.getCreatDate());
-//            blogResponse.setUserName(b.getName());
-//            blogResponse.setId(b.getId());
-//            blogResponseList.add(blogResponse);
-//        }
-//        return blogResponseList;
-        return blogResponses;
+//        List<BlogResponse> blogResponses= blogRepo.findAll().stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
+        List<Blog>listBlog = blogRepo.findAll();
+        List<BlogResponse>blogResponseList=new ArrayList<>();
+
+        for (Blog b:listBlog) {
+            BlogResponse blogResponse=new BlogResponse();
+            blogResponse.setBlogImg(b.getBlogImg());
+            blogResponse.setName(b.getName());
+            blogResponse.setContent(b.getContent());
+            blogResponse.setStatus(b.getStatus());
+            blogResponse.setCreatDate(b.getCreatDate());
+            blogResponse.setUserName(b.getName());
+            blogResponse.setId(b.getId());
+            blogResponse.setCatalogBlogName(b.getCatalogOfBlog().getName());
+            blogResponseList.add(blogResponse);
+        }
+        return blogResponseList;
+//        return blogResponses;
     }
 
     @Override
@@ -111,10 +117,11 @@ public class BlogImpl implements BlogService {
         Blog blog = new Blog();
         blog.setName(rq.getName());
         blog.setContent(rq.getContent());
-        LocalDateTime now = LocalDateTime.now();
-        blog.setCreatDate(now);
+        blog.setCreatDate(LocalDateTime.now());
         blog.setBlogImg(rq.getBlogImg());
         blog.setStatus(rq.getStatus());
+//        CatalogOfBlog cat = catalogOfBlogRepository.findById(rq.getCatalogBlogId()).get();
+        blog.setCatalogOfBlog(catalogOfBlogRepository.findById(rq.getCatalogBlogId()).get());
         blog.setUsers(userRepo.findById(rq.getUserId()).get());
         if (blog.getUsers()==null){
             return null;
@@ -133,6 +140,8 @@ public class BlogImpl implements BlogService {
         response.setBlogImg(blog.getBlogImg());
         response.setCountComment(blog.getCommentBlogList().size());
         response.setListCommentBlog(blog.getCommentBlogList());
+        response.setCatalogBlogName(blog.getCatalogOfBlog().getName());
+
         return  response;
     }
 

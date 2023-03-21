@@ -10,11 +10,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import project.bussiness.service.CartService;
+import project.bussiness.service.CouponService;
 import project.bussiness.service.UserService;
 import project.model.dto.request.LogInRequest;
 import project.model.dto.request.UserRequest;
-import project.model.dto.response.JwtResponse;
-import project.model.dto.response.UserResponse;
+import project.model.dto.response.*;
 import project.model.entity.Cart;
 import project.model.entity.ERole;
 import project.model.entity.Roles;
@@ -42,6 +43,8 @@ public class UserImpl implements UserService {
     private CartRepository cartRepository;
     private AuthenticationManager authenticationManager;
     private JwtTokenProvider tokenProvider;
+    private CartService cartService;
+    private CouponService couponService;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -198,10 +201,13 @@ public class UserImpl implements UserService {
             //Lay cac quyen cua user
             List<String> listRoles = customUserDetail.getAuthorities().stream()
                     .map(item -> item.getAuthority()).collect(Collectors.toList());
+            Cart cart=customUserDetail.getListCart().get(customUserDetail.getListCart().size() - 1);
+            CartResponse cartResponse=cartService.mapPoJoToResponse(cart);
+            List<CouponResponse> couponResponses=couponService.getAllForClient();
             JwtResponse response = new JwtResponse(jwt, customUserDetail.getUserId(), customUserDetail.getUsername(), customUserDetail.getFirstName(), customUserDetail.getLastName(),
                     customUserDetail.getEmail(), customUserDetail.getAddress(), customUserDetail.getState(), customUserDetail.getCity(), customUserDetail.getCounty(),
                     customUserDetail.getPhone(), customUserDetail.getAvatar(), customUserDetail.getBirtDate(), customUserDetail.isUserStatus(), customUserDetail.getRanking(),
-                    listRoles, customUserDetail.getListCart().get(customUserDetail.getListCart().size() - 1));
+                    listRoles, cartResponse/*,couponResponses*/);
             return new ResponseEntity<>(response,HttpStatus.OK);
         } else {
             return ResponseEntity.badRequest().body(Message.ERROR_LOCKED_USER);
