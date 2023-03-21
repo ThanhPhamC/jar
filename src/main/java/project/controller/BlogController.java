@@ -107,4 +107,14 @@ public class BlogController {
         }
     }
 
+    @GetMapping("/get_related_blog")
+    public ResponseEntity<?>get_Related_Blog(@RequestParam int catId){
+        try {
+            List<BlogResponse> responses = blogService.getRelatedBlog(catId);
+            return new ResponseEntity<>(responses,HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
 }

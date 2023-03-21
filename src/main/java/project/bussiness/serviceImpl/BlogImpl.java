@@ -18,10 +18,7 @@ import project.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -117,7 +114,7 @@ public class BlogImpl implements BlogService {
         Blog blog = new Blog();
         blog.setName(rq.getName());
         blog.setContent(rq.getContent());
-        blog.setCreatDate(LocalDate.now());
+        blog.setCreatDate(LocalDateTime.now());
         blog.setBlogImg(rq.getBlogImg());
         blog.setStatus(rq.getStatus());
 //        CatalogOfBlog cat = catalogOfBlogRepository.findById(rq.getCatalogBlogId()).get();
@@ -154,6 +151,20 @@ public class BlogImpl implements BlogService {
     public BlogResponse getBlogResponseForClient(int blogId) {
         Blog blog = findById(blogId);
         return mapPoJoToResponse(blog);
+    }
+
+    @Override
+    public List<BlogResponse> getRelatedBlog(int catId) {
+        List<Blog> blogList = blogRepo.findByCatalogOfBlog_Id(catId);
+        List<BlogResponse> responses = new ArrayList<>();
+        if (blogList.size()!=0) {
+            responses = blogList.stream()
+                    .skip(blogList.size() - 3)
+                    .limit(3)
+                    .map(this::mapPoJoToResponse)
+                    .collect(Collectors.toList());
+        }
+        return responses;
     }
 
 
