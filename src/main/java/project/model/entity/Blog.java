@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "blog")
 public class Blog extends BaseEntity{
-    private LocalDate creatDate;
+    private LocalDateTime creatDate;
     @Column(columnDefinition = "text")
     private String blogImg;
     @Column(columnDefinition = "text")

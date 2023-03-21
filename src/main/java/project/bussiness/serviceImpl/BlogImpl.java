@@ -117,7 +117,7 @@ public class BlogImpl implements BlogService {
         Blog blog = new Blog();
         blog.setName(rq.getName());
         blog.setContent(rq.getContent());
-        blog.setCreatDate(LocalDate.now());
+        blog.setCreatDate(LocalDateTime.now());
         blog.setBlogImg(rq.getBlogImg());
         blog.setStatus(rq.getStatus());
 //        CatalogOfBlog cat = catalogOfBlogRepository.findById(rq.getCatalogBlogId()).get();
@@ -138,6 +138,8 @@ public class BlogImpl implements BlogService {
         response.setStatus(blog.getStatus());
         response.setContent(blog.getContent());
         response.setBlogImg(blog.getBlogImg());
+        response.setCountComment(blog.getCommentBlogList().size());
+        response.setListCommentBlog(blog.getCommentBlogList());
         response.setCatalogBlogName(blog.getCatalogOfBlog().getName());
 
         return  response;
@@ -148,6 +150,13 @@ public class BlogImpl implements BlogService {
         List<BlogResponse> responses = blogRepo.findAll().stream().sorted(Comparator.comparing(Blog::getCreatDate)).map(this::mapPoJoToResponse).collect(Collectors.toList());
         List<BlogResponse> result=responses.stream().skip(Math.max(0, responses.size())-3).collect(Collectors.toList());
         return result;
+    }
+
+    @Override
+    public BlogResponse getBlogForClient(int blogId) {
+        Blog blog = findById(blogId);
+        BlogResponse blogResponse = mapPoJoToResponse(blog);
+        return blogResponse;
     }
 
 
