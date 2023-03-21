@@ -45,7 +45,6 @@ public class CatalogController {
         }catch (Exception e){
             return new ResponseEntity(Message.ERROR_400,HttpStatus.BAD_REQUEST);
         }
-
     }
 
     @GetMapping("/get_feature_catalog_for_screen_2")
