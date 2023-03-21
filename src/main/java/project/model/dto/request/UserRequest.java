@@ -2,6 +2,7 @@ package project.model.dto.request;
 
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -18,6 +19,6 @@ public class UserRequest {
     private String county;
     private String phone;
     private String avatar;
-    private LocalDateTime birtDate;
+    private LocalDate birtDate;
     private Set<String> listRoles;
 }

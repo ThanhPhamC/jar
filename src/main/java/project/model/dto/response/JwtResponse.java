@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import project.model.entity.Cart;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,14 +23,14 @@ public class JwtResponse {
     private String country;
     private String phone;
     private String avatar;
-    private LocalDateTime birtDate;
+    private LocalDate birtDate;
     private boolean userStatus;
     private int ranking;
     private List<String> listRoles;
     private CartResponse cartResponse;
 //    private List<CouponResponse> couponResponseList;
 
-    public JwtResponse(String token, int userId, String userName, String firstName, String lastName, String email, String address, String state, String city, String country, String phone, String avatar, LocalDateTime birtDate, boolean userStatus, int ranking, List<String> listRoles, CartResponse cartResponse/*, List<CouponResponse> couponResponseList */) {
+    public JwtResponse(String token, int userId, String userName, String firstName, String lastName, String email, String address, String state, String city, String country, String phone, String avatar, LocalDate birtDate, boolean userStatus, int ranking, List<String> listRoles, CartResponse cartResponse/*, List<CouponResponse> couponResponseList */) {
         this.token = token;
         this.userId = userId;
         this.userName = userName;
@@ -47,6 +48,6 @@ public class JwtResponse {
         this.ranking = ranking;
         this.listRoles = listRoles;
         this.cartResponse = cartResponse;
-//        this.couponResponseList=couponResponseList;
+        //        this.couponResponseList=couponResponseList;
     }
 }
