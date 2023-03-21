@@ -5,7 +5,6 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +27,7 @@ public class Users {
     private String country;
     private String city;
     private String state;
-    private LocalDateTime birtDate;
+    private LocalDate birtDate;
     private String avatar;
     private int ranking;
     private boolean userStatus;
@@ -46,4 +45,5 @@ public class Users {
     private List<Blog> blogList=new ArrayList<>();
     @OneToMany(mappedBy = "users")
     private List<Coupon> couponList= new ArrayList<>();
+    private LocalDate blockedDate;
 }

@@ -12,5 +12,6 @@ public interface BlogService extends RootService<Blog,Integer, BlogRequest, Blog
     List<BlogResponse> getTopNew();
     BlogResponse getBlogResponseForClient(int blogId);
     List<BlogResponse> searchByCatalogAndTag (List<Integer> listCatalogId,List<Integer> listTagId);
+    List<BlogResponse> getRelatedBlog(int catId);
 
 }
