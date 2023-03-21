@@ -9,9 +9,11 @@ import project.bussiness.service.BlogService;
 import project.model.dto.request.BlogRequest;
 import project.model.dto.response.BlogResponse;
 import project.model.entity.Blog;
+import project.model.entity.CatalogOfBlog;
 import project.model.shopMess.Message;
 import project.model.utility.Utility;
 import project.repository.BlogRepository;
+import project.repository.CatalogOfBlogRepository;
 import project.repository.UserRepository;
 
 import java.time.LocalDate;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 public class BlogImpl implements BlogService {
      private BlogRepository blogRepo;
      private UserRepository userRepo;
+     private CatalogOfBlogRepository catalogOfBlogRepository;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -76,23 +79,24 @@ public class BlogImpl implements BlogService {
 
     @Override
     public List<BlogResponse> getAllForClient() {
-        List<BlogResponse> blogResponses= blogRepo.findAll().stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
-//        List<Blog>listBlog = blogRepo.findAll();
-//        List<BlogResponse>blogResponseList=new ArrayList<>();
-//
-//        for (Blog b:listBlog) {
-//            BlogResponse blogResponse=new BlogResponse();
-//            blogResponse.setBlogImg(b.getBlogImg());
-//            blogResponse.setName(b.getName());
-//            blogResponse.setContent(b.getContent());
-//            blogResponse.setStatus(b.getStatus());
-//            blogResponse.setCreatDate(b.getCreatDate());
-//            blogResponse.setUserName(b.getName());
-//            blogResponse.setId(b.getId());
-//            blogResponseList.add(blogResponse);
-//        }
-//        return blogResponseList;
-        return blogResponses;
+//        List<BlogResponse> blogResponses= blogRepo.findAll().stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
+        List<Blog>listBlog = blogRepo.findAll();
+        List<BlogResponse>blogResponseList=new ArrayList<>();
+
+        for (Blog b:listBlog) {
+            BlogResponse blogResponse=new BlogResponse();
+            blogResponse.setBlogImg(b.getBlogImg());
+            blogResponse.setName(b.getName());
+            blogResponse.setContent(b.getContent());
+            blogResponse.setStatus(b.getStatus());
+            blogResponse.setCreatDate(b.getCreatDate());
+            blogResponse.setUserName(b.getName());
+            blogResponse.setId(b.getId());
+            blogResponse.setCatalogBlogName(b.getCatalogOfBlog().getName());
+            blogResponseList.add(blogResponse);
+        }
+        return blogResponseList;
+//        return blogResponses;
     }
 
     @Override
@@ -116,6 +120,8 @@ public class BlogImpl implements BlogService {
         blog.setCreatDate(LocalDate.now());
         blog.setBlogImg(rq.getBlogImg());
         blog.setStatus(rq.getStatus());
+//        CatalogOfBlog cat = catalogOfBlogRepository.findById(rq.getCatalogBlogId()).get();
+        blog.setCatalogOfBlog(catalogOfBlogRepository.findById(rq.getCatalogBlogId()).get());
         blog.setUsers(userRepo.findById(rq.getUserId()).get());
         if (blog.getUsers()==null){
             return null;
@@ -132,6 +138,8 @@ public class BlogImpl implements BlogService {
         response.setStatus(blog.getStatus());
         response.setContent(blog.getContent());
         response.setBlogImg(blog.getBlogImg());
+        response.setCatalogBlogName(blog.getCatalogOfBlog().getName());
+
         return  response;
     }
 

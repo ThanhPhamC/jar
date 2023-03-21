@@ -53,7 +53,7 @@ public class WishImpl implements WishService {
 
     @Override
     public ResponseEntity<?> delete(Integer id) {
-        return null ;
+        return null;
     }
     @Override
     public List<Wish> findAll() {
