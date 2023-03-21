@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "blog")
 public class Blog extends BaseEntity{
-    private LocalDate creatDate;
+    private LocalDateTime creatDate;
     @Column(columnDefinition = "text")
     private String blogImg;
     @Column(columnDefinition = "text")
@@ -20,6 +21,10 @@ public class Blog extends BaseEntity{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId")
     private Users users;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "catalogOfBlogId")
+    private CatalogOfBlog catalogOfBlog;
+
     @OneToMany(mappedBy = "blog")
     private List<CommentBlog> commentBlogList = new ArrayList<>();
     @ManyToMany(fetch = FetchType.EAGER)
