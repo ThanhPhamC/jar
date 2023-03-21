@@ -36,6 +36,7 @@ public class BlogController {
             return new ResponseEntity<>(Message.ERROR_400, HttpStatus.BAD_REQUEST);
         }
     }
+
     @GetMapping("byId/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") int blogId){
         try {
@@ -95,6 +96,7 @@ public class BlogController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+
     @GetMapping("/search_blog")
     public ResponseEntity<?>search_Sort_paging(@RequestParam Map<String,String> headers){
         try {
