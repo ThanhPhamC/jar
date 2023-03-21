@@ -36,10 +36,11 @@ public class BlogController {
             return new ResponseEntity<>(Message.ERROR_400, HttpStatus.BAD_REQUEST);
         }
     }
+
     @GetMapping("byId/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") int blogId){
         try {
-            Blog blog = blogService.findById(blogId);
+            BlogResponse blog = blogService.getBlogResponseForClient(blogId);
             return new ResponseEntity<>(blog, HttpStatus.OK);
         } catch (Exception ex){
             return ResponseEntity.accepted().body(Message.ERROR_400);
@@ -95,6 +96,7 @@ public class BlogController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+
     @GetMapping("/search_blog")
     public ResponseEntity<?>search_Sort_paging(@RequestParam Map<String,String> headers){
         try {
@@ -102,6 +104,26 @@ public class BlogController {
             Map<String,Object>result = blogService.findByName(headers.get("name"),pageable);
             return new  ResponseEntity(result,HttpStatus.OK);
 
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
+    @GetMapping("/get_related_blog")
+    public ResponseEntity<?>get_Related_Blog(@RequestParam int catId){
+        try {
+            List<BlogResponse> responses = blogService.getRelatedBlog(catId);
+            return new ResponseEntity<>(responses,HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
+    @GetMapping("/search_blog_by_catalog_and_tag")
+    public ResponseEntity<?>search_By_Catalog_And_Tag(@RequestBody BlogRequest blogRequest ){
+        try {
+            List<BlogResponse> blogResponseList = blogService.searchByCatalogAndTag(blogRequest.getCatalogId(), blogRequest.getTagId());
+            return new ResponseEntity<>(blogResponseList,HttpStatus.OK);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }

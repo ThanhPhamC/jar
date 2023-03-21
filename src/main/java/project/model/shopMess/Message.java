@@ -17,4 +17,5 @@ public class Message {
     public static final String ERROR_BOUGHT = "The product can only be purchased once during the sale period";
 
     public static final String ERROR_NOT_IN_CART = "The product does not exist in the cart";
+    public static  final String UNBLOCK_USER_SUCCESS= "Unblock user success";
 }

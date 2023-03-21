@@ -13,5 +13,7 @@ public interface CatalogService extends RootService<Catalog,Integer, CatalogRequ
     List<CatalogResponse> getListFeatured();
     List<CatalogResponse> getFeatureCatalogForScreen2(LocalDateTime startDate, LocalDateTime endDate, int size);
     List<CatalogResponse> countTypeOfProduct();
+    CatalogResponse finByIdResponse(int id);
+
 
 }

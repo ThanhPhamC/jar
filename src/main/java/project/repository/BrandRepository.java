@@ -1,5 +1,7 @@
 package project.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import project.model.entity.Brand;
@@ -11,4 +13,5 @@ import java.util.Set;
 @Repository
 public interface BrandRepository extends JpaRepository<Brand,Integer> {
     Set<Brand> findByProductListIn(List<Product> listProduct);
+    Page<Brand>findByNameContaining(String name, Pageable pageable);
 }

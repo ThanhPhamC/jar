@@ -33,7 +33,7 @@ public class CustomUserDetails implements UserDetails {
     private String county;
     private String phone;
     private String avatar;
-    private LocalDateTime birtDate;
+    private LocalDate birtDate;
     private boolean userStatus;
     private int ranking;
     private List<Cart> listCart;

@@ -10,5 +10,7 @@ public interface UserService extends RootService<Users,Integer, UserRequest, Use
     Users findByEmail(String email);
     ResponseEntity<?> register(UserRequest userRequest);
     Users saveUpdate(Users users);
+    ResponseEntity<?> blockedUser(int userId, int blockedDays);
+    ResponseEntity<?> unBlockedUser(int userId);
     ResponseEntity<?> logIn (LogInRequest logInRequest);
 }

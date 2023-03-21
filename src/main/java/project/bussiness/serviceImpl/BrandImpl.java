@@ -2,6 +2,7 @@ package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ import project.model.dto.response.ProductResponse;
 import project.model.entity.Brand;
 import project.model.entity.Catalog;
 import project.model.entity.Product;
+import project.model.shopMess.Message;
+import project.model.utility.Utility;
 import project.repository.BrandRepository;
 
 import java.time.LocalDateTime;
@@ -31,22 +34,38 @@ public class BrandImpl implements BrandService {
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
-        return null;
+        Page<Brand> brands = brandRepository.findAll(pageable);
+        Map<String, Object> result = Utility.returnResponse(brands);
+        return result;
     }
 
     @Override
     public BrandResponse saveOrUpdate(BrandRequest brandRequest) {
-        return null;
+        Brand brand = mapRequestToPoJo(brandRequest);
+        Brand brandNew = brandRepository.save(brand);
+        BrandResponse brandResponse = mapPoJoToResponse(brandNew);
+        return brandResponse;
     }
 
     @Override
     public BrandResponse update(Integer id, BrandRequest brandRequest) {
-        return null;
+        Brand brand = mapRequestToPoJo(brandRequest);
+        brand.setId(id);
+        Brand brandOfUpdate = brandRepository.save(brand);
+        BrandResponse brandResponse = mapPoJoToResponse(brandOfUpdate);
+        return brandResponse;
     }
 
     @Override
     public ResponseEntity<?> delete(Integer id) {
-        return null;
+        try {
+            Brand brandDelete = brandRepository.findById(id).get();
+            brandDelete.setStatus(0);
+            brandRepository.save(brandDelete);
+            return ResponseEntity.ok().body(Message.SUCCESS);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
     }
 
     @Override
@@ -66,12 +85,18 @@ public class BrandImpl implements BrandService {
 
     @Override
     public Map<String, Object> findByName(String name, Pageable pageable) {
-        return null;
+        Page<Brand> page = brandRepository.findByNameContaining(name, pageable);
+        Map<String, Object> result = Utility.returnResponse(page);
+        return result;
     }
 
     @Override
     public Brand mapRequestToPoJo(BrandRequest brandRequest) {
-        return null;
+        Brand brand = new Brand();
+        brand.setBrandLogo(brandRequest.getBrandLogo());
+        brand.setName(brandRequest.getName());
+        brand.setStatus(brandRequest.getStatus());
+        return brand;
     }
 
     @Override
