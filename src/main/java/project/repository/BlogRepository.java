@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface BlogRepository extends JpaRepository<Blog,Integer> {
     Page<Blog>findByNameContaining(String searchName, Pageable pageable);
-    List<Blog> findByCatalogOfBlog_IdAndTagListIn(int catId, List<Tags> listTag);
+    List<Blog> findByCatalogOfBlog_IdAndTagListIn(int catId, List<Tags> listTag);//tìm list Blog theo Catalog id và theo tagList.
     List<Blog> findByCatalogOfBlog_Id(int catId);
     List<Blog> findByTagListIn(List<Tags> listTag);
 

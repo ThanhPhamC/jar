@@ -9,6 +9,7 @@ import project.bussiness.service.CatalogService;
 import project.bussiness.service.ProductService;
 import project.model.dto.response.ProductResponse;
 import project.model.entity.Product;
+import project.model.shopMess.Message;
 import project.model.utility.Utility;
 import project.model.dto.request.CatalogRequest;
 import project.model.dto.response.CatalogResponse;
@@ -35,18 +36,31 @@ public class CatalogImpl implements CatalogService {
 
     @Override
     public CatalogResponse saveOrUpdate(CatalogRequest catalogRequest) {
-        return null;
+        Catalog catalog =mapRequestToPoJo(catalogRequest);
+        Catalog catalogNew = catalogRepo.save(catalog);
+        CatalogResponse catalogResponse=mapPoJoToResponse(catalogNew);
+        return catalogResponse;
     }
 
     @Override
     public CatalogResponse update(Integer id, CatalogRequest catalogRequest) {
-        return null;
+        Catalog catalog=mapRequestToPoJo(catalogRequest);
+        catalog.setId(id);
+        Catalog catalogUpdate = catalogRepo.save(catalog);
+        CatalogResponse catalogResponse =mapPoJoToResponse(catalogUpdate);
+        return catalogResponse;
     }
 
 
     @Override
     public ResponseEntity<?> delete(Integer id) {
-        return null;
+        try {
+            Catalog catalogDelete =catalogRepo.findById(id).get();
+            catalogDelete.setStatus(0);
+            return ResponseEntity.ok().body(Message.SUCCESS);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
     }
 
     @Override
@@ -70,7 +84,9 @@ public class CatalogImpl implements CatalogService {
 
     @Override
     public Map<String, Object> findByName(String name, Pageable pageable) {
-        return null;
+        Page<Catalog>page=catalogRepo.findByNameContaining(name,pageable);
+        Map<String,Object>result=Utility.returnResponse(page);
+        return result;
     }
 
     @Override
@@ -87,6 +103,7 @@ public class CatalogImpl implements CatalogService {
         response.setId(catalog.getId());
         response.setName(catalog.getName());
         response.setStatus(catalog.getStatus());
+        response.setTotalProductInCatalog(catalog.getProductList().size());
         return response;
     }
 
@@ -131,4 +148,11 @@ public class CatalogImpl implements CatalogService {
         }
         return responses;
     }
+
+    @Override
+    public CatalogResponse finByIdResponse(int id) {
+        return mapPoJoToResponse(findById(id));
+    }
+
+
 }
