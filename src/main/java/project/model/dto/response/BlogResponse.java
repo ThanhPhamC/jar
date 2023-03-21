@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 public class BlogResponse extends RootResponse{
-    private LocalDateTime creatDate;
+    private LocalDate creatDate;
     private String blogImg;
     private String content;
     private String userName;

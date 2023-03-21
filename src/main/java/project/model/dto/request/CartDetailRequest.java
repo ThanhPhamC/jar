@@ -6,4 +6,6 @@ import lombok.Data;
 public class CartDetailRequest {
     private int productId;
     private int quantity;
+    private float price;
+    private String status;
 }
