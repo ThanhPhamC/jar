@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface BlogService extends RootService<Blog,Integer, BlogRequest, BlogResponse>{
     List<BlogResponse> getTopNew();
-
+    BlogResponse getBlogResponseForClient(int blogId);
 
 }

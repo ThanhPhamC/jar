@@ -150,5 +150,11 @@ public class BlogImpl implements BlogService {
         return result;
     }
 
+    @Override
+    public BlogResponse getBlogResponseForClient(int blogId) {
+        Blog blog = findById(blogId);
+        return mapPoJoToResponse(blog);
+    }
+
 
 }

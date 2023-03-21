@@ -11,4 +11,6 @@ public class BlogResponse extends RootResponse{
     private String content;
     private String userName;
     private String catalogBlogName;
+    private String tagName;
 }
+

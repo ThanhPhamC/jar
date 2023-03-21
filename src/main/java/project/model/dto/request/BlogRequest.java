@@ -1,6 +1,7 @@
 package project.model.dto.request;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class BlogRequest {
@@ -10,4 +11,5 @@ public class BlogRequest {
     private int userId;
     private int status;
     private int catalogBlogId;
+    private List<Integer>tagId;
 }
