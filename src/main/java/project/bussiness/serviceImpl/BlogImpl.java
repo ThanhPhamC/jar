@@ -6,14 +6,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.BlogService;
+import project.bussiness.service.CommentService;
 import project.model.dto.request.BlogRequest;
 import project.model.dto.response.BlogResponse;
+import project.model.dto.response.CommentResponse;
 import project.model.entity.Blog;
 import project.model.entity.CatalogOfBlog;
+import project.model.entity.CommentBlog;
+import project.model.entity.Tags;
 import project.model.shopMess.Message;
 import project.model.utility.Utility;
 import project.repository.BlogRepository;
 import project.repository.CatalogOfBlogRepository;
+import project.repository.TagsRepository;
 import project.repository.UserRepository;
 
 import java.time.LocalDate;
@@ -27,22 +32,24 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class BlogImpl implements BlogService {
-     private BlogRepository blogRepo;
-     private UserRepository userRepo;
-     private CatalogOfBlogRepository catalogOfBlogRepository;
+    private BlogRepository blogRepo;
+    private UserRepository userRepo;
+    private CatalogOfBlogRepository catalogOfBlogRepository;
+    private TagsRepository tagsRepository;
+    private CommentService commentService;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
-        Page<Blog> blogPage=blogRepo.findAll(pageable);
-        Map<String,Object> result= Utility.returnResponse(blogPage);
+        Page<Blog> blogPage = blogRepo.findAll(pageable);
+        Map<String, Object> result = Utility.returnResponse(blogPage);
         return result;
     }
 
     @Override
     public BlogResponse saveOrUpdate(BlogRequest blogRequest) {
-            Blog blog= mapRequestToPoJo(blogRequest);
-            Blog blog1 =blogRepo.save(blog);
-            BlogResponse blogResponse =mapPoJoToResponse(blog1);
+        Blog blog = mapRequestToPoJo(blogRequest);
+        Blog blog1 = blogRepo.save(blog);
+        BlogResponse blogResponse = mapPoJoToResponse(blog1);
 
         return blogResponse;
     }
@@ -58,12 +65,12 @@ public class BlogImpl implements BlogService {
 
     @Override
     public ResponseEntity<?> delete(Integer id) {
-        try{
+        try {
             Blog blogDelete = blogRepo.findById(id).get();
             blogDelete.setStatus(0);
             blogRepo.save(blogDelete);
             return ResponseEntity.ok().body(Message.SUCCESS);
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
 
@@ -72,7 +79,7 @@ public class BlogImpl implements BlogService {
 
     @Override
     public List<Blog> findAll() {
-        List<Blog> blogList =blogRepo.findAll();
+        List<Blog> blogList = blogRepo.findAll();
 
         return blogList;
     }
@@ -80,11 +87,11 @@ public class BlogImpl implements BlogService {
     @Override
     public List<BlogResponse> getAllForClient() {
 //        List<BlogResponse> blogResponses= blogRepo.findAll().stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
-        List<Blog>listBlog = blogRepo.findAll();
-        List<BlogResponse>blogResponseList=new ArrayList<>();
+        List<Blog> listBlog = blogRepo.findAll();
+        List<BlogResponse> blogResponseList = new ArrayList<>();
 
-        for (Blog b:listBlog) {
-            BlogResponse blogResponse=new BlogResponse();
+        for (Blog b : listBlog) {
+            BlogResponse blogResponse = new BlogResponse();
             blogResponse.setBlogImg(b.getBlogImg());
             blogResponse.setName(b.getName());
             blogResponse.setContent(b.getContent());
@@ -106,8 +113,8 @@ public class BlogImpl implements BlogService {
 
     @Override
     public Map<String, Object> findByName(String name, Pageable pageable) {
-        Page<Blog>blogPage=blogRepo.findByNameContaining(name,pageable);
-        Map<String,Object>result= Utility.returnResponse(blogPage);
+        Page<Blog> blogPage = blogRepo.findByNameContaining(name, pageable);
+        Map<String, Object> result = Utility.returnResponse(blogPage);
         return result;
 
     }
@@ -117,17 +124,19 @@ public class BlogImpl implements BlogService {
         Blog blog = new Blog();
         blog.setName(rq.getName());
         blog.setContent(rq.getContent());
-        blog.setCreatDate(LocalDate.now());
+        blog.setCreatDate(LocalDateTime.now());
         blog.setBlogImg(rq.getBlogImg());
         blog.setStatus(rq.getStatus());
 //        CatalogOfBlog cat = catalogOfBlogRepository.findById(rq.getCatalogBlogId()).get();
         blog.setCatalogOfBlog(catalogOfBlogRepository.findById(rq.getCatalogBlogId()).get());
         blog.setUsers(userRepo.findById(rq.getUserId()).get());
-        if (blog.getUsers()==null){
+        blog.setTagList(tagsRepository.findByIdIn(rq.getTagId()));
+        if (blog.getUsers() == null) {
             return null;
         }
         return blog;
     }
+
     @Override
     public BlogResponse mapPoJoToResponse(Blog blog) {
         BlogResponse response = new BlogResponse();
@@ -139,14 +148,24 @@ public class BlogImpl implements BlogService {
         response.setContent(blog.getContent());
         response.setBlogImg(blog.getBlogImg());
         response.setCatalogBlogName(blog.getCatalogOfBlog().getName());
-
-        return  response;
+        List<CommentResponse> commentResponseList = new ArrayList<>();
+        for (CommentBlog cm : blog.getCommentBlogList()) {
+            commentResponseList.add(commentService.mapPoJoToResponse(cm));
+        }
+        response.setListCommentResponse(commentResponseList);
+        response.setCountComment(commentResponseList.size());
+        List<String> taglist = new ArrayList<>();
+        for (Tags tag : blog.getTagList()) {
+            taglist.add(tag.getName());
+        }
+        response.setTagName(taglist);
+        return response;
     }
 
     @Override
     public List<BlogResponse> getTopNew() {
         List<BlogResponse> responses = blogRepo.findAll().stream().sorted(Comparator.comparing(Blog::getCreatDate)).map(this::mapPoJoToResponse).collect(Collectors.toList());
-        List<BlogResponse> result=responses.stream().skip(Math.max(0, responses.size())-3).collect(Collectors.toList());
+        List<BlogResponse> result = responses.stream().skip(Math.max(0, responses.size()) - 3).collect(Collectors.toList());
         return result;
     }
 
@@ -154,6 +173,33 @@ public class BlogImpl implements BlogService {
     public BlogResponse getBlogResponseForClient(int blogId) {
         Blog blog = findById(blogId);
         return mapPoJoToResponse(blog);
+    }
+
+    @Override
+    public List<BlogResponse> searchByCatalogAndTag(List<Integer> listCatalogId, List<Integer> listTagId) {
+        List<BlogResponse> blogList = new ArrayList<>();
+        if (listTagId.size()==0) {
+            for (int i = 0; i < listCatalogId.size(); i++) {
+                List<Blog> lb = blogRepo.findByCatalogOfBlog_Id(listCatalogId.get(i));
+                List<BlogResponse> lbr = lb.stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
+                blogList.addAll(lbr);
+            }
+        } else if (listCatalogId.size()==0) {
+            List<Tags> listTag = tagsRepository.findByIdIn(listTagId);
+            List<Blog> lb = blogRepo.findByTagListIn(listTag);
+            List<BlogResponse> lbr = lb.stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
+            blogList.addAll(lbr);
+        }
+        else {
+            List<Tags> listTag = tagsRepository.findByIdIn(listTagId);
+            for (int i = 0; i < listCatalogId.size(); i++) {
+                List<Blog> listBlogByTagId = blogRepo.findByCatalogOfBlog_IdAndTagListIn(listCatalogId.get(i),listTag);
+                List<BlogResponse> blogResponseList = listBlogByTagId.stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
+                blogList.addAll(blogResponseList);
+            }
+        }
+
+        return blogList;
     }
 
 
