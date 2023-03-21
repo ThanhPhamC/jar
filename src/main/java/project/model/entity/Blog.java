@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
 @Table(name = "blog")
 public class Blog extends BaseEntity{
-    private LocalDateTime creatDate;
+    private LocalDate creatDate;
     @Column(columnDefinition = "text")
     private String blogImg;
     @Column(columnDefinition = "text")
@@ -21,5 +23,11 @@ public class Blog extends BaseEntity{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "catalogOfBlogId")
     private CatalogOfBlog catalogOfBlog;
+
+    @OneToMany(mappedBy = "blog")
+    private List<CommentBlog> commentBlogList = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable( name = "Tag_Blog", joinColumns = @JoinColumn(name = "blogId"), inverseJoinColumns = @JoinColumn(name = "tagId"))
+    private List<Tags> tagList= new ArrayList<>();
 
 }

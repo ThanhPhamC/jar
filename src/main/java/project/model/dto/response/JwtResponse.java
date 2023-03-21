@@ -26,10 +26,10 @@ public class JwtResponse {
     private boolean userStatus;
     private int ranking;
     private List<String> listRoles;
-    @JsonIgnore
-    private Cart cart;
+    private CartResponse cartResponse;
+//    private List<CouponResponse> couponResponseList;
 
-    public JwtResponse(String token, int userId, String userName, String firstName, String lastName, String email, String address, String state, String city, String country, String phone, String avatar, LocalDateTime birtDate, boolean userStatus, int ranking, List<String> listRoles, Cart cart) {
+    public JwtResponse(String token, int userId, String userName, String firstName, String lastName, String email, String address, String state, String city, String country, String phone, String avatar, LocalDateTime birtDate, boolean userStatus, int ranking, List<String> listRoles, CartResponse cartResponse/*, List<CouponResponse> couponResponseList */) {
         this.token = token;
         this.userId = userId;
         this.userName = userName;
@@ -46,6 +46,7 @@ public class JwtResponse {
         this.userStatus = userStatus;
         this.ranking = ranking;
         this.listRoles = listRoles;
-        this.cart = cart;
+        this.cartResponse = cartResponse;
+//        this.couponResponseList=couponResponseList;
     }
 }
