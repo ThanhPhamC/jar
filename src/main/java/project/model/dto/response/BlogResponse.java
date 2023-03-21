@@ -14,8 +14,8 @@ public class BlogResponse extends RootResponse{
     private String content;
     private String userName;
     private int countComment;
-    private List<CommentBlog> listCommentBlog = new ArrayList<>();
+    private List<CommentResponse> listCommentResponse = new ArrayList<>();
     private String catalogBlogName;
-    private String tagName;
+    private List<String> tagName;
 }
 
