@@ -2,7 +2,6 @@ package project.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import project.model.entity.Blog;
 import project.model.entity.CommentBlog;
 
 import java.util.List;

@@ -1,7 +1,6 @@
 package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,6 @@ import project.model.shopMess.Constants;
 import project.repository.FlashSaleRepository;
 import project.repository.ProductRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

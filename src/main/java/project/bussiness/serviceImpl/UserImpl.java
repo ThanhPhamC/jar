@@ -1,8 +1,6 @@
 package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +15,10 @@ import project.bussiness.service.CouponService;
 import project.bussiness.service.UserService;
 import project.model.dto.request.LogInRequest;
 import project.model.dto.request.UserRequest;
-import project.model.dto.response.*;
+import project.model.dto.response.CartResponse;
+import project.model.dto.response.CouponResponse;
+import project.model.dto.response.JwtResponse;
+import project.model.dto.response.UserResponse;
 import project.model.entity.Cart;
 import project.model.entity.ERole;
 import project.model.entity.Roles;

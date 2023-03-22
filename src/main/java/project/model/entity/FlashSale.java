@@ -1,6 +1,7 @@
 package project.model.entity;
 import lombok.Data;
 import project.model.shopMess.Constants;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 @Data
@@ -94,7 +95,7 @@ public class FlashSale {
 
     public int getStatus() {
         if (this.getQuantity()!=this.getSold()&&((LocalDateTime.now().compareTo(this.getStartTime())>0)&&(LocalDateTime.now().compareTo(this.getEndTime())<0))){
-            this.status=Constants.ONLINE;
+            this.status= Constants.ONLINE;
         }else {
             this.status=Constants.OFFLINE;
         };

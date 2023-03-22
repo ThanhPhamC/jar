@@ -5,12 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.CommentService;
-import project.model.dto.request.CatalogRequest;
 import project.model.dto.request.CommentRequest;
-import project.model.dto.response.CatalogResponse;
 import project.model.dto.response.CommentResponse;
 import project.model.shopMess.Message;
-import project.repository.CommentRepository;
 
 @RestController
 @CrossOrigin("http://localhost:8080")

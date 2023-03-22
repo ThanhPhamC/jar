@@ -5,9 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.FlashSaleService;
-import project.model.dto.request.FlashSaleRequest;
 import project.model.dto.response.FlashSaleResponse;
-import project.model.entity.FlashSale;
 import project.model.shopMess.Message;
 
 import java.util.List;

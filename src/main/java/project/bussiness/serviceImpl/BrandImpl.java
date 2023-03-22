@@ -1,7 +1,6 @@
 package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -9,10 +8,8 @@ import project.bussiness.service.BrandService;
 import project.bussiness.service.ProductService;
 import project.model.dto.request.BrandRequest;
 import project.model.dto.response.BrandResponse;
-import project.model.dto.response.CatalogResponse;
 import project.model.dto.response.ProductResponse;
 import project.model.entity.Brand;
-import project.model.entity.Catalog;
 import project.model.entity.Product;
 import project.repository.BrandRepository;
 
