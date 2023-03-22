@@ -21,8 +21,9 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class FlashSaleImpl implements FlashSaleService {
-     private ProductRepository productRepo;
-     private FlashSaleRepository flashSaleRepo;
+    private ProductRepository productRepo;
+    private FlashSaleRepository flashSaleRepo;
+
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
         return null;
@@ -30,9 +31,9 @@ public class FlashSaleImpl implements FlashSaleService {
 
     @Override
     public FlashSaleResponse saveOrUpdate(FlashSaleRequest rq) {
-        FlashSale map= mapRequestToPoJo(rq);
-        FlashSale result= flashSaleRepo.save(map);
-        FlashSaleResponse response=mapPoJoToResponse(result);
+        FlashSale map = mapRequestToPoJo(rq);
+        FlashSale result = flashSaleRepo.save(map);
+        FlashSaleResponse response = mapPoJoToResponse(result);
         return response;
     }
 
@@ -48,19 +49,21 @@ public class FlashSaleImpl implements FlashSaleService {
 
     @Override
     public List<FlashSale> findAll() {
-        List<FlashSale> saleList=flashSaleRepo.findAll().stream()
-                .map(flashSale ->{
+        List<FlashSale> saleList = flashSaleRepo.findAll().stream()
+                .map(flashSale -> {
                     flashSale.getStatus();
-                    FlashSale result= flashSaleRepo.save(flashSale);
-                return result;})
+                    FlashSale result = flashSaleRepo.save(flashSale);
+                    return result;
+                })
                 .collect(Collectors.toList());
-        return  saleList;
+        return saleList;
     }
+
     @Override
     public List<FlashSaleResponse> getAllForClient() {
-        List<FlashSaleResponse> responses=flashSaleRepo.findAll().stream()
+        List<FlashSaleResponse> responses = flashSaleRepo.findAll().stream()
                 .map(this::mapPoJoToResponse)
-                .filter(response -> response.getStatus()==Constants.ONLINE)
+                .filter(response -> response.getStatus() == Constants.ONLINE)
                 .collect(Collectors.toList());
         return responses;
     }
@@ -77,7 +80,7 @@ public class FlashSaleImpl implements FlashSaleService {
 
     @Override
     public FlashSale mapRequestToPoJo(FlashSaleRequest rq) {
-        FlashSale flashSale =new FlashSale();
+        FlashSale flashSale = new FlashSale();
         flashSale.setProduct(productRepo.findById(rq.getProductId()).get());
         flashSale.setName(String.format("%s(%s)", productRepo.findById(rq.getProductId()).get().getName(), Constants.FLASH_SALE_NAME));
         flashSale.setStartTime(rq.getStartTime());
@@ -87,6 +90,7 @@ public class FlashSaleImpl implements FlashSaleService {
         flashSale.setSold(rq.getSold());
         return flashSale;
     }
+
     @Override
     public FlashSaleResponse mapPoJoToResponse(FlashSale flashSale) {
         FlashSaleResponse response = new FlashSaleResponse();
@@ -103,4 +107,6 @@ public class FlashSaleImpl implements FlashSaleService {
         flashSaleRepo.save(flashSale);
         return response;
     }
+
+
 }
