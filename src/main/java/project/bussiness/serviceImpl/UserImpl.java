@@ -245,12 +245,12 @@ public class UserImpl implements UserService {
                     customUserDetail.getEmail(), customUserDetail.getAddress(), customUserDetail.getState(), customUserDetail.getCity(), customUserDetail.getCounty(),
                     customUserDetail.getPhone(), customUserDetail.getAvatar(), customUserDetail.getBirtDate(), customUserDetail.isUserStatus(), customUserDetail.getRanking(),
                     listRoles, cartResponse/*,couponResponses*/);
-
             TokenLogIn tokenLogIn = new TokenLogIn();
             tokenLogIn.setName(jwt);
             tokenLogIn.setUsers(users);
             tokenLogIn.setStatus(1);
-            tokenLogInReposirory.save(tokenLogIn);
+            TokenLogIn tk= tokenLogInReposirory.save(tokenLogIn);
+
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return ResponseEntity.badRequest().body(Message.ERROR_LOCKED_USER);

@@ -16,6 +16,7 @@ import project.model.dto.response.CartResponse;
 import project.model.entity.*;
 import project.model.shopMess.Constants;
 import project.model.shopMess.Message;
+import project.model.utility.Utility;
 import project.repository.*;
 import project.security_jwt.CustomUserDetails;
 
@@ -39,7 +40,9 @@ public class CartImpl implements CartService {
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
-        return null;
+        Page<CartResponse> responses=cartRepository.findAll(pageable).map(this::mapPoJoToResponse);
+        Map<String,Object> result= Utility.returnResponse(responses);
+        return result;
     }
 
     @Override
@@ -64,6 +67,7 @@ public class CartImpl implements CartService {
 
     @Override
     public List<CartResponse> getAllForClient() {
+
         return null;
     }
 
@@ -154,6 +158,9 @@ public class CartImpl implements CartService {
         if (tokenLogInReposirory.existsByUsers_UserId(users.getUserId())) {
             flashSaleService.findAll();// cập nhập lại toàn bộ trạng thái flash sale;
             Product product = productRepository.findById(cartDetailRequest.getProductId()).get();
+            if (cartDetailRequest.getPrice()!=product.getExportPrice()*(100- product.getDiscount())/100){
+                return ResponseEntity.badRequest().body(Message.ERROR_PRICE);
+            }
             Cart pendingCart = cartRepository.findByUsers_UserIdAndStatus(users.getUserId(), 0);
             boolean checkFlashSale = flashSaleRepo.existsByStatusAndProduct_Id(1, product.getId());
             List<CartDetail> cartDetail = cartDetailRepository.findByProduct_IdAndCart_Id(product.getId(), pendingCart.getId());
@@ -168,7 +175,7 @@ public class CartImpl implements CartService {
                 Product checkBought = productRepository.findByIdAndCartDetailListIn(product.getId(), boughtDetail);
                 if (checkBought != null) {
                     newDetail.setQuantity(cartDetailRequest.getQuantity());
-                    newDetail.setPrice(cartDetailRequest.getPrice());
+                    newDetail.setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                     newDetail.setName(product.getName());
                     cartDetailRepository.save(newDetail);
                     return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
@@ -176,7 +183,7 @@ public class CartImpl implements CartService {
                     if (cartDetail.size() == 1) {
                         if (cartDetail.get(0).getName().contains(Constants.FLASH_SALE_NAME)) {// sản phẩm đã được thêm LẦN ĐẦU TIÊN TRONG thời gian bắt đầu sale -> tạo 1 oderDetail giá thường
                             newDetail.setQuantity(cartDetailRequest.getQuantity());
-                            newDetail.setPrice(product.getExportPrice());
+                            newDetail.setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                             newDetail.setName(product.getName());
 
                         } else {// sản phẩm đã được thêm vào giỏ hàng TRƯỚC thời gian diễn ra sale.-> tạo 1 oderDetail với giá sale
@@ -214,7 +221,7 @@ public class CartImpl implements CartService {
                     return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
                 } else {
                     newDetail.setQuantity(cartDetailRequest.getQuantity());
-                    newDetail.setPrice(cartDetailRequest.getPrice());
+                    newDetail.setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                     newDetail.setName(product.getName());
 
                     cartDetailRepository.save(newDetail);
@@ -245,10 +252,26 @@ public class CartImpl implements CartService {
     }
 
     @Override
-    public ResponseEntity<?> checkout(CartRequest cartRequest) {
-
-        return null;
+    public Map<String, Object> getAllForClient(Pageable pageable) {
+        CustomUserDetails customUser= (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Page<CartResponse> responses=cartRepository.findByUsers_UserIdAndStatusIsNot(customUser.getUserId(),0,pageable).map(this::mapPoJoToResponse);
+        Map<String,Object> result=Utility.returnResponse(responses);
+        return result;
     }
 
-
+    @Override
+    public ResponseEntity<?> changeStatus(Integer cartId, Integer status) {
+        try {
+            Cart cart=cartRepository.findById(cartId).get();
+            if(cart!=null&&cart.getStatus()>Constants.CART_STATUS_PENDING&&cart.getStatus()<Constants.CART_STATUS_DONE){
+                cart.setStatus(status);
+                cartRepository.save(cart);
+                return ResponseEntity.ok(Message.SUCCESS);
+            }else {
+                return ResponseEntity.badRequest().body(Message.ERROR_400);
+            }
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
 }

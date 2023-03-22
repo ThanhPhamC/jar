@@ -10,12 +10,13 @@ import project.model.entity.Cart;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface CartService extends RootService<Cart,Integer, CartRequest, CartResponse> {
     List<Cart> findByCreatDateBetween(LocalDateTime startDate, LocalDateTime endDate);
     ResponseEntity<?> addToCart(CartDetailRequest cartDetailRequest, String action);
    Page<CartResponse> findByStatusIn(Integer status, Pageable pageable);
    CartResponse showCartPending();
-
-    ResponseEntity<?> checkout(CartRequest cartRequest);
+    Map<String,Object> getAllForClient(Pageable pageable);
+    ResponseEntity<?> changeStatus(Integer cartId,Integer status);
 }

@@ -57,6 +57,7 @@ public class CatalogImpl implements CatalogService {
         try {
             Catalog catalogDelete =catalogRepo.findById(id).get();
             catalogDelete.setStatus(0);
+             catalogRepo.save(catalogDelete);
             return ResponseEntity.ok().body(Message.SUCCESS);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(Message.ERROR_400);
