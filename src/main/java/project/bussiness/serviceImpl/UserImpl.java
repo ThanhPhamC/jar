@@ -249,7 +249,8 @@ public class UserImpl implements UserService {
             tokenLogIn.setName(jwt);
             tokenLogIn.setUsers(users);
             tokenLogIn.setStatus(1);
-            tokenLogInReposirory.save(tokenLogIn);
+            TokenLogIn tk= tokenLogInReposirory.save(tokenLogIn);
+
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return ResponseEntity.badRequest().body(Message.ERROR_LOCKED_USER);
