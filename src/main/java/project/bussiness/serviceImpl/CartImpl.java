@@ -158,6 +158,9 @@ public class CartImpl implements CartService {
         if (tokenLogInReposirory.existsByUsers_UserId(users.getUserId())) {
             flashSaleService.findAll();// cập nhập lại toàn bộ trạng thái flash sale;
             Product product = productRepository.findById(cartDetailRequest.getProductId()).get();
+            if (cartDetailRequest.getPrice()!=product.getExportPrice()*(100- product.getDiscount())/100){
+                return ResponseEntity.badRequest().body(Message.ERROR_PRICE);
+            }
             Cart pendingCart = cartRepository.findByUsers_UserIdAndStatus(users.getUserId(), 0);
             boolean checkFlashSale = flashSaleRepo.existsByStatusAndProduct_Id(1, product.getId());
             List<CartDetail> cartDetail = cartDetailRepository.findByProduct_IdAndCart_Id(product.getId(), pendingCart.getId());
@@ -172,7 +175,7 @@ public class CartImpl implements CartService {
                 Product checkBought = productRepository.findByIdAndCartDetailListIn(product.getId(), boughtDetail);
                 if (checkBought != null) {
                     newDetail.setQuantity(cartDetailRequest.getQuantity());
-                    newDetail.setPrice(cartDetailRequest.getPrice());
+                    newDetail.setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                     newDetail.setName(product.getName());
                     cartDetailRepository.save(newDetail);
                     return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
@@ -180,7 +183,7 @@ public class CartImpl implements CartService {
                     if (cartDetail.size() == 1) {
                         if (cartDetail.get(0).getName().contains(Constants.FLASH_SALE_NAME)) {// sản phẩm đã được thêm LẦN ĐẦU TIÊN TRONG thời gian bắt đầu sale -> tạo 1 oderDetail giá thường
                             newDetail.setQuantity(cartDetailRequest.getQuantity());
-                            newDetail.setPrice(product.getExportPrice());
+                            newDetail.setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                             newDetail.setName(product.getName());
 
                         } else {// sản phẩm đã được thêm vào giỏ hàng TRƯỚC thời gian diễn ra sale.-> tạo 1 oderDetail với giá sale
@@ -218,7 +221,7 @@ public class CartImpl implements CartService {
                     return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
                 } else {
                     newDetail.setQuantity(cartDetailRequest.getQuantity());
-                    newDetail.setPrice(cartDetailRequest.getPrice());
+                    newDetail.setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                     newDetail.setName(product.getName());
 
                     cartDetailRepository.save(newDetail);
