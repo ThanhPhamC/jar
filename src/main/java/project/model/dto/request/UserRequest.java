@@ -21,4 +21,5 @@ public class UserRequest {
     private String avatar;
     private LocalDate birtDate;
     private Set<String> listRoles;
+    private boolean userStatus;
 }
