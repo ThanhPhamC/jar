@@ -3,6 +3,7 @@ package project.bussiness.serviceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,10 @@ import project.bussiness.service.UserService;
 import project.model.dto.request.LogInRequest;
 import project.model.dto.request.UserRequest;
 import project.model.dto.response.*;
-import project.model.entity.Cart;
-import project.model.entity.ERole;
-import project.model.entity.Roles;
-import project.model.entity.Users;
+import project.model.entity.*;
 import project.model.regex.RegexValidate;
 import project.model.shopMess.Message;
+import project.model.utility.Utility;
 import project.repository.CartRepository;
 import project.repository.RoleRepository;
 import project.repository.UserRepository;
@@ -94,7 +93,11 @@ public class UserImpl implements UserService {
 
     @Override
     public Map<String, Object> findByName(String name, Pageable pageable) {
-        return null;
+
+//        Page<Users> users = userRepository.findByNameContaining(name,pageable);
+//        Map<String,Object>result = Utility.returnResponse(users);
+//        return result;
+        return  null;
     }
 
     @Override

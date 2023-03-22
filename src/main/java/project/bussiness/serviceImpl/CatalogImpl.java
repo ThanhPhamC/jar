@@ -151,6 +151,7 @@ public class CatalogImpl implements CatalogService {
 
     @Override
     public CatalogResponse finByIdResponse(int id) {
+
         return mapPoJoToResponse(findById(id));
     }
 
