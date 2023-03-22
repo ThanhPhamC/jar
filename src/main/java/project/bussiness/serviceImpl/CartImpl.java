@@ -18,6 +18,7 @@ import project.model.dto.response.CartResponse;
 import project.model.entity.*;
 import project.model.shopMess.Constants;
 import project.model.shopMess.Message;
+import project.model.utility.Utility;
 import project.repository.*;
 import project.security_jwt.CustomUserDetails;
 
@@ -41,7 +42,9 @@ public class CartImpl implements CartService {
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
-        return null;
+        Page<CartResponse> responses=cartRepository.findAll(pageable).map(this::mapPoJoToResponse);
+        Map<String,Object> result= Utility.returnResponse(responses);
+        return result;
     }
 
     @Override
@@ -66,6 +69,7 @@ public class CartImpl implements CartService {
 
     @Override
     public List<CartResponse> getAllForClient() {
+
         return null;
     }
 
@@ -243,10 +247,26 @@ public class CartImpl implements CartService {
     }
 
     @Override
-    public ResponseEntity<?> checkout(CartRequest cartRequest) {
-
-        return null;
+    public Map<String, Object> getAllForClient(Pageable pageable) {
+        CustomUserDetails customUser= (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Page<CartResponse> responses=cartRepository.findByUsers_UserIdAndStatusIsNot(customUser.getUserId(),0,pageable).map(this::mapPoJoToResponse);
+        Map<String,Object> result=Utility.returnResponse(responses);
+        return result;
     }
 
-
+    @Override
+    public ResponseEntity<?> changeStatus(Integer cartId, Integer status) {
+        try {
+            Cart cart=cartRepository.findById(cartId).get();
+            if(cart!=null&&cart.getStatus()>Constants.CART_STATUS_PENDING&&cart.getStatus()<Constants.CART_STATUS_DONE){
+                cart.setStatus(status);
+                cartRepository.save(cart);
+                return ResponseEntity.ok(Message.SUCCESS);
+            }else {
+                return ResponseEntity.badRequest().body(Message.ERROR_400);
+            }
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
 }
