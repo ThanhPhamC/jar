@@ -4,6 +4,8 @@ package project.bussiness.serviceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import project.model.dto.response.*;
 import project.model.entity.*;
 import project.model.regex.RegexValidate;
 import project.model.shopMess.Message;
+import project.model.utility.Utility;
 import project.repository.CartRepository;
 import project.repository.RoleRepository;
 import project.repository.TokenLogInReposirory;
@@ -85,7 +88,11 @@ public class UserImpl implements UserService {
 
     @Override
     public Map<String, Object> findByName(String name, Pageable pageable) {
-        return null;
+
+//        Page<Users> users = userRepository.findByNameContaining(name,pageable);
+//        Map<String,Object>result = Utility.returnResponse(users);
+//        return result;
+        return  null;
     }
 
     @Override
@@ -212,11 +219,11 @@ public class UserImpl implements UserService {
     public ResponseEntity<?> logIn(LogInRequest logInRequest) {
         Users users = userRepository.findUsersByUserName(logInRequest.getUserName());
         LocalDate now = LocalDate.now();
-        if (users.getBlockedDate() != null && now.isAfter(users.getBlockedDate()) ) {
+        if (users.getBlockedDate()!=null && now.isAfter(users.getBlockedDate())) {
             users.setUserStatus(true);
             userRepository.save(users);
         }
-        if (users.isUserStatus() && !tokenLogInReposirory.existsByUsers_UserId(users.getUserId())) {
+        if (users.isUserStatus()) {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(logInRequest.getUserName(), logInRequest.getPassword())
             );

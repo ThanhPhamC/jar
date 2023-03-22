@@ -16,6 +16,4 @@ public class Brand extends BaseEntity {
     @OneToMany(mappedBy = "brand")
     @JsonIgnore
     private List<Product> productList= new ArrayList<>();
-
-
 }

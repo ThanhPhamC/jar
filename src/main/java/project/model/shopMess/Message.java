@@ -12,6 +12,10 @@ public class Message {
     public static final String ERROR_ROLE_NOT_FOUND = "Role is not found";
     public static final String ERROR_LOCKED_USER = "Your account is locked";
     public static final String ADD_TO_CART_SUCCESS = "Add to cart success";
+    public static final String UPDATE_TO_FLASH_SALE = "Successfully updated flash sale products";
+    public static final String QUANTITY_MAXIMUM = "The maximum number of flash sale products is 1 piece";
+    public static final String ERROR_BOUGHT = "The product can only be purchased once during the sale period";
+    public static final String ERROR_NOT_IN_CART = "The product does not exist in the cart";
     public static  final String UNBLOCK_USER_SUCCESS= "Unblock user success";
     public static  final String LOGOUT_SUCCESS= "Log out success";
 }

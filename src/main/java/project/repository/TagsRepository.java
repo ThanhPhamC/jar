@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface TagsRepository extends JpaRepository<Tags,Integer> {
     Page<Tags>findByNameContaining(String searchName, Pageable pageable);
-    List<Tags> findByIdIn(List<Integer> listTag);
+    List<Tags> findByIdIn(List<Integer> listTag);//tìm tất cả đối tượng task có id trong List<Interger> truyền vào
 }

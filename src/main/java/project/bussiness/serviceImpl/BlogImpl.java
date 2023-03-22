@@ -121,7 +121,7 @@ public class BlogImpl implements BlogService {
         Blog blog = new Blog();
         blog.setName(rq.getName());
         blog.setContent(rq.getContent());
-        blog.setCreatDate(LocalDateTime.now());
+        blog.setCreatDate(LocalDate.now());
         blog.setBlogImg(rq.getBlogImg());
         blog.setStatus(rq.getStatus());
 //        CatalogOfBlog cat = catalogOfBlogRepository.findById(rq.getCatalogBlogId()).get();
@@ -171,7 +171,6 @@ public class BlogImpl implements BlogService {
         Blog blog = findById(blogId);
         return mapPoJoToResponse(blog);
     }
-
     @Override
     public List<BlogResponse> getRelatedBlog(int catId) {
         List<Blog> blogList = blogRepo.findByCatalogOfBlog_Id(catId);
