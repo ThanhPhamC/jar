@@ -19,10 +19,7 @@ import project.model.entity.CartDetail;
 import project.model.entity.Product;
 import project.model.entity.Users;
 import project.model.shopMess.Message;
-import project.repository.CartDetailRepository;
-import project.repository.CartRepository;
-import project.repository.ProductRepository;
-import project.repository.UserRepository;
+import project.repository.*;
 import project.security_jwt.CustomUserDetails;
 
 import java.time.LocalDateTime;
@@ -38,6 +35,7 @@ public class CartImpl implements CartService {
     private ProductRepository productRepository;
     private CartDetailRepository cartDetailRepository;
     private CartDetailService cartDetailService;
+    private TokenLogInReposirory tokenLogInReposirory;
 
 
     @Override
@@ -112,30 +110,34 @@ public class CartImpl implements CartService {
         Cart cart = cartRepository.findByUsers_UserIdAndStatus(users.getUserId(), 0);
         CartDetail cartDetail = cartDetailRepository.findByProduct_IdAndCart_Id(product.getId(), cart.getId());
 
-        try {
-            if (cartDetail != null) {
-                if (action.equals("create")) {
-                    cartDetail.setQuantity(cartDetail.getQuantity() + cartDetailRequest.getQuantity());
-                    cartDetail.setPrice(product.getExportPrice() * cartDetail.getQuantity());
-                    cartDetailRepository.save(cartDetail);
-                } else if (action.equals("edit")) {
-                    cartDetail.setQuantity(cartDetailRequest.getQuantity());
-                    cartDetail.setPrice(product.getExportPrice() * cartDetail.getQuantity());
-                    cartDetailRepository.save(cartDetail);
+        if (tokenLogInReposirory.existsByUsers_UserId(users.getUserId())){
+            try {
+                if (cartDetail != null) {
+                    if (action.equals("create")) {
+                        cartDetail.setQuantity(cartDetail.getQuantity() + cartDetailRequest.getQuantity());
+                        cartDetail.setPrice(product.getExportPrice() * cartDetail.getQuantity());
+                        cartDetailRepository.save(cartDetail);
+                    } else if (action.equals("edit")) {
+                        cartDetail.setQuantity(cartDetailRequest.getQuantity());
+                        cartDetail.setPrice(product.getExportPrice() * cartDetail.getQuantity());
+                        cartDetailRepository.save(cartDetail);
+                    }
+                    return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
+                } else {
+                    CartDetail cartDetailNew = new CartDetail();
+                    cartDetailNew.setProduct(product);
+                    cartDetailNew.setCart(cart);
+                    cartDetailNew.setQuantity(cartDetailRequest.getQuantity());
+                    cartDetailNew.setPrice(product.getExportPrice() * cartDetailRequest.getQuantity());
+                    cartDetailNew.setName(product.getName());
+                    cartDetailNew.setStatus(1);
+                    cartDetailRepository.save(cartDetailNew);
+                    return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
                 }
-                return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
-            } else {
-                CartDetail cartDetailNew = new CartDetail();
-                cartDetailNew.setProduct(product);
-                cartDetailNew.setCart(cart);
-                cartDetailNew.setQuantity(cartDetailRequest.getQuantity());
-                cartDetailNew.setPrice(product.getExportPrice() * cartDetailRequest.getQuantity());
-                cartDetailNew.setName(product.getName());
-                cartDetailNew.setStatus(1);
-                cartDetailRepository.save(cartDetailNew);
-                return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(Message.ERROR_400);
             }
-        } catch (Exception e) {
+        } else {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }

@@ -13,4 +13,5 @@ public class Message {
     public static final String ERROR_LOCKED_USER = "Your account is locked";
     public static final String ADD_TO_CART_SUCCESS = "Add to cart success";
     public static  final String UNBLOCK_USER_SUCCESS= "Unblock user success";
+    public static  final String LOGOUT_SUCCESS= "Log out success";
 }
