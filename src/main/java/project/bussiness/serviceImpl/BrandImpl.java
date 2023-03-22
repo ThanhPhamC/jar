@@ -10,11 +10,10 @@ import project.bussiness.service.BrandService;
 import project.bussiness.service.ProductService;
 import project.model.dto.request.BrandRequest;
 import project.model.dto.response.BrandResponse;
-import project.model.dto.response.CatalogResponse;
 import project.model.dto.response.ProductResponse;
 import project.model.entity.Brand;
-import project.model.entity.Catalog;
 import project.model.entity.Product;
+
 import project.model.shopMess.Message;
 import project.model.utility.Utility;
 import project.repository.BrandRepository;

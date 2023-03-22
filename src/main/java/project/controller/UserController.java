@@ -8,6 +8,9 @@ import project.bussiness.service.UserService;
 import project.model.dto.request.LogInRequest;
 import project.model.dto.request.UserRequest;
 import project.model.shopMess.Message;
+import project.security_jwt.CustomUserDetails;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @CrossOrigin("http://localhost:8080")
@@ -35,7 +38,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-//    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
     public ResponseEntity<?> blockedUser(@PathVariable int userId, @RequestParam int blockedDays){
         try {
             return userService.blockedUser(userId, blockedDays);
@@ -45,11 +48,21 @@ public class UserController {
     }
 
     @PutMapping("/unblockUser/{userId}")
-//    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
     public ResponseEntity<?> unBlockedUser(@PathVariable int userId){
         try {
             return userService.unBlockedUser(userId);
         } catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
+    @PostMapping("logOut")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
+    public ResponseEntity<?> logOut () {
+        try {
+            return userService.logOut();
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
