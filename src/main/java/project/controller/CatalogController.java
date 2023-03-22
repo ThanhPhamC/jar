@@ -1,6 +1,5 @@
 package project.controller;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,11 +8,9 @@ import project.bussiness.service.CatalogService;
 import project.model.dto.request.CatalogRequest;
 import project.model.dto.request.ProductFeatureRequest;
 import project.model.dto.response.CatalogResponse;
-import project.model.entity.Catalog;
 import project.model.utility.Utility;
 import project.model.shopMess.Message;
 
-import javax.swing.plaf.PanelUI;
 import java.util.List;
 import java.util.Map;
 @RestController

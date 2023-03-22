@@ -1,8 +1,8 @@
 package project.model.dto.response;
 
 import lombok.Data;
-import project.model.entity.Review;
 import project.model.entity.SubImg;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

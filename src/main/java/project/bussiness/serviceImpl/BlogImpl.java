@@ -11,7 +11,6 @@ import project.model.dto.request.BlogRequest;
 import project.model.dto.response.BlogResponse;
 import project.model.dto.response.CommentResponse;
 import project.model.entity.Blog;
-import project.model.entity.CatalogOfBlog;
 import project.model.entity.CommentBlog;
 import project.model.entity.Tags;
 import project.model.shopMess.Message;
@@ -21,7 +20,6 @@ import project.repository.CatalogOfBlogRepository;
 import project.repository.TagsRepository;
 import project.repository.UserRepository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -121,7 +119,7 @@ public class BlogImpl implements BlogService {
         Blog blog = new Blog();
         blog.setName(rq.getName());
         blog.setContent(rq.getContent());
-        blog.setCreatDate(LocalDate.now());
+        blog.setCreatDate(LocalDateTime.now());
         blog.setBlogImg(rq.getBlogImg());
         blog.setStatus(rq.getStatus());
 //        CatalogOfBlog cat = catalogOfBlogRepository.findById(rq.getCatalogBlogId()).get();

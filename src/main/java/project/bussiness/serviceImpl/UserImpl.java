@@ -1,8 +1,11 @@
 package project.bussiness.serviceImpl;
 
+
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,50 +15,49 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import project.bussiness.service.CartService;
 import project.bussiness.service.CouponService;
 import project.bussiness.service.UserService;
 import project.model.dto.request.LogInRequest;
 import project.model.dto.request.UserRequest;
 import project.model.dto.response.*;
+import project.model.entity.*;
+import project.model.dto.response.CartResponse;
+import project.model.dto.response.CouponResponse;
+import project.model.dto.response.JwtResponse;
+import project.model.dto.response.UserResponse;
 import project.model.entity.Cart;
 import project.model.entity.ERole;
 import project.model.entity.Roles;
 import project.model.entity.Users;
 import project.model.regex.RegexValidate;
 import project.model.shopMess.Message;
+import project.model.utility.Utility;
 import project.repository.CartRepository;
 import project.repository.RoleRepository;
+import project.repository.TokenLogInReposirory;
 import project.repository.UserRepository;
 import project.security_jwt.CustomUserDetails;
 import project.security_jwt.JwtTokenProvider;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class UserImpl implements UserService {
-
     private UserRepository userRepository;
-
     private PasswordEncoder encoder;
-
     private RoleRepository roleRepository;
-
     private CartRepository cartRepository;
-
     private AuthenticationManager authenticationManager;
-
     private JwtTokenProvider tokenProvider;
-
     private CartService cartService;
-
     private CouponService couponService;
+    private TokenLogInReposirory tokenLogInReposirory;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -243,10 +245,25 @@ public class UserImpl implements UserService {
                     customUserDetail.getEmail(), customUserDetail.getAddress(), customUserDetail.getState(), customUserDetail.getCity(), customUserDetail.getCounty(),
                     customUserDetail.getPhone(), customUserDetail.getAvatar(), customUserDetail.getBirtDate(), customUserDetail.isUserStatus(), customUserDetail.getRanking(),
                     listRoles, cartResponse/*,couponResponses*/);
+
+            TokenLogIn tokenLogIn = new TokenLogIn();
+            tokenLogIn.setName(jwt);
+            tokenLogIn.setUsers(users);
+            tokenLogIn.setStatus(1);
+            tokenLogInReposirory.save(tokenLogIn);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return ResponseEntity.badRequest().body(Message.ERROR_LOCKED_USER);
         }
+    }
+
+    @Override
+    public ResponseEntity<?> logOut() {
+        CustomUserDetails userIsLoggingIn = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users users = userRepository.findUsersByUserName(userIsLoggingIn.getUsername());
+        TokenLogIn tokenLogIn = tokenLogInReposirory.findByUsers_UserId(users.getUserId());
+        tokenLogInReposirory.deleteById(tokenLogIn.getId());
+        return ResponseEntity.ok().body(Message.LOGOUT_SUCCESS);
     }
 
 }
