@@ -23,6 +23,14 @@ import project.model.dto.request.LogInRequest;
 import project.model.dto.request.UserRequest;
 import project.model.dto.response.*;
 import project.model.entity.*;
+import project.model.dto.response.CartResponse;
+import project.model.dto.response.CouponResponse;
+import project.model.dto.response.JwtResponse;
+import project.model.dto.response.UserResponse;
+import project.model.entity.Cart;
+import project.model.entity.ERole;
+import project.model.entity.Roles;
+import project.model.entity.Users;
 import project.model.regex.RegexValidate;
 import project.model.shopMess.Message;
 import project.model.utility.Utility;
@@ -88,11 +96,7 @@ public class UserImpl implements UserService {
 
     @Override
     public Map<String, Object> findByName(String name, Pageable pageable) {
-
-//        Page<Users> users = userRepository.findByNameContaining(name,pageable);
-//        Map<String,Object>result = Utility.returnResponse(users);
-//        return result;
-        return  null;
+        return null;
     }
 
     @Override
