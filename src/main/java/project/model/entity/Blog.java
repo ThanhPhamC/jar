@@ -22,7 +22,6 @@ public class Blog extends BaseEntity{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "catalogOfBlogId")
     private CatalogOfBlog catalogOfBlog;
-
     @OneToMany(mappedBy = "blog")
     private List<CommentBlog> commentBlogList = new ArrayList<>();
     @ManyToMany(fetch = FetchType.EAGER)

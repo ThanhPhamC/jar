@@ -169,7 +169,6 @@ public class BlogImpl implements BlogService {
         Blog blog = findById(blogId);
         return mapPoJoToResponse(blog);
     }
-
     @Override
     public List<BlogResponse> getRelatedBlog(int catId) {
         List<Blog> blogList = blogRepo.findByCatalogOfBlog_Id(catId);

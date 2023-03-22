@@ -8,22 +8,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.CartDetailService;
 import project.bussiness.service.CartService;
+import project.bussiness.service.FlashSaleService;
 import project.model.dto.request.CartDetailRequest;
 import project.model.dto.request.CartRequest;
 import project.model.dto.response.CartDetailResponse;
 import project.model.dto.response.CartResponse;
-import project.model.entity.Cart;
-import project.model.entity.CartDetail;
-import project.model.entity.Product;
-import project.model.entity.Users;
+import project.model.entity.*;
+import project.model.shopMess.Constants;
 import project.model.shopMess.Message;
-import project.repository.CartDetailRepository;
-import project.repository.CartRepository;
-import project.repository.ProductRepository;
-import project.repository.UserRepository;
+import project.repository.*;
 import project.security_jwt.CustomUserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,6 +33,8 @@ public class CartImpl implements CartService {
     private ProductRepository productRepository;
     private CartDetailRepository cartDetailRepository;
     private CartDetailService cartDetailService;
+    private FlashSaleRepository flashSaleRepo;
+    private FlashSaleService flashSaleService;
 
 
     @Override
@@ -89,10 +88,56 @@ public class CartImpl implements CartService {
         response.setId(cart.getId());
         response.setName(cart.getName());
         response.setStatus(cart.getStatus());
-        List<CartDetailResponse> responseList = cart.getCartDetailList().stream().map(cartDetail -> {
-            CartDetailResponse rp = cartDetailService.mapPoJoToResponse(cartDetail);
-            return rp;
-        }).collect(Collectors.toList());
+        List<CartDetailResponse> responseList = new ArrayList<>();
+        if (cart.getStatus()==0){
+            List<CartDetail> newDetailList = new ArrayList<>();
+            flashSaleService.findAll();// cập nhập lại toàn bộ trạng thái flash sale;
+            List<CartDetail> detailList = cart.getCartDetailList();
+            for (CartDetail dt : detailList) {
+                boolean checkFlashSale = flashSaleRepo.existsByStatusAndProduct_Id(1, dt.getProduct().getId());
+                List<CartDetail> countCartDetailByProductId = cartDetailRepository.findByProduct_IdAndCart_Id(dt.getProduct().getId(), cart.getId());
+                if (checkFlashSale){
+                    FlashSale flashSale = flashSaleRepo.findByStatusAndProduct_Id(1, dt.getProduct().getId());
+                    // co sale
+                    if (countCartDetailByProductId.size()==1){
+                        if (!dt.getName().contains(Constants.FLASH_SALE_NAME)&&dt.getQuantity()==1){
+                            dt.setName(String.format("%s%s", dt.getName(), Constants.FLASH_SALE_NAME));
+                            dt.setPrice(dt.getPrice()*(100-flashSale.getDiscount())/100);
+                            cartDetailRepository.save(dt);
+                        } else if (!dt.getName().contains(Constants.FLASH_SALE_NAME)) {
+                            CartDetail newFlashSale= new CartDetail();
+                            newFlashSale.setName(String.format("%s%s", dt.getName(), Constants.FLASH_SALE_NAME));
+                            newFlashSale.setPrice(dt.getPrice()*(100-flashSale.getDiscount())/100);
+                            newFlashSale.setProduct(dt.getProduct());
+                            newFlashSale.setStatus(1);
+                            newFlashSale.setCart(cart);
+                            newFlashSale.setQuantity(1);
+                            dt.setQuantity(dt.getQuantity()-1);
+                            cartDetailRepository.save(dt);
+                            newDetailList.add(cartDetailRepository.save(newFlashSale));
+                        }
+                    }
+                    newDetailList.add(dt);
+                }else {  // khong sale
+                    if (dt.getName().contains(Constants.FLASH_SALE_NAME)){
+                        cartDetailRepository.delete(dt);
+                    }else {
+                        newDetailList.add(dt);
+                    }
+                }
+            }
+            responseList=newDetailList.stream().map(cartDetail -> {
+                CartDetailResponse rp = cartDetailService.mapPoJoToResponse(cartDetail);
+                return rp;
+            }).collect(Collectors.toList());
+
+        }else {
+               responseList = cart.getCartDetailList().stream().map(cartDetail -> {
+                CartDetailResponse rp = cartDetailService.mapPoJoToResponse(cartDetail);
+                return rp;
+            }).collect(Collectors.toList());
+
+        }
         response.setDetailResponses(responseList);
         return response;
     }
@@ -104,37 +149,76 @@ public class CartImpl implements CartService {
 
     @Override
     public ResponseEntity<?> addToCart(CartDetailRequest cartDetailRequest, String action) {
+        flashSaleService.findAll();// cập nhập lại toàn bộ trạng thái flash sale;
         CustomUserDetails userIsLoggingIn = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Users users = userRepository.findUsersByUserName(userIsLoggingIn.getUsername());
         Product product = productRepository.findById(cartDetailRequest.getProductId()).get();
-        Cart cart = cartRepository.findByUsers_UserIdAndStatus(users.getUserId(), 0);
-        CartDetail cartDetail = cartDetailRepository.findByProduct_IdAndCart_Id(product.getId(), cart.getId());
-
-        try {
-            if (cartDetail != null) {
-                if (action.equals("create")) {
-                    cartDetail.setQuantity(cartDetail.getQuantity() + cartDetailRequest.getQuantity());
-                    cartDetail.setPrice(product.getExportPrice() * cartDetail.getQuantity());
-                    cartDetailRepository.save(cartDetail);
-                } else if (action.equals("edit")) {
-                    cartDetail.setQuantity(cartDetailRequest.getQuantity());
-                    cartDetail.setPrice(product.getExportPrice() * cartDetail.getQuantity());
-                    cartDetailRepository.save(cartDetail);
-                }
+        Cart pendingCart = cartRepository.findByUsers_UserIdAndStatus(users.getUserId(), 0);
+        boolean checkFlashSale = flashSaleRepo.existsByStatusAndProduct_Id(1, product.getId());
+        List<CartDetail> cartDetail = cartDetailRepository.findByProduct_IdAndCart_Id(product.getId(), pendingCart.getId());
+        CartDetail newDetail = new CartDetail();
+        newDetail.setProduct(product);
+        newDetail.setCart(pendingCart);
+        newDetail.setStatus(1);
+        if (checkFlashSale) {
+            FlashSale flashSale = flashSaleRepo.findByStatusAndProduct_Id(1, product.getId());
+            List<Cart> boughtCart = cartRepository.findByStatusAndUsers_UserIdAndCreatDateBetween(1, users.getUserId(), flashSale.getStartTime(), flashSale.getEndTime());
+            List<CartDetail> boughtDetail = cartDetailRepository.findByCartIn(boughtCart);
+            Product checkBought = productRepository.findByIdAndCartDetailListIn(product.getId(), boughtDetail);
+            if (checkBought != null) {
+                newDetail.setQuantity(cartDetailRequest.getQuantity());
+                newDetail.setPrice(cartDetailRequest.getPrice());
+                newDetail.setName(product.getName());
+                cartDetailRepository.save(newDetail);
                 return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
             } else {
-                CartDetail cartDetailNew = new CartDetail();
-                cartDetailNew.setProduct(product);
-                cartDetailNew.setCart(cart);
-                cartDetailNew.setQuantity(cartDetailRequest.getQuantity());
-                cartDetailNew.setPrice(product.getExportPrice() * cartDetailRequest.getQuantity());
-                cartDetailNew.setName(product.getName());
-                cartDetailNew.setStatus(1);
-                cartDetailRepository.save(cartDetailNew);
+                if (cartDetail.size() == 1) {
+                    if (cartDetail.get(0).getName().contains(Constants.FLASH_SALE_NAME)) {// sản phẩm đã được thêm LẦN ĐẦU TIÊN TRONG thời gian bắt đầu sale -> tạo 1 oderDetail giá thường
+                        newDetail.setQuantity(cartDetailRequest.getQuantity());
+                        newDetail.setPrice(product.getExportPrice());
+                        newDetail.setName(product.getName());
+
+                    } else {// sản phẩm đã được thêm vào giỏ hàng TRƯỚC thời gian diễn ra sale.-> tạo 1 oderDetail với giá sale
+                        newDetail.setQuantity(1);
+                        newDetail.setPrice(product.getExportPrice() * (100 - flashSale.getDiscount()) / 100);
+                        newDetail.setName(String.format("%s%s", product.getName(), Constants.FLASH_SALE_NAME));
+
+                    }
+                } else if (cartDetail.size() == 2) { // kich thuoc list cartdetal theo san pham sale = 2(gom ca oderdetail sale và oderDetail thuong)
+                    newDetail = cartDetail.stream().filter(dt -> !dt.getName().contains(Constants.FLASH_SALE_NAME)).collect(Collectors.toList()).get(0);
+                    if (action.equals("create")) {
+                        newDetail.setQuantity(newDetail.getQuantity() + cartDetailRequest.getQuantity());
+                    } else if (action.equals("edit")) {
+                        newDetail.setQuantity(cartDetailRequest.getQuantity());
+                    } else {
+                        return ResponseEntity.badRequest().body(Message.ERROR_400);
+                    }
+                } else {
+                    newDetail.setQuantity(1);
+                    newDetail.setPrice(product.getExportPrice() * (100 - flashSale.getDiscount()) / 100);
+                    newDetail.setName(String.format("%s%s", product.getName(), Constants.FLASH_SALE_NAME));
+                }
+                cartDetailRepository.save(newDetail);
                 return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
             }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        } else {
+            if (cartDetail.size() != 0) {
+                if (action.equals("create")) {
+                    cartDetail.get(0).setQuantity(cartDetail.get(0).getQuantity() + cartDetailRequest.getQuantity());
+                    cartDetail.get(0).setPrice(cartDetailRequest.getPrice());
+                } else if (action.equals("edit")) {
+                    cartDetail.get(0).setQuantity(cartDetailRequest.getQuantity());
+                }
+                cartDetailRepository.save(cartDetail.get(0));
+                return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
+            } else {
+                newDetail.setQuantity(cartDetailRequest.getQuantity());
+                newDetail.setPrice(cartDetailRequest.getPrice());
+                newDetail.setName(product.getName());
+
+                cartDetailRepository.save(newDetail);
+                return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
+            }
         }
     }
 
@@ -145,11 +229,22 @@ public class CartImpl implements CartService {
 
     @Override
     public CartResponse showCartPending() {
+        flashSaleService.findAll();
         CustomUserDetails customUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        CartResponse response = cartRepository.findByStatusAndUsers_UserId(0, customUser.getUserId())
+        List<Integer> arrInt = new ArrayList<>();
+        arrInt.add(0);
+        CartResponse response = cartRepository.findByStatusInAndUsers_UserId(arrInt, customUser.getUserId())
                 .stream().map(this::mapPoJoToResponse)
                 .collect(Collectors.toList())
                 .get(0);
         return response;
     }
+
+    @Override
+    public ResponseEntity<?> checkout(CartRequest cartRequest) {
+
+        return null;
+    }
+
+
 }

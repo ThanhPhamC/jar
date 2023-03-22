@@ -17,4 +17,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     Page<Product> findByNameContaining(String searchName, Pageable pageable);
     int countByCatalog_Id(int catalogId);
     List<Product> findByLocationIn(List<Location> listLocation);
+    Product findByIdAndCartDetailListIn(int id, List<CartDetail> cartDetailList);
+
 }

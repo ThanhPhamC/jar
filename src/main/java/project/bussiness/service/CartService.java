@@ -16,4 +16,6 @@ public interface CartService extends RootService<Cart,Integer, CartRequest, Cart
     ResponseEntity<?> addToCart(CartDetailRequest cartDetailRequest, String action);
    Page<CartResponse> findByStatusIn(Integer status, Pageable pageable);
    CartResponse showCartPending();
+
+    ResponseEntity<?> checkout(CartRequest cartRequest);
 }

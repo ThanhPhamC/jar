@@ -56,7 +56,6 @@ public class CatalogOfBlogServiceImp implements CatalogOfBlogService {
         }catch (Exception e){
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
-
     }
 
     @Override

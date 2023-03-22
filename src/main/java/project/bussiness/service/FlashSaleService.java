@@ -5,4 +5,5 @@ import project.model.dto.response.FlashSaleResponse;
 import project.model.entity.FlashSale;
 
 public interface FlashSaleService extends RootService<FlashSale,Integer, FlashSaleRequest, FlashSaleResponse> {
+
 }
