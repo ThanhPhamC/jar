@@ -1,10 +1,6 @@
 package project.bussiness.serviceImpl;
 
-
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -15,13 +11,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import project.bussiness.service.CartService;
 import project.bussiness.service.CouponService;
 import project.bussiness.service.UserService;
 import project.model.dto.request.LogInRequest;
 import project.model.dto.request.UserRequest;
-import project.model.dto.response.*;
 import project.model.entity.*;
 import project.model.dto.response.CartResponse;
 import project.model.dto.response.CouponResponse;
@@ -40,8 +34,6 @@ import project.repository.TokenLogInReposirory;
 import project.repository.UserRepository;
 import project.security_jwt.CustomUserDetails;
 import project.security_jwt.JwtTokenProvider;
-
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -61,7 +53,9 @@ public class UserImpl implements UserService {
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
-        return null;
+        Page<Users> page = userRepository.findAll(pageable);
+        Map<String,Object> result = Utility.returnResponse(page);
+        return result;
     }
 
     @Override
@@ -71,12 +65,62 @@ public class UserImpl implements UserService {
 
     @Override
     public UserResponse update(Integer id, UserRequest userRequest) {
-        return null;
+        Users userUpdate = userRepository.findById(id).get();
+        userUpdate.setUserStatus(userRequest.isUserStatus());
+        Set<String> strRoles = userRequest.getListRoles();
+        Set<Roles> listRoles = new HashSet<>();
+        if (strRoles == null) {
+            //User quyen mac dinh
+            Roles userRole = (Roles) roleRepository.findByRoleName(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException(Message.ERROR_ROLE_NOT_FOUND));
+            listRoles.add(userRole);
+        } else {
+            strRoles.forEach(role -> {
+                switch (role) {
+                    case "admin":
+                        Roles adminRole = null;
+                        try {
+                            adminRole = roleRepository.findByRoleName(ERole.ROLE_ADMIN)
+                                    .orElseThrow(() -> new RuntimeException(Message.ERROR_ROLE_NOT_FOUND));
+                        } catch (Throwable e) {
+                            throw new RuntimeException(e);
+                        }
+                        listRoles.add(adminRole);
+                    case "moderator":
+                        Roles modRole = null;
+                        try {
+                            modRole = roleRepository.findByRoleName(ERole.ROLE_MODERATOR)
+                                    .orElseThrow(() -> new RuntimeException(Message.ERROR_ROLE_NOT_FOUND));
+                        } catch (Throwable e) {
+                            throw new RuntimeException(e);
+                        }
+                        listRoles.add(modRole);
+                    case "user":
+                        Roles userRole = null;
+                        try {
+                            userRole = roleRepository.findByRoleName(ERole.ROLE_USER)
+                                    .orElseThrow(() -> new RuntimeException(Message.ERROR_ROLE_NOT_FOUND));
+                        } catch (Throwable e) {
+                            throw new RuntimeException(e);
+                        }
+                        listRoles.add(userRole);
+                }
+            });
+        }
+        userUpdate.setListRoles(listRoles);
+        userRepository.save(userUpdate);
+        return mapPoJoToResponse(userUpdate);
     }
 
     @Override
     public ResponseEntity<?> delete(Integer id) {
-        return null;
+        try {
+            Users userDelete = findById(id);
+            userDelete.setUserStatus(false);
+            userRepository.save(userDelete);
+            return ResponseEntity.ok().body(Message.DELETE_SUCCESS);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
     }
 
     @Override
@@ -91,12 +135,14 @@ public class UserImpl implements UserService {
 
     @Override
     public Users findById(Integer id) {
-        return null;
+        return userRepository.findById(id).get();
     }
 
     @Override
     public Map<String, Object> findByName(String name, Pageable pageable) {
-        return null;
+        Page<Users> page = userRepository.findByFirstNameContaining(name, pageable);
+        Map<String, Object> result = Utility.returnResponse(page);
+        return result;
     }
 
     @Override
@@ -106,7 +152,22 @@ public class UserImpl implements UserService {
 
     @Override
     public UserResponse mapPoJoToResponse(Users users) {
-        return null;
+        UserResponse userResponse = new UserResponse();
+        userResponse.setUserId(users.getUserId());
+        userResponse.setUserName(users.getUserName());
+        userResponse.setFirstName(users.getFirstName());
+        userResponse.setLastName(users.getLastName());
+        userResponse.setEmail(users.getEmail());
+        userResponse.setAvatar(users.getAvatar());
+        userResponse.setCity(users.getCity());
+        userResponse.setState(users.getState());
+        userResponse.setAddress(users.getAddress());
+        userResponse.setCounty(users.getCountry());
+        userResponse.setPhone(users.getPhone());
+        userResponse.setBirtDate(users.getBirtDate());
+        userResponse.setListRoles(users.getListRoles());
+        userResponse.setUserStatus(users.isUserStatus());
+        return userResponse;
     }
 
     @Override
@@ -265,5 +326,86 @@ public class UserImpl implements UserService {
         tokenLogInReposirory.deleteById(tokenLogIn.getId());
         return ResponseEntity.ok().body(Message.LOGOUT_SUCCESS);
     }
+
+    @Override
+    public List<UserResponse> getAllUserForModerator() {
+        List<Users> usersForModerator = new ArrayList<>();
+        List<Users> listUser = userRepository.findAll();
+        Set<Roles> roleUser = new HashSet<>();
+        Roles userRole = roleRepository.findById(3).get();
+        roleUser.add(userRole);
+        for (Users user : listUser) {
+            if (user.getListRoles().containsAll(roleUser)&&user.getListRoles().size()==1){
+                usersForModerator.add(user);
+            }
+
+        }
+        List<UserResponse> responses = usersForModerator.stream()
+                .map(this::mapPoJoToResponse).collect(Collectors.toList());
+        return responses;
+    }
+
+    @Override
+    public ResponseEntity<?> updateUserForModerator(int userId, UserRequest userRequest) {
+        Users user = findById(userId);
+        Set<Roles> roleUser = new HashSet<>();
+        Roles userRole = roleRepository.findById(3).get();
+        roleUser.add(userRole);
+        if (user.getListRoles().containsAll(roleUser)&&user.getListRoles().size()==1){
+            user.setUserStatus(userRequest.isUserStatus());
+            userRepository.save(user);
+            UserResponse response = mapPoJoToResponse(user);
+            return new ResponseEntity<>(response,HttpStatus.OK);
+        } else {
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> updateUserForUser(int userId, UserRequest userRequest) {
+        CustomUserDetails userIsLoggingIn = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users users = userRepository.findUsersByUserName(userIsLoggingIn.getUsername());
+        if (users.getUserId()==userId) {
+            try {
+                if (userRepository.existsByEmail(userRequest.getEmail())) {
+                    return ResponseEntity.badRequest().body(Message.ERROR_EXISTED_EMAIL);
+                }
+                if (!RegexValidate.checkRegexEmail(userRequest.getEmail())) {
+                    return ResponseEntity.badRequest().body(Message.ERROR_INVALID_EMAIL);
+                }
+                if (!RegexValidate.checkRegexPhone(userRequest.getPhone())) {
+                    return ResponseEntity.badRequest().body(Message.ERROR_INVALID_PHONE);
+                }
+                Users userUpdateUser = findById(userId);
+                userUpdateUser.setFirstName(userRequest.getFirstName());
+                userUpdateUser.setLastName(userRequest.getLastName());
+                userUpdateUser.setPhone(userRequest.getPhone());
+                userUpdateUser.setAddress(userRequest.getAddress());
+                userUpdateUser.setEmail(userRequest.getEmail());
+                userUpdateUser.setCountry(userRequest.getCounty());
+                userUpdateUser.setCity(userRequest.getCity());
+                userUpdateUser.setState(userRequest.getState());
+                userUpdateUser.setBirtDate(userRequest.getBirtDate());
+                userUpdateUser.setAvatar(userRequest.getAvatar());
+                userRepository.save(userUpdateUser);
+                UserResponse response = mapPoJoToResponse(userUpdateUser);
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(Message.ERROR_400);
+            }
+        } else {
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+
+
+    }
+
+    @Override
+    public UserResponse findUserByIdForClient() {
+        CustomUserDetails userIsLoggingIn = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users users = userRepository.findUsersByUserName(userIsLoggingIn.getUsername());
+        return mapPoJoToResponse(findById(users.getUserId()));
+    }
+
 
 }
