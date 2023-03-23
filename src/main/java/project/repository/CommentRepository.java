@@ -14,4 +14,5 @@ public interface CommentRepository extends JpaRepository<CommentBlog,Integer> {
     List<CommentBlog> findAllByUsers_UserId(int Id);
     List<CommentBlog> findAllByBlog_Id(int Id);
     Page<CommentBlog>findByNameContaining(String name, Pageable pageable);
+    Page<CommentBlog> searchAllByBlog_Id(Pageable pageable,int id);
 }
