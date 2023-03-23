@@ -18,6 +18,7 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
     private String userName;
+    @JsonIgnore
     private String password;
     private String firstName;
     private  String lastName;
@@ -45,5 +46,6 @@ public class Users {
     private List<Blog> blogList=new ArrayList<>();
     @OneToMany(mappedBy = "users")
     private List<Coupon> couponList= new ArrayList<>();
+    @JsonIgnore
     private LocalDate blockedDate;
 }

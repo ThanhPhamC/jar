@@ -3,7 +3,6 @@ package project.bussiness.serviceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.SliderService;
@@ -14,7 +13,6 @@ import project.model.shopMess.Message;
 import project.model.utility.Utility;
 import project.repository.SliderRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

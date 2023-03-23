@@ -1,5 +1,6 @@
 package project.model.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -13,4 +14,5 @@ public class Roles {
     private int roleId;
     @Enumerated(EnumType.STRING)
     private ERole roleName;
+
 }

@@ -8,7 +8,6 @@ import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.ProductService;
-import project.bussiness.service.WishService;
 import project.model.dto.request.FilterProductRequest;
 import project.model.dto.request.ProductFeatureRequest;
 import project.model.dto.request.ProductRequest;
