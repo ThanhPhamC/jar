@@ -19,13 +19,12 @@ import project.repository.CommentRepository;
 public class CommentController {
     private CommentService commentService;
     @PostMapping
-    public ResponseEntity<?> creatNewCatalog(@RequestBody CommentRequest request){
+    public ResponseEntity<?> creatNewComment(@RequestBody CommentRequest request){
         try {
             CommentResponse result= commentService.saveOrUpdate(request);
             return  new ResponseEntity<>(result, HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity(Message.ERROR_400,HttpStatus.BAD_REQUEST);
         }
-
     }
 }

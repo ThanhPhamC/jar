@@ -82,7 +82,7 @@ public class ReviewImpl implements ReviewService {
         response.setLastName(review.getUsers().getLastName());
         response.setAvatar(review.getUsers().getAvatar());
         response.setComment(review.getCommentContent());
-        response.setStarPoint(response.getStarPoint());
+        response.setStarPoint(review.getStarPoint());
         response.setStatus(review.getStatus());
         LocalDate now = LocalDate.now();
         Period period = Period.between(review.getCreateDate(), now);

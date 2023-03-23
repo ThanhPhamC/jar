@@ -12,6 +12,7 @@ import project.model.dto.request.ProductRequest;
 import project.model.dto.response.ProductResponse;
 import project.model.dto.response.ReviewResponse;
 import project.model.entity.*;
+import project.model.shopMess.Message;
 import project.model.utility.Utility;
 import project.repository.*;
 
@@ -32,22 +33,38 @@ public class ProductImpl implements ProductService {
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
-        return null;
+        Page<ProductResponse> page = productRepo.findAll(pageable).map(this::mapPoJoToResponse);
+        Map<String,Object> result = Utility.returnResponse(page);
+        return result;
     }
 
     @Override
     public ProductResponse saveOrUpdate(ProductRequest productRequest) {
-        return null;
+        Product product = mapRequestToPoJo(productRequest);
+        Product productNew = productRepo.save(product);
+        ProductResponse productResponse = mapPoJoToResponse(productNew);
+        return productResponse;
     }
 
     @Override
     public ProductResponse update(Integer id, ProductRequest productRequest) {
-        return null;
+        Product product = mapRequestToPoJo(productRequest);
+        product.setId(id);
+        Product productUpdate = productRepo.save(product);
+        ProductResponse productResponse = mapPoJoToResponse(productUpdate);
+        return productResponse;
     }
 
     @Override
     public ResponseEntity<?> delete(Integer id) {
-        return null;
+        try {
+            Product productDelete = productRepo.findById(id).get();
+            productDelete.setStatus(0);
+            return ResponseEntity.ok().body(Message.SUCCESS);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+
     }
 
     @Override

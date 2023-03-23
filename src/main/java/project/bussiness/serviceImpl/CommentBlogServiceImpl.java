@@ -87,7 +87,6 @@ public class CommentBlogServiceImpl implements CommentService {
         commentBlog.setStatus(0);
         return commentBlog;
     }
-
     @Override
     public CommentResponse mapPoJoToResponse(CommentBlog commentBlog) {
         CommentResponse commentResponse = new CommentResponse();
