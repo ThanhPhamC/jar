@@ -86,9 +86,7 @@ public class CatalogController {
        }catch (Exception e){
            return ResponseEntity.badRequest().body(Message.ERROR_400);
        }
-
     }
-
     @GetMapping("/get_feature_catalog_for_screen_2")
     public ResponseEntity<?> getFeatureCatalogForScreen2(@RequestBody ProductFeatureRequest productFeatureRequest){
         try {

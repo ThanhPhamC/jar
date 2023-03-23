@@ -8,6 +8,8 @@ import project.model.entity.Users;
 import java.util.List;
 
 
+import java.util.List;
+
 public interface UserService extends RootService<Users,Integer, UserRequest, UserResponse> {
     Users findByEmail(String email);
     ResponseEntity<?> register(UserRequest userRequest);
