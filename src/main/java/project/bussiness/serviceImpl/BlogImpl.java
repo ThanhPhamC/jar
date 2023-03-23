@@ -108,8 +108,9 @@ public class BlogImpl implements BlogService {
 
     @Override
     public Map<String, Object> findByName(String name, Pageable pageable) {
-        Page<Blog> blogPage = blogRepo.findByNameContaining(name, pageable);
+        Page<BlogResponse> blogPage = blogRepo.findByNameContaining(name, pageable).map(this::mapPoJoToResponse);
         Map<String, Object> result = Utility.returnResponse(blogPage);
+
         return result;
 
     }

@@ -1,6 +1,7 @@
 package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,6 +12,8 @@ import project.model.dto.response.ReviewResponse;
 import project.model.entity.Product;
 import project.model.entity.Review;
 import project.model.entity.Users;
+import project.model.shopMess.Message;
+import project.model.utility.Utility;
 import project.repository.ProductRepository;
 import project.repository.ReviewRepository;
 import project.repository.UserRepository;
@@ -20,6 +23,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -30,9 +34,10 @@ public class ReviewImpl implements ReviewService {
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
-        return null;
+        Page<ReviewResponse>reviewPage=reviewRepository.findAll(pageable).map(this::mapPoJoToResponse);
+        Map<String,Object>result = Utility.returnResponse(reviewPage);
+        return result;
     }
-
     @Override
     public ReviewResponse saveOrUpdate(ReviewRequest reviewRequest) {
         return null;
@@ -40,33 +45,52 @@ public class ReviewImpl implements ReviewService {
 
     @Override
     public ReviewResponse update(Integer id, ReviewRequest reviewRequest) {
-        return null;
+        Review review = reviewRepository.findById(id).get();
+        review.setCommentContent(reviewRequest.getCommentContent());
+        review.setStarPoint(reviewRequest.getStarPoint());
+        Review review1=reviewRepository.save(review);
+        ReviewResponse response = mapPoJoToResponse(review1);
+        return response;
     }
 
+//
     @Override
     public ResponseEntity<?> delete(Integer id) {
-        return null;
+        try {
+            Review reviewDelete = reviewRepository.findById(id).get();
+            reviewDelete.setStatus(0);
+            reviewRepository.save(reviewDelete);
+            return ResponseEntity.ok().body(Message.SUCCESS);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.ok().body(Message.ERROR_400);
+        }
     }
 
     @Override
     public List<Review> findAll() {
-        return null;
+        return reviewRepository.findAll();
     }
 
     @Override
     public List<ReviewResponse> getAllForClient() {
-        return null;
+        List<ReviewResponse>result =reviewRepository.findAll().stream().map(this::mapPoJoToResponse).collect(Collectors.toList());
+
+        return result;
     }
 
     @Override
     public Review findById(Integer id) {
-        return null;
+        Review review =reviewRepository.findById(id).get();
+        return review;
     }
 
     @Override
     public Map<String, Object> findByName(String name, Pageable pageable) {
+//        Page<Review>reviewPage=reviewRepository.findReviewByUsersFirstName(name,pageable);
         return null;
     }
+
 
     @Override
     public Review mapRequestToPoJo(ReviewRequest reviewRequest) {
@@ -121,4 +145,31 @@ public class ReviewImpl implements ReviewService {
     public ReviewResponse getReviewResponseById(int reviewId) {
         return mapPoJoToResponse(reviewRepository.findById(reviewId).get());
     }
+
+    @Override
+    public ReviewResponse updateAdmin(Integer id, ReviewRequest reviewRequest) {
+        Review review= reviewRepository.findById(id).get();
+        review.setStatus(reviewRequest.getStatus());
+        Review review1=reviewRepository.save(review);
+        ReviewResponse response=mapPoJoToResponse(review1);
+
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> findReviewByProductId(int productId, Pageable pageable) {
+        Page<ReviewResponse>reviewResponses=reviewRepository.findReviewByProductId(productId,pageable).map(this::mapPoJoToResponse);
+        Map<String,Object> result=Utility.returnResponse(reviewResponses);
+        return result;
+    }
+
+    @Override
+    public  Map<String,Object> findReviewByUsersUserId(int userId, Pageable pageable) {
+        Page<ReviewResponse> reviewResponses=reviewRepository.findReviewByUsersUserId(userId,pageable).map(this::mapPoJoToResponse);
+        Map<String,Object>result =Utility.returnResponse(reviewResponses);
+
+        return result;
+    }
+
+
 }
