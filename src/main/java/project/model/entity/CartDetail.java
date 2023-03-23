@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "cartDetail")
 public class CartDetail extends BaseEntity{
+
     private int quantity;
     private float price;
     @ManyToOne(fetch =  FetchType.EAGER)

@@ -123,11 +123,15 @@ public class CartImpl implements CartService {
                     }
                     newDetailList.add(dt);
                 }else {  // khong sale
-                    if (dt.getName().contains(Constants.FLASH_SALE_NAME)){
-                        cartDetailRepository.delete(dt);
-                    }else {
+                        if (dt.getName().contains(Constants.FLASH_SALE_NAME)){
+                            if (countCartDetailByProductId.size()==1){
+                                dt.setPrice(dt.getProduct().getExportPrice()*(100-dt.getProduct().getDiscount())/100);
+                            }
+                            cartDetailRepository.delete(dt);
+                        }
+                        else {
                         newDetailList.add(dt);
-                    }
+                        }
                 }
             }
             responseList=newDetailList.stream().map(cartDetail -> {
