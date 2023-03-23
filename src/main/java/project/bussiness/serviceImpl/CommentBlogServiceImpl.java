@@ -116,4 +116,11 @@ public class CommentBlogServiceImpl implements CommentService {
     public CommentResponse finByIdResponse(int id) {
         return mapPoJoToResponse(findById(id));
     }
+
+    @Override
+    public Map<String, Object> searchByBlogId(Pageable pageable, int id) {
+        Page<CommentResponse> commentResponses =commentRepository.searchAllByBlog_Id(pageable,id).map(this::mapPoJoToResponse);
+       Map<String,Object>result =Utility.returnResponse(commentResponses);
+        return result;
+    }
 }
