@@ -1,6 +1,7 @@
 package project.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +12,9 @@ import project.model.dto.request.CartDetailRequest;
 import project.model.dto.request.CartRequest;
 import project.model.dto.response.CartResponse;
 import project.model.shopMess.Message;
+import project.repository.TokenLogInReposirory;
+import project.model.utility.Utility;
+import java.util.Map;
 
 @RestController
 @CrossOrigin("http://localhost:8080")
@@ -30,6 +34,7 @@ public class CartController {
         return detailService.delete(cartDetailId);
     }
     @GetMapping("/get_cart_pending_for_user")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
     public ResponseEntity<?>getCartPending(){
         try {
             CartResponse response= cartService.showCartPending();
@@ -38,8 +43,31 @@ public class CartController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
-    @PutMapping("/checkout")
-    public ResponseEntity<?> checkOutCart(@RequestParam CartRequest rq){
-        return null;
+    @GetMapping ("/get_paging_and_sort")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') ")
+    public ResponseEntity<?> getAllCartForAdmin(@RequestParam Map<String,String> headers){
+        try{
+            Pageable pageable= Utility.sort_order(headers);
+            Map<String, Object> result = cartService.getPagingAndSort(pageable);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity(Message.ERROR_400,HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PutMapping("/change_status")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') ")
+    public ResponseEntity<?>confirmNextStatus(@RequestParam Integer cartId,Integer status ){
+        return cartService.changeStatus(cartId, status);
+    }
+    @GetMapping("/get_all_history")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')or hasRole('USER') ")
+    public ResponseEntity<?> getAllByUserId(@RequestParam Map<String,String> headers){
+        try {
+            Pageable pageable=Utility.sort_order(headers);
+            Map<String,Object> result=cartService.getAllForClient(pageable);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity(Message.ERROR_400,HttpStatus.BAD_REQUEST);
+        }
     }
 }

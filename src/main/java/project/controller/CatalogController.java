@@ -77,18 +77,16 @@ public class CatalogController {
         }
     }
     @GetMapping("/search")
-    public ResponseEntity<?>search(@RequestParam Map<String,String> hearch){
+    public ResponseEntity<?>search(@RequestParam Map<String,String> headers){
        try {
-           Pageable pageable=Utility.sort_order(hearch);
-           Map<String,Object>result=catalogService.findByName(hearch.get("name"),pageable);
+           Pageable pageable=Utility.sort_order(headers);
+           Map<String,Object>result=catalogService.findByName(headers.get("name"),pageable);
            return new ResponseEntity<>(result,HttpStatus.OK);
 
        }catch (Exception e){
            return ResponseEntity.badRequest().body(Message.ERROR_400);
        }
-
     }
-
     @GetMapping("/get_feature_catalog_for_screen_2")
     public ResponseEntity<?> getFeatureCatalogForScreen2(@RequestBody ProductFeatureRequest productFeatureRequest){
         try {

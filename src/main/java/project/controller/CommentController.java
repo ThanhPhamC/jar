@@ -27,7 +27,7 @@ public class CommentController {
     private CommentService commentService;
     private UserService userService;
     @PostMapping
-    public ResponseEntity<?> creatNewCatalog(@RequestBody CommentRequest request){
+    public ResponseEntity<?> creatNewComment(@RequestBody CommentRequest request){
         try {
             CommentResponse result= commentService.saveOrUpdate(request);
             return  new ResponseEntity<>(result, HttpStatus.OK);
