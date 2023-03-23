@@ -8,4 +8,5 @@ public class ReviewRequest {
     private int starPoint;
     private String commentContent;
     private int productId;
+    private int status;
 }
