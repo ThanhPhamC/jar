@@ -2,6 +2,7 @@ package project.bussiness.service;
 
 import project.model.dto.request.CatalogRequest;
 import project.model.dto.response.CatalogResponse;
+import project.model.dto.response.ProductResponse;
 import project.model.entity.Catalog;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,5 @@ public interface CatalogService extends RootService<Catalog,Integer, CatalogRequ
     List<CatalogResponse> getFeatureCatalogForScreen2(LocalDateTime startDate, LocalDateTime endDate, int size);
     List<CatalogResponse> countTypeOfProduct();
     CatalogResponse finByIdResponse(int id);
-
 
 }

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import project.bussiness.service.ReviewService;
 import project.model.dto.request.ReviewRequest;
 import project.model.dto.response.ReviewResponse;
+import project.model.entity.*;
+import project.repository.*;
 import project.model.entity.Product;
 import project.model.entity.Review;
 import project.model.entity.Users;
@@ -18,9 +20,8 @@ import project.repository.ProductRepository;
 import project.repository.ReviewRepository;
 import project.repository.UserRepository;
 import project.security_jwt.CustomUserDetails;
-
-import java.time.LocalDate;
-import java.time.Period;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,6 +32,8 @@ public class ReviewImpl implements ReviewService {
     private UserRepository userRepository;
     private ProductRepository productRepository;
     private ReviewRepository reviewRepository;
+    private CartRepository cartRepository;
+    private CartDetailRepository cartDetailRepository;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -38,6 +41,7 @@ public class ReviewImpl implements ReviewService {
         Map<String,Object>result = Utility.returnResponse(reviewPage);
         return result;
     }
+
     @Override
     public ReviewResponse saveOrUpdate(ReviewRequest reviewRequest) {
         return null;
@@ -107,16 +111,36 @@ public class ReviewImpl implements ReviewService {
         response.setComment(review.getCommentContent());
         response.setStarPoint(review.getStarPoint());
         response.setStatus(review.getStatus());
-        LocalDate now = LocalDate.now();
-        Period period = Period.between(review.getCreateDate(), now);
-        int days = period.getDays();
-        int months = period.getMonths();
-        int years = period.getYears();
-        if (days!=0 && months==0 && years==0) {
+        LocalDateTime now = LocalDateTime.now();
+        long years = ChronoUnit.YEARS.between(review.getCreateDate(), now);
+        long months = ChronoUnit.MONTHS.between(review.getCreateDate(), now);
+        long weeks = ChronoUnit.WEEKS.between(review.getCreateDate(), now);
+        long days = ChronoUnit.DAYS.between(review.getCreateDate(), now);
+        long hours = ChronoUnit.HOURS.between(review.getCreateDate(), now);
+        long minutes = ChronoUnit.MINUTES.between(review.getCreateDate(), now);
+        long seconds = ChronoUnit.SECONDS.between(review.getCreateDate(), now);
+        if (seconds==0){
+            response.setDaysAgo( "just now");
+        }
+        if (seconds!=0 && minutes==0 && hours ==0&& days ==0 && weeks==0 && months == 0&& years==0) {
+            response.setDaysAgo(seconds + " seconds ago");
+        }
+        if (minutes!=0 && hours ==0&& days ==0 && weeks==0 && months == 0&& years==0){
+            response.setDaysAgo(minutes + " minutes ago");
+        }
+        if (hours!=0&& days ==0 && weeks==0 && months == 0&& years==0){
+            response.setDaysAgo(hours + " hours ago");
+        }
+        if (days != 0 && weeks==0 && months == 0 && years == 0) {
             response.setDaysAgo(days + " days ago");
-        } else if (months !=0 && years ==0) {
+        }
+        if (weeks!=0 && months == 0&& years==0){
+            response.setDaysAgo(weeks + " weeks ago");
+        }
+        if (months != 0 && years == 0) {
             response.setDaysAgo(months + " months ago");
-        } else if(years!=0){
+        }
+        if (years != 0) {
             response.setDaysAgo(years + " years ago");
         }
         return response;
@@ -127,17 +151,21 @@ public class ReviewImpl implements ReviewService {
         CustomUserDetails userIsLoggingIn = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Users users = userRepository.findUsersByUserName(userIsLoggingIn.getUsername());
         Product product = productRepository.findById(reviewRequest.getProductId()).get();
-
+        List<Cart> cartList = cartRepository.findByUsers_UserIdAndStatus(users.getUserId(), 4);
+        List<CartDetail> cartDetailList = cartDetailRepository.findByCartIn(cartList);
         Review review = new Review();
-        review.setUsers(users);
-        review.setProduct(product);
-        review.setCommentContent(reviewRequest.getCommentContent());
-        review.setStarPoint(reviewRequest.getStarPoint());
-        review.setStatus(0);
-        LocalDate now = LocalDate.now();
-        review.setCreateDate(now);
-        reviewRepository.save(review);
-
+        for (CartDetail cd : cartDetailList) {
+            if (cd.getProduct().getId() == reviewRequest.getProductId()) {
+                review.setUsers(users);
+                review.setProduct(product);
+                review.setCommentContent(reviewRequest.getCommentContent());
+                review.setStarPoint(reviewRequest.getStarPoint());
+                review.setStatus(0);
+                LocalDateTime now = LocalDateTime.now();
+                review.setCreateDate(now);
+                reviewRepository.save(review);
+            }
+        }
         return mapPoJoToResponse(review);
     }
 

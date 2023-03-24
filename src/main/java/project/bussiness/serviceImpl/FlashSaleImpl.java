@@ -31,8 +31,18 @@ public class FlashSaleImpl implements FlashSaleService {
     public FlashSaleResponse saveOrUpdate(FlashSaleRequest rq) {
         FlashSale map = mapRequestToPoJo(rq);
         FlashSale result = flashSaleRepo.save(map);
-        FlashSaleResponse response = mapPoJoToResponse(result);
-        return response;
+        List<FlashSale> flashSales = findAll().stream().filter(fs -> fs.getStatus() == Constants.ONLINE).collect(Collectors.toList());
+        boolean check =false;
+        for (FlashSale fs : flashSales) {
+                if (fs.getProduct().getId()== map.getProduct().getId()&&fs.getEndTime().compareTo(map.getStartTime())>0){
+                    check =true;}
+        }
+        if (!check){
+            FlashSaleResponse response = mapPoJoToResponse(result);
+            return response;
+        }else {
+            return null;
+        }
     }
 
     @Override
@@ -80,7 +90,7 @@ public class FlashSaleImpl implements FlashSaleService {
     public FlashSale mapRequestToPoJo(FlashSaleRequest rq) {
         FlashSale flashSale = new FlashSale();
         flashSale.setProduct(productRepo.findById(rq.getProductId()).get());
-        flashSale.setName(String.format("%s(%s)", productRepo.findById(rq.getProductId()).get().getName(), Constants.FLASH_SALE_NAME));
+        flashSale.setName(String.format("%s%s", productRepo.findById(rq.getProductId()).get().getName(), Constants.FLASH_SALE_NAME));
         flashSale.setStartTime(rq.getStartTime());
         flashSale.setEndTime(rq.getEndTime());
         flashSale.setDiscount(rq.getDiscount());

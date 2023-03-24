@@ -14,6 +14,7 @@ import project.model.dto.request.CartRequest;
 import project.model.dto.response.CartDetailResponse;
 import project.model.dto.response.CartResponse;
 import project.model.dto.response.ProductReportByBrand;
+import project.model.dto.response.ProductReportByCatalog;
 import project.model.entity.*;
 import project.model.shopMess.Constants;
 import project.model.shopMess.Message;
@@ -124,18 +125,21 @@ public class CartImpl implements CartService {
                     }
                     newDetailList.add(dt);
                 }else {  // khong sale
-                    if (dt.getName().contains(Constants.FLASH_SALE_NAME)){
-                        cartDetailRepository.delete(dt);
-                    }else {
+                        if (dt.getName().contains(Constants.FLASH_SALE_NAME)){
+                            if (countCartDetailByProductId.size()==1){
+                                dt.setPrice(dt.getProduct().getExportPrice()*(100-dt.getProduct().getDiscount())/100);
+                            }
+                            cartDetailRepository.delete(dt);
+                        }
+                        else {
                         newDetailList.add(dt);
-                    }
+                        }
                 }
             }
             responseList=newDetailList.stream().map(cartDetail -> {
                 CartDetailResponse rp = cartDetailService.mapPoJoToResponse(cartDetail);
                 return rp;
             }).collect(Collectors.toList());
-
         }else {
                responseList = cart.getCartDetailList().stream().map(cartDetail -> {
                 CartDetailResponse rp = cartDetailService.mapPoJoToResponse(cartDetail);
@@ -144,6 +148,19 @@ public class CartImpl implements CartService {
 
         }
         response.setDetailResponses(responseList);
+        response.setDiscount(cart.getDiscount());
+        response.setShipping(cart.getShipping());
+        response.setTax(cart.getTax());
+        CustomUserDetails userIsLoggingIn = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users users = userRepository.findUsersByUserName(userIsLoggingIn.getUsername());
+        response.setFirstName(users.getFirstName());
+        response.setLastName(users.getLastName());
+        response.setEmail(users.getEmail());
+        response.setPhone(users.getPhone());
+        response.setAddress(users.getAddress());
+        response.setCity(users.getCity());
+        response.setCountry(users.getCountry());
+        response.setState(users.getState());
         return response;
     }
 
@@ -159,10 +176,7 @@ public class CartImpl implements CartService {
         if (tokenLogInReposirory.existsByUsers_UserId(users.getUserId())) {
             flashSaleService.findAll();// cập nhập lại toàn bộ trạng thái flash sale;
             Product product = productRepository.findById(cartDetailRequest.getProductId()).get();
-            if (cartDetailRequest.getPrice()!=product.getExportPrice()*(100- product.getDiscount())/100){
-                return ResponseEntity.badRequest().body(Message.ERROR_PRICE);
-            }
-            Cart pendingCart = cartRepository.findByUsers_UserIdAndStatus(users.getUserId(), 0);
+            Cart pendingCart = cartRepository.findByUsers_UserIdAndStatus(users.getUserId(), 0).get(0);
             boolean checkFlashSale = flashSaleRepo.existsByStatusAndProduct_Id(1, product.getId());
             List<CartDetail> cartDetail = cartDetailRepository.findByProduct_IdAndCart_Id(product.getId(), pendingCart.getId());
             CartDetail newDetail = new CartDetail();
@@ -178,6 +192,7 @@ public class CartImpl implements CartService {
                     newDetail.setQuantity(cartDetailRequest.getQuantity());
                     newDetail.setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                     newDetail.setName(product.getName());
+                    newDetail.setDiscount(product.getDiscount()*product.getExportPrice()/100);
                     cartDetailRepository.save(newDetail);
                     return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
                 } else {
@@ -186,12 +201,13 @@ public class CartImpl implements CartService {
                             newDetail.setQuantity(cartDetailRequest.getQuantity());
                             newDetail.setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                             newDetail.setName(product.getName());
+                            newDetail.setDiscount(product.getDiscount()*product.getExportPrice()/100);
 
                         } else {// sản phẩm đã được thêm vào giỏ hàng TRƯỚC thời gian diễn ra sale.-> tạo 1 oderDetail với giá sale
                             newDetail.setQuantity(1);
                             newDetail.setPrice(product.getExportPrice() * (100 - flashSale.getDiscount()) / 100);
+                            newDetail.setDiscount(product.getExportPrice()* flashSale.getDiscount()/100);
                             newDetail.setName(String.format("%s%s", product.getName(), Constants.FLASH_SALE_NAME));
-
                         }
                     } else if (cartDetail.size() == 2) { // kich thuoc list cartdetal theo san pham sale = 2(gom ca oderdetail sale và oderDetail thuong)
                         newDetail = cartDetail.stream().filter(dt -> !dt.getName().contains(Constants.FLASH_SALE_NAME)).collect(Collectors.toList()).get(0);
@@ -205,6 +221,7 @@ public class CartImpl implements CartService {
                     } else {
                         newDetail.setQuantity(1);
                         newDetail.setPrice(product.getExportPrice() * (100 - flashSale.getDiscount()) / 100);
+                        newDetail.setDiscount(product.getExportPrice()* flashSale.getDiscount()/100);
                         newDetail.setName(String.format("%s%s", product.getName(), Constants.FLASH_SALE_NAME));
                     }
                     cartDetailRepository.save(newDetail);
@@ -214,17 +231,17 @@ public class CartImpl implements CartService {
                 if (cartDetail.size() != 0) {
                     if (action.equals("create")) {
                         cartDetail.get(0).setQuantity(cartDetail.get(0).getQuantity() + cartDetailRequest.getQuantity());
-                        cartDetail.get(0).setPrice(cartDetailRequest.getPrice());
+                        cartDetail.get(0).setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                     } else if (action.equals("edit")) {
                         cartDetail.get(0).setQuantity(cartDetailRequest.getQuantity());
                     }
                     cartDetailRepository.save(cartDetail.get(0));
                     return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
                 } else {
+                    newDetail.setDiscount(product.getDiscount()*product.getExportPrice()/100);
                     newDetail.setQuantity(cartDetailRequest.getQuantity());
                     newDetail.setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                     newDetail.setName(product.getName());
-
                     cartDetailRepository.save(newDetail);
                     return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
                 }
@@ -241,7 +258,6 @@ public class CartImpl implements CartService {
 
     @Override
     public CartResponse showCartPending() {
-        flashSaleService.findAll();
         CustomUserDetails customUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Integer> arrInt = new ArrayList<>();
         arrInt.add(0);
@@ -275,6 +291,8 @@ public class CartImpl implements CartService {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+
+
 
     @Override
     public List<ProductReportByBrand> findCartByStatusAndCreatDateBetween(int status, int bradId, LocalDateTime createDate, LocalDateTime endDate) {

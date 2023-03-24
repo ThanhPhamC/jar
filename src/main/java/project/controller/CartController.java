@@ -8,10 +8,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.CartDetailService;
 import project.bussiness.service.CartService;
+import project.model.dto.request.CartConfirmRequest;
 import project.model.dto.request.CartDetailRequest;
 import project.model.dto.request.CartRequest;
 import project.model.dto.response.CartResponse;
 import project.model.dto.response.ProductReportByBrand;
+import project.model.dto.response.ProductReportByCatalog;
 import project.model.shopMess.Message;
 import project.repository.TokenLogInReposirory;
 import project.model.utility.Utility;
@@ -86,4 +88,6 @@ public class CartController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+
+
 }

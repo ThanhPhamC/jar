@@ -20,4 +20,6 @@ public class Message {
     public static  final String UNBLOCK_USER_SUCCESS= "Unblock user success";
     public static  final String LOGOUT_SUCCESS= "Log out success";
     public static  final String DELETE_SUCCESS= "Delete success";
+    public static final String ERROR_EXISTED_NAME = "Name is already";
+    public static final String ERROR_EXISTED_TIME = "Sale period is still valid";
 }
