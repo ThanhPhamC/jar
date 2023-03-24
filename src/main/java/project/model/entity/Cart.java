@@ -23,7 +23,7 @@ public class Cart extends BaseEntity{
     private String note;
     private LocalDateTime creatDate;
     private float total;
-    private int discount;
+    private float discount;
     private float shipping;
     private float tax;
     @ManyToOne(fetch =  FetchType.EAGER)
