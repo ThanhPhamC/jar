@@ -22,5 +22,4 @@ public interface CartService extends RootService<Cart,Integer, CartRequest, Cart
     Map<String,Object> getAllForClient(Pageable pageable);
     ResponseEntity<?> changeStatus(Integer cartId,Integer status);
 //    ResponseEntity<?> getRevenueByBrand(String brand,LocalDateTime start,LocalDateTime end);
-List<ProductReportByBrand> findCartByStatusAndCreatDateBetween(int status , int bradId, LocalDateTime createDate, LocalDateTime endDate);
 }

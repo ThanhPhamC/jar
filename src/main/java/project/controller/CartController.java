@@ -77,17 +77,7 @@ public class CartController {
         }
     }
 
-    @GetMapping("/productByBrand")
-    public ResponseEntity<?>finProductByBrand(@RequestParam int id,@RequestParam String startDate,@RequestParam String endDate){
-        try {
-            LocalDateTime start=LocalDateTime.parse(startDate);
-            LocalDateTime end=LocalDateTime.parse(endDate);
-            List<ProductReportByBrand> list =  cartService.findCartByStatusAndCreatDateBetween(4,id,start,end);
-            return  new ResponseEntity<>(list,HttpStatus.OK);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(Message.ERROR_400);
-        }
-    }
+
 
 
 }
