@@ -18,5 +18,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     int countByCatalog_Id(int catalogId);
     List<Product> findByLocationIn(List<Location> listLocation);
     Product findByIdAndCartDetailListIn(int id, List<CartDetail> cartDetailList);
+    List<Product>findByCatalog_IdAndCartDetailListIn(int catalog_id, List<CartDetail> cartDetailList);
 
 }
