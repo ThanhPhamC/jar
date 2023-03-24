@@ -50,13 +50,14 @@ public class ReportImpl implements ReportService {
                 for (Cart cart:carts){
                     LocalDate date=cart.getCreatDate().toLocalDate();
                     if (date.equals(add.getSaleDate())){
-                        add.setRevenue(add.getRevenue()+cart.getTotal());
+                        add.setDiscount(add.getDiscount()+ cart.getDiscount());
+                        add.setRevenue(add.getRevenue()+cart.getTotal()+cart.getDiscount());
                         add.setTax(add.getTax()+ cart.getTax());
                         add.setShip(add.getShip()+cart.getShipping());
                         add.setCountOder(add.getCountOder()+1);
                     }
                 }
-                add.setTotalRevenue(add.getRevenue()+ add.getTax()+ add.getShip());
+                add.setTotalRevenue(add.getRevenue()+ add.getTax()+ add.getShip()-add.getDiscount());
                 responses.add(add);
             }
             return new ResponseEntity<>(responses, HttpStatus.OK);
