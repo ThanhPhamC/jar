@@ -1,6 +1,9 @@
 package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,6 +19,8 @@ import project.bussiness.service.CouponService;
 import project.bussiness.service.UserService;
 import project.model.dto.request.LogInRequest;
 import project.model.dto.request.UserRequest;
+import project.model.dto.response.*;
+import project.model.entity.*;
 import project.model.entity.*;
 import project.model.dto.response.CartResponse;
 import project.model.dto.response.CouponResponse;
@@ -143,6 +148,7 @@ public class UserImpl implements UserService {
         Page<Users> page = userRepository.findByFirstNameContaining(name, pageable);
         Map<String, Object> result = Utility.returnResponse(page);
         return result;
+
     }
 
     @Override
@@ -406,6 +412,8 @@ public class UserImpl implements UserService {
         Users users = userRepository.findUsersByUserName(userIsLoggingIn.getUsername());
         return mapPoJoToResponse(findById(users.getUserId()));
     }
+
+
 
 
 }

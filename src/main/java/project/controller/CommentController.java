@@ -27,7 +27,7 @@ public class CommentController {
     private CommentService commentService;
     private UserService userService;
     @PostMapping
-    public ResponseEntity<?> creatNewCatalog(@RequestBody CommentRequest request){
+    public ResponseEntity<?> creatNewComment(@RequestBody CommentRequest request){
         try {
             CommentResponse result= commentService.saveOrUpdate(request);
             return  new ResponseEntity<>(result, HttpStatus.OK);
@@ -63,8 +63,9 @@ public class CommentController {
     @GetMapping("/search")
     public ResponseEntity<?>searchByName_sort_paging(@RequestParam Map<String,String> headers){
         try{
+            int blogId = Integer.parseInt(headers.get("blogId"));
             Pageable pageable = Utility.sort_order(headers);
-            Map<String,Object>result=commentService.findByName(headers.get("name"),pageable);
+            Map<String,Object>result=commentService.searchByBlogId(pageable,blogId);
             return new ResponseEntity<>(result,HttpStatus.OK);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(Message.ERROR_400);
