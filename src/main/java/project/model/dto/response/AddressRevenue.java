@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Data
 public class AddressRevenue {
     protected int id;
+    private float discount;
     private int countOder;
     private float revenue;
     private LocalDate saleDate;
