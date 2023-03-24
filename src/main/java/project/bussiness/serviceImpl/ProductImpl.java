@@ -208,6 +208,11 @@ public class ProductImpl implements ProductService {
         return mapPoJoToResponse(findById(id));
     }
 
+    @Override
+    public List<ProductResponse> get_top_revenue(LocalDateTime startDate, LocalDateTime endDate, int size) {
+        return null;
+    }
+
 
     @Override
     public Product mapRequestToPoJo(ProductRequest productRequest) {
