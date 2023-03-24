@@ -13,6 +13,7 @@ import project.model.dto.request.CartDetailRequest;
 import project.model.dto.request.CartRequest;
 import project.model.dto.response.CartDetailResponse;
 import project.model.dto.response.CartResponse;
+import project.model.dto.response.ProductReportByBrand;
 import project.model.entity.*;
 import project.model.shopMess.Constants;
 import project.model.shopMess.Message;
@@ -274,4 +275,48 @@ public class CartImpl implements CartService {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+
+    @Override
+    public List<ProductReportByBrand> findCartByStatusAndCreatDateBetween(int status, int bradId, LocalDateTime createDate, LocalDateTime endDate) {
+            List<Cart> list =cartRepository.findCartByStatusAndCreatDateBetween(status,createDate,endDate);
+            List<CartDetail> detailList =cartDetailRepository.findByCartIn(list);
+            List<ProductReportByBrand>listProDto= new ArrayList<>();
+            for (CartDetail ca:detailList) {
+                boolean check   = false;
+                if (ca.getProduct().getBrand().getId()==bradId&&listProDto.size()!=0){
+                    for (ProductReportByBrand proResponse:listProDto) {
+                        if (proResponse.getId()==ca.getProduct().getId()){
+                            System.out.println("buoc 1 khi listdto khac rong va trung san pham");
+                            proResponse.setQuantitySales(proResponse.getQuantitySales()+ca.getQuantity());
+                            proResponse.setRevenue(proResponse.getRevenue()+ca.getPrice());
+                            proResponse.setRealRevenue(proResponse.getRevenue()+ proResponse.getDiscount());
+                        }else {
+                            check=true;
+                        }
+                    }
+                }else if (ca.getProduct().getBrand().getId()==bradId){
+                    check=true;
+                }
+                if (check){
+                    ProductReportByBrand pr1 =new ProductReportByBrand();
+                    pr1.setName(ca.getProduct().getName());
+                    pr1.setQuantitySales(ca.getQuantity());
+                    pr1.setRevenue(ca.getPrice()*pr1.getQuantitySales());
+                    pr1.setId(ca.getProduct().getId());
+                    pr1.setStatus(ca.getStatus());
+                    pr1.setBrandName(ca.getProduct().getBrand().getName());
+                    pr1.setRealRevenue(pr1.getRevenue()-pr1.getDiscount());
+                    listProDto.add(pr1);
+                }
+            }
+            return listProDto;
+    }
+
+//    @Override
+//    public ResponseEntity<?> getRevenueByBrand(String brand, LocalDateTime start, LocalDateTime end) {
+//        List<Cart> cartList = cartRepository.
+//        return null;
+//    }
+
+
 }

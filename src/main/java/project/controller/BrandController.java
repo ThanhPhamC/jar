@@ -60,7 +60,7 @@ public class BrandController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
-
+    
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?>delete(@PathVariable("id")int id){
         try{

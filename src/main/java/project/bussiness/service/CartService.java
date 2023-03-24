@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import project.model.dto.request.CartDetailRequest;
 import project.model.dto.request.CartRequest;
 import project.model.dto.response.CartResponse;
+import project.model.dto.response.ProductReportByBrand;
 import project.model.entity.Cart;
 
 import java.time.LocalDateTime;
@@ -19,4 +20,6 @@ public interface CartService extends RootService<Cart,Integer, CartRequest, Cart
    CartResponse showCartPending();
     Map<String,Object> getAllForClient(Pageable pageable);
     ResponseEntity<?> changeStatus(Integer cartId,Integer status);
+//    ResponseEntity<?> getRevenueByBrand(String brand,LocalDateTime start,LocalDateTime end);
+List<ProductReportByBrand> findCartByStatusAndCreatDateBetween(int status , int bradId, LocalDateTime createDate, LocalDateTime endDate);
 }

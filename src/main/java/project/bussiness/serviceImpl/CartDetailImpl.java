@@ -42,7 +42,6 @@ public class CartDetailImpl implements CartDetailService {
 
         return null;
     }
-
     @Override
     public CartDetailResponse update(Integer id, CartDetailRequest rq) {
 
@@ -51,7 +50,7 @@ public class CartDetailImpl implements CartDetailService {
     @Override
     public ResponseEntity<?> delete(Integer id) {
         try {
-            CustomUserDetails customUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+              CustomUserDetails customUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             Cart cart =cartRepo.findByUsers_UserIdAndStatus(customUser.getUserId(),0);
             List<CartDetail> detailList=  cartDetailRepo.findByCart_Id(cart.getId())
                     .stream()
