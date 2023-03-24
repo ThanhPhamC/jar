@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.ReportService;
 import project.model.dto.response.AddressRevenue;
+import project.model.dto.response.ProductReportByCatalog;
 import project.model.entity.Cart;
 import project.model.entity.CartDetail;
 import project.model.shopMess.Constants;
@@ -28,6 +29,7 @@ import java.util.Map;
 public class ReportImpl implements ReportService {
     private CartRepository cartRepo;
     private CartDetailRepository cartDetailRepo;
+
 
     @Override
     public ResponseEntity<?> reportByAddress(Map<String, String> header) {
@@ -64,5 +66,41 @@ public class ReportImpl implements ReportService {
         }catch (Exception e){
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
+    }
+
+    @Override
+    public  List<ProductReportByCatalog> findCartByStatusAndCreatDateBetween(int status, int catId, LocalDateTime creDate, LocalDateTime endTime) {
+        List<Cart> list =cartRepo.findCartByStatusAndCreatDateBetween(status,creDate,endTime);
+        List<CartDetail> detailList =cartDetailRepo.findByCartIn(list);
+        List<ProductReportByCatalog>listProDto= new ArrayList<>();
+        for (CartDetail ca:detailList) {
+            boolean check   = false;
+            if (ca.getProduct().getCatalog().getId()==catId&&listProDto.size()!=0){
+                for (ProductReportByCatalog proResponse:listProDto) {
+                    if (proResponse.getId()==ca.getProduct().getId()){
+//                        System.out.println("buoc 1 khi listdto khac rong va trung san pham");
+                        proResponse.setQuantitySales(proResponse.getQuantitySales()+ca.getQuantity());
+                        proResponse.setRevenue(proResponse.getRevenue()+ca.getPrice());
+                        proResponse.setRealRevenue(proResponse.getRevenue()+ proResponse.getDiscount());
+                    }else {
+                        check=true;
+                    }
+                }
+            }else if (ca.getProduct().getCatalog().getId()==catId){
+                check=true;
+            }
+            if (check){
+                ProductReportByCatalog pr1 =new ProductReportByCatalog();
+                pr1.setName(ca.getProduct().getName());
+                pr1.setQuantitySales(ca.getQuantity());
+                pr1.setRevenue(ca.getPrice()*pr1.getQuantitySales());
+                pr1.setId(ca.getProduct().getId());
+                pr1.setStatus(ca.getStatus());
+                pr1.setCatalogName(ca.getProduct().getCatalog().getName());
+                pr1.setRealRevenue(pr1.getRevenue()-pr1.getDiscount());
+                listProDto.add(pr1);
+            }
+        }
+        return listProDto;
     }
 }

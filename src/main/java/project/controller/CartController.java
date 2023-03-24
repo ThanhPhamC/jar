@@ -12,9 +12,13 @@ import project.model.dto.request.CartConfirmRequest;
 import project.model.dto.request.CartDetailRequest;
 import project.model.dto.request.CartRequest;
 import project.model.dto.response.CartResponse;
+import project.model.dto.response.ProductReportByCatalog;
 import project.model.shopMess.Message;
 import project.repository.TokenLogInReposirory;
 import project.model.utility.Utility;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -72,9 +76,5 @@ public class CartController {
         }
     }
 
-//    @PutMapping("/check_out")
-//    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
-//    public ResponseEntity<?> checkout(@RequestBody CartConfirmRequest confirm) {
-//
-//    }
+
 }

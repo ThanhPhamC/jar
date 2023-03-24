@@ -20,4 +20,5 @@ public interface CartRepository extends JpaRepository<Cart,Integer> {
     List<Cart>  findByStatusAndUsers_UserIdAndCreatDateBetween(int status, int users_userId, LocalDateTime creatDate, LocalDateTime creatDate2 );
     List<Cart> findByUsers_UserIdAndStatus(int userId, int status);
     List<Cart> findByStatusAndCityAndCreatDateBetween(Integer status, String city, LocalDateTime start, LocalDateTime end);
+    List<Cart> findCartByStatusAndCreatDateBetween(int status,LocalDateTime creDate,LocalDateTime endTime);
 }

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import project.model.dto.request.CartDetailRequest;
 import project.model.dto.request.CartRequest;
 import project.model.dto.response.CartResponse;
+import project.model.dto.response.ProductReportByCatalog;
 import project.model.entity.Cart;
 
 import java.time.LocalDateTime;
