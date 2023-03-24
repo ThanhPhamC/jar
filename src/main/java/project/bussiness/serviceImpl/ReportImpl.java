@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.ReportService;
 import project.model.dto.response.AddressRevenue;
+import project.model.dto.response.ProductReportByBrand;
 import project.model.dto.response.ProductReportByCatalog;
 import project.model.entity.Cart;
 import project.model.entity.CartDetail;
@@ -69,7 +70,7 @@ public class ReportImpl implements ReportService {
     }
 
     @Override
-    public  List<ProductReportByCatalog> findCartByStatusAndCreatDateBetween(int status, int catId, LocalDateTime creDate, LocalDateTime endTime) {
+    public  List<ProductReportByCatalog> reportByCatalog(int status, int catId, LocalDateTime creDate, LocalDateTime endTime) {
         List<Cart> list =cartRepo.findCartByStatusAndCreatDateBetween(status,creDate,endTime);
         List<CartDetail> detailList =cartDetailRepo.findByCartIn(list);
         List<ProductReportByCatalog>listProDto= new ArrayList<>();
@@ -78,7 +79,6 @@ public class ReportImpl implements ReportService {
             if (ca.getProduct().getCatalog().getId()==catId&&listProDto.size()!=0){
                 for (ProductReportByCatalog proResponse:listProDto) {
                     if (proResponse.getId()==ca.getProduct().getId()){
-//                        System.out.println("buoc 1 khi listdto khac rong va trung san pham");
                         proResponse.setQuantitySales(proResponse.getQuantitySales()+ca.getQuantity());
                         proResponse.setRevenue(proResponse.getRevenue()+ca.getPrice());
                         proResponse.setRealRevenue(proResponse.getRevenue()+ proResponse.getDiscount());
@@ -103,4 +103,39 @@ public class ReportImpl implements ReportService {
         }
         return listProDto;
     }
+    @Override
+    public List<ProductReportByBrand> reportByBrand(int status, int bradId, LocalDateTime createDate, LocalDateTime endDate) {
+        List<Cart> list =cartRepo.findCartByStatusAndCreatDateBetween(status,createDate,endDate);
+        List<CartDetail> detailList =cartDetailRepo.findByCartIn(list);
+        List<ProductReportByBrand>listProDto= new ArrayList<>();
+        for (CartDetail ca:detailList) {
+            boolean check   = false;
+            if (ca.getProduct().getBrand().getId()==bradId&&listProDto.size()!=0){
+                for (ProductReportByBrand proResponse:listProDto) {
+                    if (proResponse.getId()==ca.getProduct().getId()){
+                        proResponse.setQuantitySales(proResponse.getQuantitySales()+ca.getQuantity());
+                        proResponse.setRevenue(proResponse.getRevenue()+ca.getPrice());
+                        proResponse.setRealRevenue(proResponse.getRevenue()+ proResponse.getDiscount());
+                    }else {
+                        check=true;
+                    }
+                }
+            }else if (ca.getProduct().getBrand().getId()==bradId){
+                check=true;
+            }
+            if (check){
+                ProductReportByBrand pr1 =new ProductReportByBrand();
+                pr1.setName(ca.getProduct().getName());
+                pr1.setQuantitySales(ca.getQuantity());
+                pr1.setRevenue(ca.getPrice()*pr1.getQuantitySales());
+                pr1.setId(ca.getProduct().getId());
+                pr1.setStatus(ca.getStatus());
+                pr1.setBrandName(ca.getProduct().getBrand().getName());
+                pr1.setRealRevenue(pr1.getRevenue()-pr1.getDiscount());
+                listProDto.add(pr1);
+            }
+        }
+        return listProDto;
+    }
+
 }

@@ -13,6 +13,8 @@ import project.model.dto.request.CartRequest;
 import project.model.dto.response.CartDetailResponse;
 import project.model.dto.response.CartPendingResponse;
 import project.model.dto.response.CartResponse;
+import project.model.dto.response.ProductReportByBrand;
+import project.model.dto.response.ProductReportByCatalog;
 import project.model.entity.*;
 import project.model.shopMess.Constants;
 import project.model.shopMess.Message;

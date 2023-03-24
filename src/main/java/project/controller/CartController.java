@@ -12,6 +12,8 @@ import project.model.dto.request.CartConfirmRequest;
 import project.model.dto.request.CartDetailRequest;
 import project.model.dto.response.CartPendingResponse;
 import project.model.dto.response.CartResponse;
+import project.model.dto.response.ProductReportByBrand;
+import project.model.dto.response.ProductReportByCatalog;
 import project.model.shopMess.Message;
 import project.model.utility.Utility;
 import java.util.Map;

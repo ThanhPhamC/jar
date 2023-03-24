@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.CartService;
 import project.bussiness.service.ReportService;
+import project.model.dto.response.ProductReportByBrand;
 import project.model.dto.response.ProductReportByCatalog;
 import project.model.shopMess.Message;
 
@@ -29,8 +30,19 @@ public class ReportController {
         try {
             LocalDateTime start=LocalDateTime.parse(startDate);
             LocalDateTime end=LocalDateTime.parse(endDate);
-            List<ProductReportByCatalog> list =  reportService.findCartByStatusAndCreatDateBetween(4,id,start,end);
+            List<ProductReportByCatalog> list =  reportService.reportByCatalog(4,id,start,end);
             return  new ResponseEntity<>(list, HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+    @GetMapping("/productByBrand")
+    public ResponseEntity<?>finProductByBrand(@RequestParam int id,@RequestParam String startDate,@RequestParam String endDate){
+        try {
+            LocalDateTime start=LocalDateTime.parse(startDate);
+            LocalDateTime end=LocalDateTime.parse(endDate);
+            List<ProductReportByBrand> list =  reportService.reportByBrand(4,id,start,end);
+            return  new ResponseEntity<>(list,HttpStatus.OK);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
