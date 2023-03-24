@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.ProductService;
 import project.model.dto.request.FilterProductRequest;
 import project.model.dto.request.ProductFeatureRequest;
+import project.model.dto.request.ProductRequest;
 import project.model.dto.response.ProductResponse;
 import project.model.shopMess.Message;
 
@@ -51,7 +53,6 @@ public class ProductController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
-
     @GetMapping("top_rated_product")
     public ResponseEntity<?> topRatedProduct(@RequestBody ProductFeatureRequest productFeatureRequest) {
         try {
@@ -61,7 +62,6 @@ public class ProductController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
-
     @GetMapping("search_sort_newest_product")
     public ResponseEntity<?> searchAndSortNewestProductByName(@RequestParam Map<String, String> headers) {
         try {
@@ -72,7 +72,6 @@ public class ProductController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
-
     @GetMapping("filter_product_by_Price_Location_Rating")
     public ResponseEntity<?> filterProductByPriceLocationAndStar(@RequestBody FilterProductRequest filterProductRequest) {
         try {
@@ -96,6 +95,9 @@ public class ProductController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+
+
+
 
 
 }

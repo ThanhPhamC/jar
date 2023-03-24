@@ -6,4 +6,5 @@ import lombok.Data;
 public class CartDetailResponse extends RootResponse{
     private int quantity;
     private float price;
+
 }

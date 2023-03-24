@@ -9,9 +9,9 @@ import javax.persistence.*;
 @Entity
 @Table(name = "cartDetail")
 public class CartDetail extends BaseEntity{
-
     private int quantity;
     private float price;
+    private float discount;
     @ManyToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name = "productId")
     private Product product;

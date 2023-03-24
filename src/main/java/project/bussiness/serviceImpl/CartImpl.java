@@ -178,6 +178,7 @@ public class CartImpl implements CartService {
                     newDetail.setQuantity(cartDetailRequest.getQuantity());
                     newDetail.setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                     newDetail.setName(product.getName());
+                    newDetail.setDiscount(product.getDiscount()*product.getExportPrice()/100);
                     cartDetailRepository.save(newDetail);
                     return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
                 } else {
@@ -186,12 +187,13 @@ public class CartImpl implements CartService {
                             newDetail.setQuantity(cartDetailRequest.getQuantity());
                             newDetail.setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                             newDetail.setName(product.getName());
+                            newDetail.setDiscount(product.getDiscount()*product.getExportPrice()/100);
 
                         } else {// sản phẩm đã được thêm vào giỏ hàng TRƯỚC thời gian diễn ra sale.-> tạo 1 oderDetail với giá sale
                             newDetail.setQuantity(1);
                             newDetail.setPrice(product.getExportPrice() * (100 - flashSale.getDiscount()) / 100);
+                            newDetail.setDiscount(product.getExportPrice()* flashSale.getDiscount()/100);
                             newDetail.setName(String.format("%s%s", product.getName(), Constants.FLASH_SALE_NAME));
-
                         }
                     } else if (cartDetail.size() == 2) { // kich thuoc list cartdetal theo san pham sale = 2(gom ca oderdetail sale và oderDetail thuong)
                         newDetail = cartDetail.stream().filter(dt -> !dt.getName().contains(Constants.FLASH_SALE_NAME)).collect(Collectors.toList()).get(0);
@@ -205,6 +207,7 @@ public class CartImpl implements CartService {
                     } else {
                         newDetail.setQuantity(1);
                         newDetail.setPrice(product.getExportPrice() * (100 - flashSale.getDiscount()) / 100);
+                        newDetail.setDiscount(product.getExportPrice()* flashSale.getDiscount()/100);
                         newDetail.setName(String.format("%s%s", product.getName(), Constants.FLASH_SALE_NAME));
                     }
                     cartDetailRepository.save(newDetail);
@@ -214,13 +217,14 @@ public class CartImpl implements CartService {
                 if (cartDetail.size() != 0) {
                     if (action.equals("create")) {
                         cartDetail.get(0).setQuantity(cartDetail.get(0).getQuantity() + cartDetailRequest.getQuantity());
-                        cartDetail.get(0).setPrice(cartDetailRequest.getPrice());
+                        cartDetail.get(0).setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                     } else if (action.equals("edit")) {
                         cartDetail.get(0).setQuantity(cartDetailRequest.getQuantity());
                     }
                     cartDetailRepository.save(cartDetail.get(0));
                     return ResponseEntity.ok().body(Message.ADD_TO_CART_SUCCESS);
                 } else {
+                    newDetail.setDiscount(product.getDiscount()*product.getExportPrice()/100);
                     newDetail.setQuantity(cartDetailRequest.getQuantity());
                     newDetail.setPrice(product.getExportPrice()*(100- product.getDiscount())/100);
                     newDetail.setName(product.getName());

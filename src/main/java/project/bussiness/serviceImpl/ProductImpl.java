@@ -32,11 +32,13 @@ public class ProductImpl implements ProductService {
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
-        return null;
+        Page<ProductResponse> responses=productRepo.findAll(pageable).map(this::mapPoJoToResponse);
+        Map<String,Object> result=Utility.returnResponse(responses);
+        return result;
     }
 
     @Override
-    public ProductResponse saveOrUpdate(ProductRequest productRequest) {
+    public ProductResponse saveOrUpdate(ProductRequest rq) {
         return null;
     }
 
@@ -185,6 +187,11 @@ public class ProductImpl implements ProductService {
         return mapPoJoToResponse(findById(id));
     }
 
+    @Override
+    public List<ProductResponse> get_top_revenue(LocalDateTime startDate, LocalDateTime endDate, int size) {
+        return null;
+    }
+
 
     @Override
     public Product mapRequestToPoJo(ProductRequest productRequest) {
@@ -195,7 +202,7 @@ public class ProductImpl implements ProductService {
             product.setStatus(1);
         }
         product.setName(productRequest.getName());
-        product.setCreatDate(productRequest.getCreatDate());
+            product.setCreatDate(productRequest.getCreatDate());
         product.setDiscount(productRequest.getDiscount());
         product.setExportPrice(productRequest.getExportPrice());
         product.setImportPrice(productRequest.getImportPrice());
@@ -207,7 +214,6 @@ public class ProductImpl implements ProductService {
         product.setBrand(brandRepo.findById(productRequest.getBrandId()).get());
         return product;
     }
-
     @Override
     public ProductResponse mapPoJoToResponse(Product pro) {
         ProductResponse rp = new ProductResponse();
