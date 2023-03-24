@@ -13,12 +13,12 @@ import java.util.List;
 public class Cart extends BaseEntity{
     private String firstName;
     private String lastName;
-    private  String email;
+    private String email;
     private String phone;
     private String address;
     private String country;
     private String city;
-    private  String state;
+    private String state;
     @Column(columnDefinition = "text")
     private String note;
     private LocalDateTime creatDate;

@@ -102,6 +102,7 @@ public class CartDetailImpl implements CartDetailService {
         rp.setQuantity(cartDetail.getQuantity());
         rp.setPrice(cartDetail.getPrice());
         rp.setStatus(cartDetail.getStatus());
+        rp.setProductId(cartDetail.getProduct().getId());
         return rp;
     }
 
