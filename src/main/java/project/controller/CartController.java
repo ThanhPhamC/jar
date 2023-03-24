@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.CartDetailService;
 import project.bussiness.service.CartService;
+import project.model.dto.request.CartConfirmRequest;
 import project.model.dto.request.CartDetailRequest;
 import project.model.dto.request.CartRequest;
 import project.model.dto.response.CartResponse;
@@ -70,4 +71,10 @@ public class CartController {
             return new ResponseEntity(Message.ERROR_400,HttpStatus.BAD_REQUEST);
         }
     }
+
+//    @PutMapping("/check_out")
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
+//    public ResponseEntity<?> checkout(@RequestBody CartConfirmRequest confirm) {
+//
+//    }
 }
