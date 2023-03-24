@@ -52,8 +52,8 @@ public class CartDetailImpl implements CartDetailService {
     public ResponseEntity<?> delete(Integer id) {
         try {
             CustomUserDetails customUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            Cart cart =cartRepo.findByUsers_UserIdAndStatus(customUser.getUserId(),0);
-            List<CartDetail> detailList=  cartDetailRepo.findByCart_Id(cart.getId())
+            List<Cart> cart =cartRepo.findByUsers_UserIdAndStatus(customUser.getUserId(),0);
+            List<CartDetail> detailList=  cartDetailRepo.findByCart_Id(cart.get(0).getId())
                     .stream()
                     .filter(cartDetail -> cartDetail.getId()==id).collect(Collectors.toList());
             if (detailList.size()!=0){
@@ -101,6 +101,7 @@ public class CartDetailImpl implements CartDetailService {
         rp.setName(cartDetail.getName());
         rp.setQuantity(cartDetail.getQuantity());
         rp.setPrice(cartDetail.getPrice());
+        rp.setStatus(cartDetail.getStatus());
         return rp;
     }
 

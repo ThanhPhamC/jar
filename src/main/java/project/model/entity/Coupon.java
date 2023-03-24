@@ -17,4 +17,5 @@ public class Coupon extends BaseEntity{
     private float couponValue;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private int quantity;
 }

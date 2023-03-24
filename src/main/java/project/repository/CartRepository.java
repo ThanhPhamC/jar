@@ -14,9 +14,9 @@ import java.util.List;
 @Repository
 public interface CartRepository extends JpaRepository<Cart,Integer> {
     List<Cart> findByCreatDateBetween(LocalDateTime startDate, LocalDateTime endDate);
-    Cart findByUsers_UserIdAndStatus(int userId, int stautus);
     Page<Cart> findByStatus(Integer status,Pageable pageable);
     Page<Cart> findByUsers_UserIdAndStatusIsNot(int users_userId, int status, Pageable pageable);
     List<Cart> findByStatusInAndUsers_UserId(List<Integer> status, Integer userId);
     List<Cart>  findByStatusAndUsers_UserIdAndCreatDateBetween(int status, int users_userId, LocalDateTime creatDate, LocalDateTime creatDate2 );
+    List<Cart> findByUsers_UserIdAndStatus(int userId, int status);
 }

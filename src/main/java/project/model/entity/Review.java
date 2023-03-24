@@ -3,7 +3,7 @@ package project.model.entity;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Table(name = "review")
@@ -18,5 +18,5 @@ public class Review extends BaseEntity{
     @ManyToOne (fetch =  FetchType.EAGER)
     @JoinColumn(name = "productId")
     private Product product;
-    private LocalDate createDate;
+    private LocalDateTime createDate;
 }
