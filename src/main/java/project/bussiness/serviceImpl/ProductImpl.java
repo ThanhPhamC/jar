@@ -69,12 +69,18 @@ public class ProductImpl implements ProductService {
 
     @Override
     public List<Product> findAll() {
+        for (Product pd : productRepo.findAll()) {
+            if (pd.getProductQuantity()==0) {
+                pd.setStatus(0);
+                productRepo.save(pd);
+            }
+        }
         return productRepo.findAll();
     }
 
     @Override
     public List<ProductResponse> getAllForClient() {
-        List<ProductResponse> productResponseList = findAll().stream()
+        List<ProductResponse> productResponseList = productRepo.findAll().stream()
                 .map(this::mapPoJoToResponse)
                 .collect(Collectors.toList());
         return productResponseList;

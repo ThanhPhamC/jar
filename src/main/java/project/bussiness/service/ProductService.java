@@ -15,4 +15,5 @@ public interface ProductService extends RootService<Product,Integer, ProductRequ
     int countByCatalog_Id(int catalogId);
     List<ProductResponse> filterProductByPriceLocationStar(List<Integer> listLocationId, float max, float min, List<Integer> starPoint);
     ProductResponse getProductResponseById(int id);
+
 }

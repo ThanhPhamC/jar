@@ -11,6 +11,7 @@ import project.bussiness.service.CartService;
 import project.model.dto.request.CartConfirmRequest;
 import project.model.dto.request.CartDetailRequest;
 import project.model.dto.request.CartRequest;
+import project.model.dto.response.CartPendingResponse;
 import project.model.dto.response.CartResponse;
 import project.model.shopMess.Message;
 import project.repository.TokenLogInReposirory;
@@ -38,7 +39,7 @@ public class CartController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
     public ResponseEntity<?>getCartPending(){
         try {
-            CartResponse response= cartService.showCartPending();
+            CartPendingResponse response= cartService.showCartPending();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(Message.ERROR_400);
@@ -72,9 +73,24 @@ public class CartController {
         }
     }
 
-//    @PutMapping("/check_out")
-//    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
-//    public ResponseEntity<?> checkout(@RequestBody CartConfirmRequest confirm) {
-//
-//    }
+    @GetMapping("/pre_check_out")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
+    public ResponseEntity<?> pre_checkout(@RequestParam int couponId) {
+        try {
+            CartResponse result = cartService.showCartCheckout(couponId);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity(Message.ERROR_400,HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("check_out")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or hasRole('USER')")
+    public ResponseEntity<?> checkout(@RequestBody CartConfirmRequest cartConfirmRequest) {
+        try {
+            return cartService.checkout(cartConfirmRequest);
+        }catch (Exception e){
+            return new ResponseEntity(Message.ERROR_400,HttpStatus.BAD_REQUEST);
+        }
+    }
 }

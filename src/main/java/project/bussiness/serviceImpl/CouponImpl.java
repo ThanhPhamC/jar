@@ -108,7 +108,7 @@ public class CouponImpl implements CouponService {
     @Override
     public List<Coupon> findAll() {
         for (Coupon cp : couponRepo.findAll()) {
-            if (LocalDateTime.now().compareTo(cp.getEndDate()) > 0) {
+            if (LocalDateTime.now().compareTo(cp.getEndDate()) > 0 || cp.getQuantity()==0) {
                 cp.setStatus(0);
                 couponRepo.save(cp);
             }
