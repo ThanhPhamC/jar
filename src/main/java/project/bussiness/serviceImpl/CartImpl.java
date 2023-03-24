@@ -138,7 +138,6 @@ public class CartImpl implements CartService {
                 CartDetailResponse rp = cartDetailService.mapPoJoToResponse(cartDetail);
                 return rp;
             }).collect(Collectors.toList());
-
         }else {
                responseList = cart.getCartDetailList().stream().map(cartDetail -> {
                 CartDetailResponse rp = cartDetailService.mapPoJoToResponse(cartDetail);
@@ -147,6 +146,21 @@ public class CartImpl implements CartService {
 
         }
         response.setDetailResponses(responseList);
+        response.setDiscount(cart.getDiscount());
+        response.setShipping(cart.getShipping());
+        response.setTax(cart.getTax());
+
+        CustomUserDetails userIsLoggingIn = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users users = userRepository.findUsersByUserName(userIsLoggingIn.getUsername());
+        response.setFirstName(users.getFirstName());
+        response.setLastName(users.getLastName());
+        response.setEmail(users.getEmail());
+        response.setPhone(users.getPhone());
+        response.setAddress(users.getAddress());
+        response.setCity(users.getCity());
+        response.setCountry(users.getCountry());
+        response.setState(users.getState());
+
         return response;
     }
 
@@ -162,7 +176,7 @@ public class CartImpl implements CartService {
         if (tokenLogInReposirory.existsByUsers_UserId(users.getUserId())) {
             flashSaleService.findAll();// cập nhập lại toàn bộ trạng thái flash sale;
             Product product = productRepository.findById(cartDetailRequest.getProductId()).get();
-            Cart pendingCart = cartRepository.findByUsers_UserIdAndStatus(users.getUserId(), 0);
+            Cart pendingCart = cartRepository.findByUsers_UserIdAndStatus(users.getUserId(), 0).get(0);
             boolean checkFlashSale = flashSaleRepo.existsByStatusAndProduct_Id(1, product.getId());
             List<CartDetail> cartDetail = cartDetailRepository.findByProduct_IdAndCart_Id(product.getId(), pendingCart.getId());
             CartDetail newDetail = new CartDetail();
@@ -244,7 +258,6 @@ public class CartImpl implements CartService {
 
     @Override
     public CartResponse showCartPending() {
-        flashSaleService.findAll();
         CustomUserDetails customUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Integer> arrInt = new ArrayList<>();
         arrInt.add(0);
