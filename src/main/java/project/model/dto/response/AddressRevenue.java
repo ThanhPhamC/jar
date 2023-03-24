@@ -6,7 +6,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-public class AddressRevenue extends RootResponse{
+public class AddressRevenue {
+    protected int id;
     private int countOder;
     private float revenue;
     private LocalDate saleDate;

@@ -149,7 +149,6 @@ public class CartImpl implements CartService {
         response.setDiscount(cart.getDiscount());
         response.setShipping(cart.getShipping());
         response.setTax(cart.getTax());
-
         CustomUserDetails userIsLoggingIn = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Users users = userRepository.findUsersByUserName(userIsLoggingIn.getUsername());
         response.setFirstName(users.getFirstName());
@@ -160,7 +159,6 @@ public class CartImpl implements CartService {
         response.setCity(users.getCity());
         response.setCountry(users.getCountry());
         response.setState(users.getState());
-
         return response;
     }
 

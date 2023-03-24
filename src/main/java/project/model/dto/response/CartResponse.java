@@ -17,7 +17,7 @@ public class CartResponse extends RootResponse{
     private String country;
     private String city;
     private  String state;
-    private int discount;
+    private float discount;
     private float shipping;
     private float tax;
     private List<CartDetailResponse> detailResponses= new ArrayList<>();
