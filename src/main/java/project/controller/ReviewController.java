@@ -84,7 +84,6 @@ public class ReviewController {
         try {
             ReviewResponse resul=reviewService.update(id,reviewRequest);
             return new ResponseEntity<>(resul,HttpStatus.OK);
-
         }catch (Exception e){
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }

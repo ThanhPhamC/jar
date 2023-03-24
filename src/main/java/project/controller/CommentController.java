@@ -59,7 +59,6 @@ public class CommentController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
-
     @GetMapping("/search")
     public ResponseEntity<?>searchByName_sort_paging(@RequestParam Map<String,String> headers){
         try{
@@ -81,5 +80,4 @@ public class CommentController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
-
 }
