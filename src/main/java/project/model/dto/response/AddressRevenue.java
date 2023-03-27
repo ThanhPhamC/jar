@@ -7,12 +7,12 @@ import java.time.LocalDateTime;
 
 @Data
 public class AddressRevenue {
-    protected int id;
-    private float discount;
-    private int countOder;
-    private float revenue;
+    private int id;
     private LocalDate saleDate;
+    private float revenue;
+    private int countOder;
     private float ship;
     private float tax;
+    private float discount;
     private float totalRevenue;
 }
