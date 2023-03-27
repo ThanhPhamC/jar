@@ -6,11 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.CartService;
 import project.bussiness.service.ReportService;
-import project.model.dto.response.ProductByCartStatusResponse;
-import project.model.dto.response.ProductByCatalogByCartStt;
-import project.model.dto.response.ProductReportByBrand;
-import project.model.dto.response.ProductReportByCatalog;
-import project.model.dto.response.ProductReportByLocation;
+import project.model.dto.response.*;
 import project.model.shopMess.Message;
 
 import javax.servlet.http.HttpServletResponse;
@@ -85,5 +81,17 @@ public class ReportController {
             }catch (Exception e){
                 return ResponseEntity.badRequest().body(Message.ERROR_400);
             }
+    }
+    @GetMapping("/productByCartCancel")
+    public ResponseEntity<?>productByCartCancel(@RequestParam String startDate,@RequestParam String endDate){
+        try {
+            LocalDateTime start =LocalDateTime.parse(startDate);
+            LocalDateTime end =LocalDateTime.parse(endDate);
+            List<ProductByCartSttCancel>list=reportService.reportProByCartCancel(3,start,end);
+            return new ResponseEntity<>(list,HttpStatus.OK);
+
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
     }
 }

@@ -213,8 +213,8 @@ public class ReportImpl implements ReportService {
     public List<ProductByCartStatusResponse> reportByCart(int status, LocalDateTime startDate, LocalDateTime endDate) {
         List<Cart>cartList=cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
         List<CartDetail>detailList=cartDetailRepo.findByCartIn(cartList);
-        Map<Integer, ProductByCartStatusResponse> resultMap = detailList.stream()
-                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),
+        Map<Integer, ProductByCartStatusResponse> resultMap = detailList.stream() // duyet mang detailList
+                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),//mỗi 1 phần tử detail thì chuyeenr giá trị qua product
                         cd -> new ProductByCartStatusResponse(cd.getProduct().getId(),
                                 cd.getProduct().getName(),
                                 cd.getProduct().getExportPrice(),
@@ -260,5 +260,27 @@ public class ReportImpl implements ReportService {
         }
         return listProDto;
 
+    }
+
+    @Override
+    public List<ProductByCartSttCancel> reportProByCartCancel(int status, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Cart>list=cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
+        List<CartDetail> cartDetailList=cartDetailRepo.findByCartIn(list);
+        Map<Integer, ProductByCartSttCancel> resultMap = cartDetailList.stream() // duyet mang detailList
+                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),//mỗi 1 phần tử detail thì chuyeenr giá trị qua product
+                        cd -> new ProductByCartSttCancel(cd.getProduct().getId(),
+                                cd.getProduct().getName(),
+                                cd.getProduct().getExportPrice(),
+                                cd.getQuantity(),
+                                cd.getProduct().getDiscount(),
+                                cd.getProduct().getCatalog().getName()),
+
+                        (pr1, pr2) -> {
+                            pr1.setQuantity(pr1.getQuantity() + pr2.getQuantity());
+                            return pr1;
+                        }
+                ));
+
+        return new ArrayList<>(resultMap.values());
     }
 }
