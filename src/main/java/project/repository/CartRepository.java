@@ -5,11 +5,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import project.model.entity.Cart;
-import project.model.entity.CartDetail;
-
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
+
 
 @Repository
 public interface CartRepository extends JpaRepository<Cart,Integer> {
@@ -28,6 +26,7 @@ public interface CartRepository extends JpaRepository<Cart,Integer> {
     List<Cart> findByStatusAndCityAndCreatDateBetween(Integer status, String city, LocalDateTime start, LocalDateTime end);
 
     List<Cart> findCartByStatusAndCreatDateBetween(int status, LocalDateTime creDate, LocalDateTime endTime);
-//     findByCartStatusAndAddressEqualsAndOrderDateBetween
+
+
 }
 
