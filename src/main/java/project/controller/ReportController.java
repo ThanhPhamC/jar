@@ -10,6 +10,7 @@ import project.model.dto.response.ProductByCartStatusResponse;
 import project.model.dto.response.ProductByCatalogByCartStt;
 import project.model.dto.response.ProductReportByBrand;
 import project.model.dto.response.ProductReportByCatalog;
+import project.model.dto.response.ProductReportByLocation;
 import project.model.shopMess.Message;
 
 import javax.servlet.http.HttpServletResponse;
@@ -50,6 +51,18 @@ public class ReportController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+    @GetMapping("/productByLocation")
+    public ResponseEntity<?> findProductByLocation(@RequestParam int id,@RequestParam String startDate,@RequestParam String endDate){
+        try {
+            LocalDateTime start=LocalDateTime.parse(startDate);
+            LocalDateTime end=LocalDateTime.parse(endDate);
+            List<ProductReportByLocation> list = reportService.reportByLocation(4, id, start, end);
+            return  new ResponseEntity<>(list,HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
     @GetMapping("/productByCartStatus")
     public ResponseEntity<?>productByCartStatus(@RequestParam String startDate,@RequestParam String endDate){
             try {
