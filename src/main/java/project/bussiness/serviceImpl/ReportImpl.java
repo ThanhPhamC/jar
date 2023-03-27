@@ -3,27 +3,23 @@ package project.bussiness.serviceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.ReportService;
 import project.model.dto.response.AddressRevenue;
+import project.model.dto.response.ProductByCartStatusResponse;
 import project.model.dto.response.ProductReportByBrand;
 import project.model.dto.response.ProductReportByCatalog;
 import project.model.entity.Cart;
 import project.model.entity.CartDetail;
-import project.model.shopMess.Constants;
 import project.model.shopMess.Message;
 import project.repository.CartDetailRepository;
 import project.repository.CartRepository;
-import project.repository.CatalogRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -138,4 +134,21 @@ public class ReportImpl implements ReportService {
         return listProDto;
     }
 
-}
+    @Override
+    public List<ProductByCartStatusResponse> reportByCart(int status, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Cart>cartList=cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
+        List<CartDetail>detailList=cartDetailRepo.findByCartIn(cartList);
+        Map<Integer, ProductByCartStatusResponse> resultMap = detailList.stream()
+                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),
+                        cd -> new ProductByCartStatusResponse(cd.getProduct().getId(),
+                                cd.getProduct().getName(),
+                                cd.getProduct().getExportPrice(),
+                                cd.getQuantity(),
+                                cd.getProduct().getDiscount()),
+                        (pr1, pr2) -> {
+                            pr1.setQuantity(pr1.getQuantity() + pr2.getQuantity());
+                            return pr1;
+                        }
+                ));
+        return new ArrayList<>(resultMap.values());
+}}
