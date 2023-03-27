@@ -48,7 +48,6 @@ public class ReportController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
-
     @GetMapping("/productByLocation")
     public ResponseEntity<?> findProductByLocation(@RequestParam int id,@RequestParam String startDate,@RequestParam String endDate){
         try {
@@ -60,4 +59,5 @@ public class ReportController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+
 }
