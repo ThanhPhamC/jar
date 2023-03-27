@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -166,5 +167,27 @@ public class ReportImpl implements ReportService {
         }
         return listProDto;
     }
+
+    @Override
+    public List<ProductByCartStatusResponse> reportByCart(int status, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Cart>cartList=cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
+        List<CartDetail>detailList=cartDetailRepo.findByCartIn(cartList);
+        Map<Integer, ProductByCartStatusResponse> resultMap = detailList.stream()
+                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),
+                        cd -> new ProductByCartStatusResponse(cd.getProduct().getId(),
+                                cd.getProduct().getName(),
+                                cd.getProduct().getExportPrice(),
+                                cd.getQuantity(),
+                                cd.getProduct().getDiscount()),
+                        (pr1, pr2) -> {
+                            pr1.setQuantity(pr1.getQuantity() + pr2.getQuantity());
+                            return pr1;
+                        }
+                ));
+
+        return new ArrayList<>(resultMap.values());
+    }
+
+
 
 }
