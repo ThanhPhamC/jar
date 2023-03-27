@@ -102,6 +102,8 @@ public class ReportImpl implements ReportService {
         }
     }
 
+
+
     @Override
     public List<ProductReportByCatalog> reportByCatalog(int status, int catId, LocalDateTime creDate, LocalDateTime endTime) {
         List<Cart> list = cartRepo.findCartByStatusAndCreatDateBetween(status, creDate, endTime);
@@ -227,6 +229,36 @@ public class ReportImpl implements ReportService {
         return new ArrayList<>(resultMap.values());
     }
 
+    @Override
+    public List<ProductByCatalogByCartStt> reportProByCatalogCart(int status,int catId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Cart>cartList = cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
+        List<CartDetail> detailList = cartDetailRepo.findByCartIn(cartList);
+        List<ProductByCatalogByCartStt> listProDto = new ArrayList<>();
+        for (CartDetail ca : detailList) {
+            boolean check = false;
+            if (ca.getProduct().getCatalog().getId() == catId && listProDto.size() != 0) {
+                for (ProductByCatalogByCartStt proResponse : listProDto) {
+                    if (proResponse.getId() == ca.getProduct().getId()) {
+                        proResponse.setQuantity(proResponse.getQuantity() + ca.getQuantity());
+                    } else {
+                        check = true;
+                    }
+                }
+            } else if (ca.getProduct().getCatalog().getId() == catId) {
+                check = true;
+            }
+            if (check) {
+                ProductByCatalogByCartStt pr1 = new ProductByCatalogByCartStt();
+                pr1.setName(ca.getProduct().getName());
+                pr1.setQuantity(ca.getQuantity());
+                pr1.setId(ca.getProduct().getId());
+                pr1.setStatus(ca.getStatus());
+                pr1.setCatalogName(ca.getProduct().getCatalog().getName());
+                pr1.setExportPrice(ca.getProduct().getExportPrice());
+                listProDto.add(pr1);
+            }
+        }
+        return listProDto;
 
-
+    }
 }
