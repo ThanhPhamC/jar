@@ -1,11 +1,7 @@
 package project.bussiness.service;
 
 import org.springframework.http.ResponseEntity;
-import project.model.dto.response.ProductByCartStatusResponse;
-import project.model.dto.response.ProductByCatalogByCartStt;
-import project.model.dto.response.ProductReportByBrand;
-import project.model.dto.response.ProductReportByCatalog;
-import project.model.dto.response.ProductReportByLocation;
+import project.model.dto.response.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
@@ -19,5 +15,6 @@ public interface ReportService {
     List<ProductReportByLocation> reportByLocation(int status,int locationId,LocalDateTime createDate,LocalDateTime endDate);
     List<ProductByCartStatusResponse>reportByCart(int status,LocalDateTime startDate,LocalDateTime endDate);
     List<ProductByCatalogByCartStt>reportProByCatalogCart(int status ,int catId,LocalDateTime startDate, LocalDateTime endDate);
+    List<ProductByCartSttCancel>reportProByCartCancel(int status ,LocalDateTime startDate, LocalDateTime endDate);
 
 }
