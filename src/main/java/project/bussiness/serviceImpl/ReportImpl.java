@@ -5,6 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.ReportService;
+import project.model.dto.response.AddressRevenue;
+import project.model.dto.response.ProductReportByBrand;
+import project.model.dto.response.ProductReportByCatalog;
+import project.model.dto.response.ProductReportByLocation;
 import project.model.dto.response.*;
 import project.model.entity.Cart;
 import project.model.entity.CartDetail;
@@ -162,6 +166,41 @@ public class ReportImpl implements ReportService {
                 pr1.setStatus(ca.getStatus());
                 pr1.setBrandName(ca.getProduct().getBrand().getName());
                 pr1.setRealRevenue(pr1.getRevenue() - pr1.getDiscount());
+                listProDto.add(pr1);
+            }
+        }
+        return listProDto;
+    }
+
+    @Override
+    public List<ProductReportByLocation> reportByLocation(int status, int locationId, LocalDateTime createDate, LocalDateTime endDate) {
+        List<Cart> list =cartRepo.findCartByStatusAndCreatDateBetween(status,createDate,endDate);
+        List<CartDetail> detailList =cartDetailRepo.findByCartIn(list);
+        List<ProductReportByLocation>listProDto= new ArrayList<>();
+        for (CartDetail ca:detailList) {
+            boolean check   = false;
+            if (ca.getProduct().getLocation().getId()==locationId&&listProDto.size()!=0){
+                for (ProductReportByLocation proResponse:listProDto) {
+                    if (proResponse.getId()==ca.getProduct().getId()){
+                        proResponse.setQuantitySales(proResponse.getQuantitySales()+ca.getQuantity());
+                        proResponse.setRevenue(proResponse.getRevenue()+ca.getPrice());
+                        proResponse.setRealRevenue(proResponse.getRevenue()+ proResponse.getDiscount());
+                    }else {
+                        check=true;
+                    }
+                }
+            }else if (ca.getProduct().getLocation().getId()==locationId){
+                check=true;
+            }
+            if (check){
+                ProductReportByLocation pr1 =new ProductReportByLocation();
+                pr1.setName(ca.getProduct().getName());
+                pr1.setQuantitySales(ca.getQuantity());
+                pr1.setRevenue(ca.getPrice()*pr1.getQuantitySales());
+                pr1.setId(ca.getProduct().getId());
+                pr1.setStatus(ca.getStatus());
+                pr1.setLocationName(ca.getProduct().getLocation().getName());
+                pr1.setRealRevenue(pr1.getRevenue()-pr1.getDiscount());
                 listProDto.add(pr1);
             }
         }
