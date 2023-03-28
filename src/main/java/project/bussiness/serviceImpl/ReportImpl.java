@@ -1,6 +1,7 @@
 package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.math3.analysis.function.Add;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -43,61 +44,38 @@ public class ReportImpl implements ReportService {
         try {
             LocalDateTime start = LocalDateTime.parse(header.get("start"));
             LocalDateTime end = LocalDateTime.parse(header.get("end"));
-            long daysBetween = ChronoUnit.DAYS.between(start, end);
             String reportTime = header.get("reportTime");
-            String city = header.get("value");
-            List<Object[]> result= new ArrayList<>();
-            List<AddressRevenue> responses = new ArrayList<>();
-            List<Cart> carts = new ArrayList<>();
-            if (reportTime.equals("day")||reportTime=="") {
-                carts = cartRepo.findByStatusAndCityAndCreatDateBetween(Constants.CART_STATUS_DONE, city, start, end);
-                for (int i = 0; i <= daysBetween; i++) {
-                    AddressRevenue add = new AddressRevenue();
-                    add.setId(i + 1);
-                    add.setSaleDate(start.plusDays(i).toLocalDate());
-                    for (Cart cart : carts) {
-                        LocalDate date = cart.getCreatDate().toLocalDate();
-                        if (date.equals(add.getSaleDate())) {
-                            add.setDiscount(add.getDiscount() + cart.getDiscount());
-                            add.setRevenue(add.getRevenue() + cart.getTotal() + cart.getDiscount());
-                            add.setTax(add.getTax() + cart.getTax());
-                            add.setShip(add.getShip() + cart.getShipping());
-                            add.setCountOder(add.getCountOder() + 1);
-                        }
-                    }
-                    add.setTotalRevenue(add.getRevenue() + add.getTax() + add.getShip() - add.getDiscount());
-                    responses.add(add);
-                }
-                result = responses.stream()
-                        .map(revenue -> new Object[]{
-                                revenue.getId(),
-                                revenue.getSaleDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                                revenue.getRevenue(),
-                                revenue.getCountOder(),
-                                revenue.getShip(),
-                                revenue.getTax(),
-                                revenue.getDiscount(),
-                                revenue.getTotalRevenue()
-                        })
-                        .collect(Collectors.toList());
-
-            } else if (reportTime.equals("week")) {
-                result = reportRepo.find_by_week_address(start.toLocalDate(), end.toLocalDate(), city, 4);
-            } else if (reportTime.equals("month")) {
-                result = reportRepo.find_by_month_address(start.toLocalDate(), end.toLocalDate(), city, 4);
+            String city = header.get("city");
+            List<Object[]> objects= new ArrayList<>();
+            switch (reportTime){
+                case Constants.DAY:
+                    objects=reportRepo.find_by_day_address(start.toLocalDate(),end.toLocalDate(),city,Constants.CART_STATUS_DONE);
+                    break;
+                case Constants.WEEK:
+                    objects=reportRepo.find_by_week_address(start.toLocalDate(),end.toLocalDate(),city,Constants.CART_STATUS_DONE);
+                    break;
+                case Constants.MONTH:
+                    objects=reportRepo.find_by_month_address(start.toLocalDate(),end.toLocalDate(),city,Constants.CART_STATUS_DONE);
+                    break;
+                default: break;
             }
-            if (header.get("export").equals("excel")) {
-                export.setData(result);
-                if (reportTime.equals("day")) {
-                    AddressRevenue add = new AddressRevenue();
-                    export.export(response, add);
-                } else {
-                    RevenueAddress revenueAddress = new RevenueAddress();
-                    export.export(response, revenueAddress);
-                }
+            if (header.get("export").equals("excel")){
+                AddressRevenue aR = new AddressRevenue();
+                export.setData(objects);
+                export.export(response,aR);
             }
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception e) {
+            List<AddressRevenue> result = objects.stream().map(obj -> {
+                String date = obj[0].toString();
+                float totalTax = Float.parseFloat(obj[1].toString()) ;
+                float totalShip = Float.parseFloat(obj[2].toString());
+                float totalDiscount = Float.parseFloat(obj[3].toString());
+                float total = Float.parseFloat(obj[4].toString());
+                int numberOder =Integer.parseInt(obj[5].toString());
+                String address=obj[6].toString();
+                return new AddressRevenue(date, totalTax, totalShip,totalDiscount,total,numberOder,address);
+            }).collect(Collectors.toList());
+            return new ResponseEntity<>(result,HttpStatus.OK);
+        }catch (Exception e){
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
@@ -271,7 +249,8 @@ public class ReportImpl implements ReportService {
                 float totalShip = Float.parseFloat(obj[2].toString());
                 float totalDiscount = Float.parseFloat(obj[3].toString());
                 float total = Float.parseFloat(obj[4].toString());
-                return new Revenue(date, totalTax, totalShip,totalDiscount,total);
+                int numberOder =Integer.parseInt(obj[5].toString());
+                return new Revenue(date, totalTax, totalShip,totalDiscount,total,numberOder);
             }).collect(Collectors.toList());
                 return new ResponseEntity<>(result,HttpStatus.OK);
         }catch (Exception e){
