@@ -5,6 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.ReportService;
+import project.model.dto.response.AddressRevenue;
+import project.model.dto.response.ProductReportByBrand;
+import project.model.dto.response.ProductReportByCatalog;
+import project.model.dto.response.ProductReportByLocation;
 import project.model.dto.response.*;
 import project.model.entity.Cart;
 import project.model.entity.CartDetail;
@@ -98,6 +102,8 @@ public class ReportImpl implements ReportService {
         }
     }
 
+
+
     @Override
     public List<ProductReportByCatalog> reportByCatalog(int status, int catId, LocalDateTime creDate, LocalDateTime endTime) {
         List<Cart> list = cartRepo.findCartByStatusAndCreatDateBetween(status, creDate, endTime);
@@ -169,11 +175,46 @@ public class ReportImpl implements ReportService {
     }
 
     @Override
+    public List<ProductReportByLocation> reportByLocation(int status, int locationId, LocalDateTime createDate, LocalDateTime endDate) {
+        List<Cart> list =cartRepo.findCartByStatusAndCreatDateBetween(status,createDate,endDate);
+        List<CartDetail> detailList =cartDetailRepo.findByCartIn(list);
+        List<ProductReportByLocation>listProDto= new ArrayList<>();
+        for (CartDetail ca:detailList) {
+            boolean check   = false;
+            if (ca.getProduct().getLocation().getId()==locationId&&listProDto.size()!=0){
+                for (ProductReportByLocation proResponse:listProDto) {
+                    if (proResponse.getId()==ca.getProduct().getId()){
+                        proResponse.setQuantitySales(proResponse.getQuantitySales()+ca.getQuantity());
+                        proResponse.setRevenue(proResponse.getRevenue()+ca.getPrice());
+                        proResponse.setRealRevenue(proResponse.getRevenue()+ proResponse.getDiscount());
+                    }else {
+                        check=true;
+                    }
+                }
+            }else if (ca.getProduct().getLocation().getId()==locationId){
+                check=true;
+            }
+            if (check){
+                ProductReportByLocation pr1 =new ProductReportByLocation();
+                pr1.setName(ca.getProduct().getName());
+                pr1.setQuantitySales(ca.getQuantity());
+                pr1.setRevenue(ca.getPrice()*pr1.getQuantitySales());
+                pr1.setId(ca.getProduct().getId());
+                pr1.setStatus(ca.getStatus());
+                pr1.setLocationName(ca.getProduct().getLocation().getName());
+                pr1.setRealRevenue(pr1.getRevenue()-pr1.getDiscount());
+                listProDto.add(pr1);
+            }
+        }
+        return listProDto;
+    }
+
+    @Override
     public List<ProductByCartStatusResponse> reportByCart(int status, LocalDateTime startDate, LocalDateTime endDate) {
         List<Cart>cartList=cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
         List<CartDetail>detailList=cartDetailRepo.findByCartIn(cartList);
-        Map<Integer, ProductByCartStatusResponse> resultMap = detailList.stream()
-                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),
+        Map<Integer, ProductByCartStatusResponse> resultMap = detailList.stream() // duyet mang detailList
+                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),//mỗi 1 phần tử detail thì chuyeenr giá trị qua product
                         cd -> new ProductByCartStatusResponse(cd.getProduct().getId(),
                                 cd.getProduct().getName(),
                                 cd.getProduct().getExportPrice(),
@@ -186,5 +227,92 @@ public class ReportImpl implements ReportService {
                 ));
         return new ArrayList<>(resultMap.values());
     }
+    @Override
+    public List<ProductByCatalogByCartStt> reportProByCatalogCart(int status,int catId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Cart>cartList = cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
+        List<CartDetail> detailList = cartDetailRepo.findByCartIn(cartList);
+        List<ProductByCatalogByCartStt> listProDto = new ArrayList<>();
+        for (CartDetail ca : detailList) {
+            boolean check = false;
+            if (ca.getProduct().getCatalog().getId() == catId && listProDto.size() != 0) {
+                for (ProductByCatalogByCartStt proResponse : listProDto) {
+                    if (proResponse.getId() == ca.getProduct().getId()) {
+                        proResponse.setQuantity(proResponse.getQuantity() + ca.getQuantity());
+                    } else {
+                        check = true;
+                    }
+                }
+            } else if (ca.getProduct().getCatalog().getId() == catId) {
+                check = true;
+            }
+            if (check) {
+                ProductByCatalogByCartStt pr1 = new ProductByCatalogByCartStt();
+                pr1.setName(ca.getProduct().getName());
+                pr1.setQuantity(ca.getQuantity());
+                pr1.setId(ca.getProduct().getId());
+                pr1.setStatus(ca.getStatus());
+                pr1.setCatalogName(ca.getProduct().getCatalog().getName());
+                pr1.setExportPrice(ca.getProduct().getExportPrice());
+                listProDto.add(pr1);
+            }
+        }
+        return listProDto;
+    }
+    @Override
+    public List<ProductByCartSttCancel> reportProByCartCancel(int status, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Cart>list=cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
+        List<CartDetail> cartDetailList=cartDetailRepo.findByCartIn(list);
+        Map<Integer, ProductByCartSttCancel> resultMap = cartDetailList.stream() // duyet mang detailList
+                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),//mỗi 1 phần tử detail thì chuyeenr giá trị qua product
+                        cd -> new ProductByCartSttCancel(cd.getProduct().getId(),
+                                cd.getProduct().getName(),
+                                cd.getProduct().getExportPrice(),
+                                cd.getQuantity(),
+                                cd.getProduct().getDiscount(),
+                                cd.getProduct().getCatalog().getName()),
+                        (pr1, pr2) -> {
+                            pr1.setQuantity(pr1.getQuantity() + pr2.getQuantity());
+                            return pr1;
+                        }
+                ));
+        return new ArrayList<>(resultMap.values());
+    }
 
+    @Override
+    public ResponseEntity<?> reportRevenueAll(Map<String, String> header, HttpServletResponse response) {
+        try {
+            LocalDateTime start = LocalDateTime.parse(header.get("start"));
+            LocalDateTime end = LocalDateTime.parse(header.get("end"));
+            String reportTime = header.get("reportTime");
+            List<Object[]> objects= new ArrayList<>();
+            switch (reportTime){
+                case Constants.DAY:
+                    objects=reportRepo.find_by_day_total(start.toLocalDate(),end.toLocalDate(),Constants.CART_STATUS_DONE);
+                    break;
+                case Constants.WEEK:
+                    objects=reportRepo.find_by_week_total(start.toLocalDate(),end.toLocalDate(),Constants.CART_STATUS_DONE);
+                    break;
+                case Constants.MONTH:
+                    objects=reportRepo.find_by_month_total(start.toLocalDate(),end.toLocalDate(),Constants.CART_STATUS_DONE);
+                    break;
+                default: break;
+            }
+            if (header.get("export").equals("excel")){
+                Revenue revenue = new Revenue();
+                export.setData(objects);
+                export.export(response,revenue);
+            }
+            List<Revenue> result = objects.stream().map(obj -> {
+                String date = obj[0].toString();
+                float totalTax = Float.parseFloat(obj[1].toString()) ;
+                float totalShip = Float.parseFloat(obj[2].toString());
+                float totalDiscount = Float.parseFloat(obj[3].toString());
+                float total = Float.parseFloat(obj[4].toString());
+                return new Revenue(date, totalTax, totalShip,totalDiscount,total);
+            }).collect(Collectors.toList());
+                return new ResponseEntity<>(result,HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
 }
