@@ -9,6 +9,7 @@ import java.util.List;
 
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService extends RootService<Users,Integer, UserRequest, UserResponse> {
     Users findByEmail(String email);
@@ -22,4 +23,5 @@ public interface UserService extends RootService<Users,Integer, UserRequest, Use
     ResponseEntity<?> updateUserForModerator(int userId, UserRequest userRequest);
     ResponseEntity<?> updateUserForUser(int userId, UserRequest userRequest);
     UserResponse findUserByIdForClient();
+
 }

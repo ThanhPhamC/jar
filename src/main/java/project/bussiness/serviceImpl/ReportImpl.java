@@ -277,6 +277,7 @@ public class ReportImpl implements ReportService {
                 ));
         return new ArrayList<>(resultMap.values());
     }
+
     @Override
     public ResponseEntity<?> reportRevenueAll(Map<String, String> header, HttpServletResponse response) {
         try {
