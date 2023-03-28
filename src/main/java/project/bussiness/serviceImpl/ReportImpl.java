@@ -184,10 +184,7 @@ public class ReportImpl implements ReportService {
                             return pr1;
                         }
                 ));
-
         return new ArrayList<>(resultMap.values());
     }
-
-
 
 }
