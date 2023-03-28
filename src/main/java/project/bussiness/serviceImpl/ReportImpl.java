@@ -80,117 +80,83 @@ public class ReportImpl implements ReportService {
         }
     }
 
-
-
     @Override
     public List<ProductReportByCatalog> reportByCatalog(int status, int catId, LocalDateTime creDate, LocalDateTime endTime) {
         List<Cart> list = cartRepo.findCartByStatusAndCreatDateBetween(status, creDate, endTime);
         List<CartDetail> detailList = cartDetailRepo.findByCartIn(list);
-        List<ProductReportByCatalog> listProDto = new ArrayList<>();
-        for (CartDetail ca : detailList) {
-            boolean check = false;
-            if (ca.getProduct().getCatalog().getId() == catId && listProDto.size() != 0) {
-                for (ProductReportByCatalog proResponse : listProDto) {
-                    if (proResponse.getId() == ca.getProduct().getId()) {
-                        proResponse.setQuantitySales(proResponse.getQuantitySales() + ca.getQuantity());
-                        proResponse.setRevenue(proResponse.getRevenue() + ca.getPrice());
-                        proResponse.setRealRevenue(proResponse.getRevenue() + proResponse.getDiscount());
-                    } else {
-                        check = true;
-                    }
-                }
-            } else if (ca.getProduct().getCatalog().getId() == catId) {
-                check = true;
-            }
-            if (check) {
-                ProductReportByCatalog pr1 = new ProductReportByCatalog();
-                pr1.setName(ca.getProduct().getName());
-                pr1.setQuantitySales(ca.getQuantity());
-                pr1.setRevenue(ca.getPrice() * pr1.getQuantitySales());
-                pr1.setId(ca.getProduct().getId());
-                pr1.setStatus(ca.getStatus());
-                pr1.setCatalogName(ca.getProduct().getCatalog().getName());
-                pr1.setRealRevenue(pr1.getRevenue() - pr1.getDiscount());
-                listProDto.add(pr1);
-            }
-        }
-        return listProDto;
+        Map<Integer, ProductReportByCatalog> result = detailList.stream()
+                .filter(cartDetail -> cartDetail.getProduct().getCatalog().getId() == catId)
+                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),
+                        cd -> new ProductReportByCatalog(cd.getProduct().getId(),
+                                cd.getProduct().getName(),
+                                cd.getPrice() * cd.getQuantity(),
+                                cd.getQuantity(),
+                                cd.getDiscount(),
+                                cd.getProduct().getCatalog().getName(),
+                                cd.getPrice() * cd.getQuantity() + cd.getDiscount() * cd.getQuantity()
+                        ),
+                        (pr1, pr2) -> {
+                            pr1.setQuantitySales(pr1.getQuantitySales() + pr2.getQuantitySales());
+                            pr1.setRealRevenue(pr1.getRealRevenue() + pr2.getRealRevenue());
+                            pr1.setRevenue(pr1.getRevenue() + pr2.getRevenue());
+                            return pr1;
+                        }
+                ));
+        return new ArrayList<>(result.values());
     }
 
     @Override
     public List<ProductReportByBrand> reportByBrand(int status, int bradId, LocalDateTime createDate, LocalDateTime endDate) {
         List<Cart> list = cartRepo.findCartByStatusAndCreatDateBetween(status, createDate, endDate);
         List<CartDetail> detailList = cartDetailRepo.findByCartIn(list);
-        List<ProductReportByBrand> listProDto = new ArrayList<>();
-        for (CartDetail ca : detailList) {
-            boolean check = false;
-            if (ca.getProduct().getBrand().getId() == bradId && listProDto.size() != 0) {
-                for (ProductReportByBrand proResponse : listProDto) {
-                    if (proResponse.getId() == ca.getProduct().getId()) {
-                        proResponse.setQuantitySales(proResponse.getQuantitySales() + ca.getQuantity());
-                        proResponse.setRevenue(proResponse.getRevenue() + ca.getPrice());
-                        proResponse.setRealRevenue(proResponse.getRevenue() + proResponse.getDiscount());
-                    } else {
-                        check = true;
-                    }
-                }
-            } else if (ca.getProduct().getBrand().getId() == bradId) {
-                check = true;
-            }
-            if (check) {
-                ProductReportByBrand pr1 = new ProductReportByBrand();
-                pr1.setName(ca.getProduct().getName());
-                pr1.setQuantitySales(ca.getQuantity());
-                pr1.setRevenue(ca.getPrice() * pr1.getQuantitySales());
-                pr1.setId(ca.getProduct().getId());
-                pr1.setStatus(ca.getStatus());
-                pr1.setBrandName(ca.getProduct().getBrand().getName());
-                pr1.setRealRevenue(pr1.getRevenue() - pr1.getDiscount());
-                listProDto.add(pr1);
-            }
-        }
-        return listProDto;
+        Map<Integer,ProductReportByBrand>result=detailList.stream()
+                .filter(cartDetail -> cartDetail.getProduct().getBrand().getId()==bradId)
+                .collect(Collectors.toMap(cartDetail -> cartDetail.getProduct().getId(),
+                        cartDetail -> new ProductReportByBrand(cartDetail.getProduct().getId(),
+                                cartDetail.getProduct().getName(),
+                                cartDetail.getQuantity(),
+                                cartDetail.getQuantity()* cartDetail.getPrice()+cartDetail.getQuantity()* cartDetail.getDiscount(),
+                                cartDetail.getDiscount(),
+                                cartDetail.getQuantity()*cartDetail.getPrice(),
+                                cartDetail.getProduct().getBrand().getName()),
+                        (pr1, pr2) -> {
+                            pr1.setQuantitySales(pr1.getQuantitySales() + pr2.getQuantitySales());
+                            pr1.setRealRevenue(pr1.getRealRevenue() + pr2.getRealRevenue());
+                            pr1.setRevenue(pr1.getRevenue() + pr2.getRevenue());
+                            return pr1;
+                        }
+                        ));
+        return new ArrayList<>(result.values());
     }
 
     @Override
     public List<ProductReportByLocation> reportByLocation(int status, int locationId, LocalDateTime createDate, LocalDateTime endDate) {
-        List<Cart> list =cartRepo.findCartByStatusAndCreatDateBetween(status,createDate,endDate);
-        List<CartDetail> detailList =cartDetailRepo.findByCartIn(list);
-        List<ProductReportByLocation>listProDto= new ArrayList<>();
-        for (CartDetail ca:detailList) {
-            boolean check   = false;
-            if (ca.getProduct().getLocation().getId()==locationId&&listProDto.size()!=0){
-                for (ProductReportByLocation proResponse:listProDto) {
-                    if (proResponse.getId()==ca.getProduct().getId()){
-                        proResponse.setQuantitySales(proResponse.getQuantitySales()+ca.getQuantity());
-                        proResponse.setRevenue(proResponse.getRevenue()+ca.getPrice());
-                        proResponse.setRealRevenue(proResponse.getRevenue()+ proResponse.getDiscount());
-                    }else {
-                        check=true;
-                    }
-                }
-            }else if (ca.getProduct().getLocation().getId()==locationId){
-                check=true;
-            }
-            if (check){
-                ProductReportByLocation pr1 =new ProductReportByLocation();
-                pr1.setName(ca.getProduct().getName());
-                pr1.setQuantitySales(ca.getQuantity());
-                pr1.setRevenue(ca.getPrice()*pr1.getQuantitySales());
-                pr1.setId(ca.getProduct().getId());
-                pr1.setStatus(ca.getStatus());
-                pr1.setLocationName(ca.getProduct().getLocation().getName());
-                pr1.setRealRevenue(pr1.getRevenue()-pr1.getDiscount());
-                listProDto.add(pr1);
-            }
-        }
-        return listProDto;
+        List<Cart> list = cartRepo.findCartByStatusAndCreatDateBetween(status, createDate, endDate);
+        List<CartDetail> detailList = cartDetailRepo.findByCartIn(list);
+        Map<Integer,ProductReportByLocation> result =detailList.stream()
+                .filter(cartDetail -> cartDetail.getProduct().getLocation().getId()==locationId)
+                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),
+                        cd ->new ProductReportByLocation(cd.getProduct().getId(),
+                                cd.getProduct().getName(),
+                                cd.getQuantity(),
+                                cd.getQuantity()* cd.getPrice()+cd.getQuantity()* cd.getDiscount(),
+                                cd.getDiscount(),
+                                cd.getPrice()*cd.getQuantity(),
+                                cd.getProduct().getLocation().getName()),
+                        (pr1, pr2) -> {
+                            pr1.setQuantitySales(pr1.getQuantitySales() + pr2.getQuantitySales());
+                            pr1.setRealRevenue(pr1.getRealRevenue() + pr2.getRealRevenue());
+                            pr1.setRevenue(pr1.getRevenue() + pr2.getRevenue());
+                            return pr1;
+                        }
+                        ));
+        return new ArrayList<>(result.values());
     }
 
     @Override
     public List<ProductByCartStatusResponse> reportByCart(int status, LocalDateTime startDate, LocalDateTime endDate) {
-        List<Cart>cartList=cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
-        List<CartDetail>detailList=cartDetailRepo.findByCartIn(cartList);
+        List<Cart> cartList = cartRepo.findCartByStatusAndCreatDateBetween(status, startDate, endDate);
+        List<CartDetail> detailList = cartDetailRepo.findByCartIn(cartList);
         Map<Integer, ProductByCartStatusResponse> resultMap = detailList.stream() // duyet mang detailList
                 .collect(Collectors.toMap(cd -> cd.getProduct().getId(),//mỗi 1 phần tử detail thì chuyeenr giá trị qua product
                         cd -> new ProductByCartStatusResponse(cd.getProduct().getId(),
@@ -203,45 +169,41 @@ public class ReportImpl implements ReportService {
                             return pr1;
                         }
                 ));
+
+
         return new ArrayList<>(resultMap.values());
     }
     @Override
-    public List<ProductByCatalogByCartStt> reportProByCatalogCart(int status,int catId, LocalDateTime startDate, LocalDateTime endDate) {
-        List<Cart>cartList = cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
+    public List<ProductByCatalogByCartStt> reportProByCatalogCart(int status, int catId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Cart> cartList = cartRepo.findCartByStatusAndCreatDateBetween(status, startDate, endDate);
         List<CartDetail> detailList = cartDetailRepo.findByCartIn(cartList);
-        List<ProductByCatalogByCartStt> listProDto = new ArrayList<>();
-        for (CartDetail ca : detailList) {
-            boolean check = false;
-            if (ca.getProduct().getCatalog().getId() == catId && listProDto.size() != 0) {
-                for (ProductByCatalogByCartStt proResponse : listProDto) {
-                    if (proResponse.getId() == ca.getProduct().getId()) {
-                        proResponse.setQuantity(proResponse.getQuantity() + ca.getQuantity());
-                    } else {
-                        check = true;
-                    }
-                }
-            } else if (ca.getProduct().getCatalog().getId() == catId) {
-                check = true;
-            }
-            if (check) {
-                ProductByCatalogByCartStt pr1 = new ProductByCatalogByCartStt();
-                pr1.setName(ca.getProduct().getName());
-                pr1.setQuantity(ca.getQuantity());
-                pr1.setId(ca.getProduct().getId());
-                pr1.setStatus(ca.getStatus());
-                pr1.setCatalogName(ca.getProduct().getCatalog().getName());
-                pr1.setExportPrice(ca.getProduct().getExportPrice());
-                listProDto.add(pr1);
-            }
-        }
-        return listProDto;
+        Map<Integer, ProductByCatalogByCartStt> result = detailList.stream()
+                .filter(cartDetail -> cartDetail.getProduct().getCatalog().getId() == catId)
+                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),
+                        cd -> new ProductByCatalogByCartStt(cd.getProduct().getId(),
+                                cd.getProduct().getName(),
+                                cd.getPrice() * cd.getQuantity(),
+                                cd.getQuantity(),
+                                cd.getDiscount(),
+                                cd.getProduct().getCatalog().getName(),
+                                cd.getPrice() * cd.getQuantity() + cd.getDiscount() * cd.getQuantity()
+                        ),
+                        (pr1, pr2) -> {
+                            pr1.setQuantitySales(pr1.getQuantitySales() + pr2.getQuantitySales());
+                            pr1.setRealRevenue(pr1.getRealRevenue() + pr2.getRealRevenue());
+                            pr1.setRevenue(pr1.getRevenue() + pr2.getRevenue());
+                            return pr1;
+                        }
+                ));
+        return new ArrayList<>(result.values());
+
     }
     @Override
     public List<ProductByCartSttCancel> reportProByCartCancel(int status, LocalDateTime startDate, LocalDateTime endDate) {
-        List<Cart>list=cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
-        List<CartDetail> cartDetailList=cartDetailRepo.findByCartIn(list);
+        List<Cart> list = cartRepo.findCartByStatusAndCreatDateBetween(status, startDate, endDate);
+        List<CartDetail> cartDetailList = cartDetailRepo.findByCartIn(list);
         Map<Integer, ProductByCartSttCancel> resultMap = cartDetailList.stream() // duyet mang detailList
-                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),//mỗi 1 phần tử detail thì chuyeenr giá trị qua product
+                .collect(Collectors.toMap(cd -> cd.getProduct().getId(),//mỗi 1 phần tử detail thì chuyển giá trị qua product
                         cd -> new ProductByCartSttCancel(cd.getProduct().getId(),
                                 cd.getProduct().getName(),
                                 cd.getProduct().getExportPrice(),
@@ -253,6 +215,7 @@ public class ReportImpl implements ReportService {
                             return pr1;
                         }
                 ));
+
         return new ArrayList<>(resultMap.values());
     }
 

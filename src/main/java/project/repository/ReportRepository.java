@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import project.model.dto.response.Revenue;
 import project.model.entity.Cart;
+import project.model.entity.Product;
+import project.model.entity.Wish;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -85,6 +87,7 @@ public interface ReportRepository extends JpaRepository<Cart,Integer>  {
             "WHERE weeks.weekDate BETWEEN ?1 AND ?2\n" +
             "GROUP BY weeks.weekDate, city",nativeQuery = true)
     List<Object[]> find_by_month_address(@Param("start") LocalDate start, @Param("end") LocalDate end, @Param("city") String city, @Param("status") Integer status);
+
 
     @Query(value = "SELECT\n" +
             "    date_list.date AS date,\n" +
