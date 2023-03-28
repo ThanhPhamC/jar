@@ -308,7 +308,8 @@ public class ReportImpl implements ReportService {
                 float totalShip = Float.parseFloat(obj[2].toString());
                 float totalDiscount = Float.parseFloat(obj[3].toString());
                 float total = Float.parseFloat(obj[4].toString());
-                return new Revenue(date, totalTax, totalShip,totalDiscount,total);
+                int numberOder=Integer.parseInt(obj[5].toString());
+                return new Revenue(date, totalTax, totalShip,totalDiscount,total,numberOder);
             }).collect(Collectors.toList());
                 return new ResponseEntity<>(result,HttpStatus.OK);
         }catch (Exception e){

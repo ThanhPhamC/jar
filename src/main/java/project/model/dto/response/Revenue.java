@@ -8,13 +8,15 @@ public class Revenue {
     private float totalShip;
     private float totalDiscount;
     private float total;
+    private int numberOder;
 
-    public Revenue(String date, float totalTax, float totalShip, float totalDiscount, float total) {
+    public Revenue(String date, float totalTax, float totalShip, float totalDiscount, float total,int numberOder) {
         this.date=date;
         this.totalTax=totalTax;
         this.totalShip=totalShip;
         this.totalDiscount=totalDiscount;
         this.total=total;
+        this.numberOder=numberOder;
 
     }
 
