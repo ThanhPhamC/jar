@@ -225,10 +225,8 @@ public class ReportImpl implements ReportService {
                             return pr1;
                         }
                 ));
-
         return new ArrayList<>(resultMap.values());
     }
-
     @Override
     public List<ProductByCatalogByCartStt> reportProByCatalogCart(int status,int catId, LocalDateTime startDate, LocalDateTime endDate) {
         List<Cart>cartList = cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
@@ -259,9 +257,7 @@ public class ReportImpl implements ReportService {
             }
         }
         return listProDto;
-
     }
-
     @Override
     public List<ProductByCartSttCancel> reportProByCartCancel(int status, LocalDateTime startDate, LocalDateTime endDate) {
         List<Cart>list=cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
@@ -274,13 +270,48 @@ public class ReportImpl implements ReportService {
                                 cd.getQuantity(),
                                 cd.getProduct().getDiscount(),
                                 cd.getProduct().getCatalog().getName()),
-
                         (pr1, pr2) -> {
                             pr1.setQuantity(pr1.getQuantity() + pr2.getQuantity());
                             return pr1;
                         }
                 ));
-
         return new ArrayList<>(resultMap.values());
+    }
+    @Override
+    public ResponseEntity<?> reportRevenueAll(Map<String, String> header, HttpServletResponse response) {
+        try {
+            LocalDateTime start = LocalDateTime.parse(header.get("start"));
+            LocalDateTime end = LocalDateTime.parse(header.get("end"));
+            String reportTime = header.get("reportTime");
+            List<Object[]> objects= new ArrayList<>();
+            switch (reportTime){
+                case Constants.DAY:
+                    objects=reportRepo.find_by_day_total(start.toLocalDate(),end.toLocalDate(),Constants.CART_STATUS_DONE);
+                    break;
+                case Constants.WEEK:
+                    objects=reportRepo.find_by_week_total(start.toLocalDate(),end.toLocalDate(),Constants.CART_STATUS_DONE);
+                    break;
+                case Constants.MONTH:
+                    objects=reportRepo.find_by_month_total(start.toLocalDate(),end.toLocalDate(),Constants.CART_STATUS_DONE);
+                    break;
+                default: break;
+            }
+            if (header.get("export").equals("excel")){
+                Revenue revenue = new Revenue();
+                export.setData(objects);
+                export.export(response,revenue);
+            }
+            List<Revenue> result = objects.stream().map(obj -> {
+                String date = obj[0].toString();
+                float totalTax = Float.parseFloat(obj[1].toString()) ;
+                float totalShip = Float.parseFloat(obj[2].toString());
+                float totalDiscount = Float.parseFloat(obj[3].toString());
+                float total = Float.parseFloat(obj[4].toString());
+                return new Revenue(date, totalTax, totalShip,totalDiscount,total);
+            }).collect(Collectors.toList());
+                return new ResponseEntity<>(result,HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
     }
 }

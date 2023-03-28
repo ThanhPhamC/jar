@@ -21,7 +21,11 @@ import java.util.Map;
 public class ReportController {
     private ReportService reportService;
     private CartService cartService;
-        @GetMapping("/report_by_address")
+    @GetMapping("/report_all")
+    public ResponseEntity<?> reportAll(@RequestParam Map<String, String> header, HttpServletResponse response ){
+        return reportService.reportRevenueAll(header,response);
+    }
+    @GetMapping("/report_by_address")
     public ResponseEntity<?> reportByAddress(@RequestParam Map<String, String> header, HttpServletResponse response ){
         return reportService.reportByAddress(header,response);
     }
