@@ -276,4 +276,26 @@ public class ProductImpl implements ProductService {
                 .filter(Objects::nonNull).collect(Collectors.toList());
         return result;
     }
+    @Override
+    public Map<String, Integer> likeProduct() {
+        List<Integer> list = productRepo.likeProduct();
+        List<Product> productList = new ArrayList<>();
+        for (Integer id:list) {
+            Product product = productRepo.findById(id).get();
+            productList.add(product);
+        }
+
+        Map<String, Integer> data = new HashMap<>();
+        for (Product product:productList) {
+            String key = product.getName();
+            if (data.containsKey(key)) {
+                int newQuantity = data.get(key) +1;
+                data.put(product.getName(),newQuantity);
+            } else {
+                data.put(product.getName(),1);
+            }
+        }
+        return data;
+    }
+
 }

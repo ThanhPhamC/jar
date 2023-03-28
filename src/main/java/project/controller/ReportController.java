@@ -5,7 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.CartService;
+import project.bussiness.service.ProductService;
 import project.bussiness.service.ReportService;
+import project.bussiness.service.UserService;
+import project.model.dto.response.ProductByCartStatusResponse;
+import project.model.dto.response.ProductReportByBrand;
+import project.model.dto.response.ProductReportByCatalog;
 import project.model.dto.response.*;
 import project.model.shopMess.Message;
 
@@ -21,6 +26,11 @@ import java.util.Map;
 public class ReportController {
     private ReportService reportService;
     private CartService cartService;
+    @GetMapping("/report_all")
+    public ResponseEntity<?> reportAll(@RequestParam Map<String, String> header, HttpServletResponse response ){
+        return reportService.reportRevenueAll(header,response);
+    }
+    private ProductService productService;
         @GetMapping("/report_by_address")
     public ResponseEntity<?> reportByAddress(@RequestParam Map<String, String> header, HttpServletResponse response ){
         return reportService.reportByAddress(header,response);
@@ -36,6 +46,7 @@ public class ReportController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+
     @GetMapping("/productByBrand")
     public ResponseEntity<?>finProductByBrand(@RequestParam int id,@RequestParam String startDate,@RequestParam String endDate){
         try {
@@ -47,6 +58,7 @@ public class ReportController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+
     @GetMapping("/productByLocation")
     public ResponseEntity<?> findProductByLocation(@RequestParam int id,@RequestParam String startDate,@RequestParam String endDate){
         try {
@@ -94,4 +106,10 @@ public class ReportController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+
+    @GetMapping("likeProduct")
+    public ResponseEntity<?> favoriteProduct() {
+        return ResponseEntity.ok(productService.likeProduct());
+    }
+
 }

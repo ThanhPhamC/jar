@@ -56,4 +56,67 @@ public interface ReportRepository extends JpaRepository<Cart,Integer> {
     List<Object[]> find_by_month_address(@Param("start") LocalDate start, @Param("end") LocalDate end, @Param("city") String city, @Param("status") Integer status);
 
 
+    @Query(value = "SELECT\n" +
+            "    date_list.date AS date,\n" +
+            "    IFNULL(SUM(cart.tax), 0) AS totalTax,\n" +
+            "    IFNULL(SUM(cart.shipping), 0) AS totalShip,\n" +
+            "    IFNULL(SUM(cart.discount), 0) AS totalDiscount,\n" +
+            "    IFNULL(SUM(cart.total), 0) AS total\n" +
+            "FROM (\n" +
+            "         SELECT DATE_ADD(:start, INTERVAL n DAY) AS date\n" +
+            "         FROM (\n" +
+            "                  SELECT @row \\:= @row + 1 AS n\n" +
+            "                  FROM (\n" +
+            "                           SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4\n" +
+            "                           UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9\n" +
+            "                       ) r1,\n" +
+            "                       (\n" +
+            "                           SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4\n" +
+            "                           UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9\n" +
+            "                       ) r2,\n" +
+            "                       (SELECT @row \\:= -1) x\n" +
+            "              ) numbers\n" +
+            "         WHERE DATE_ADD(:start, INTERVAL n DAY) BETWEEN :start AND :end\n" +
+            "     ) date_list\n" +
+            "         LEFT JOIN cart ON cart.creatDate = date_list.date AND cart.status = :status\n" +
+            "GROUP BY date_list.date\n" +
+            "ORDER BY date_list.date",nativeQuery = true)
+    List<Object[]> find_by_day_total(@Param("start") LocalDate start, @Param("end") LocalDate end, @Param("status") Integer status);
+
+
+    @Query(value = "SELECT CONCAT(weeks.weekDate, ' - ', DATE_ADD(weeks.weekDate, INTERVAL 6 DAY)) AS date,\n" +
+            "       IFNULL(SUM(cart.tax), 0)                 AS totalTax,\n" +
+            "       IFNULL(SUM(cart.shipping), 0)            AS totalShip,\n" +
+            "       IFNULL(SUM(cart.discount), 0)            AS totalDiscount,\n" +
+            "       IFNULL(SUM(cart.total), 0)               AS total\n" +
+            "\n" +
+            "FROM (SELECT ADDDATE(:start, INTERVAL n WEEK) AS weekDate\n" +
+            "      FROM (SELECT @row \\:= @row + 1 AS n\n" +
+            "            FROM (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3) r1,\n" +
+            "                 (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3) r2,\n" +
+            "                 (SELECT @row \\:= -1) x) numbers) weeks\n" +
+            "         LEFT JOIN cart ON cart.creatDate BETWEEN weeks.weekDate AND DATE_ADD(weeks.weekDate, INTERVAL 6 DAY) and\n" +
+            "                           cart.status = :status\n" +
+            "WHERE weeks.weekDate BETWEEN :start AND :end\n" +
+            "GROUP BY weeks.weekDate;",nativeQuery = true)
+    List<Object[]> find_by_week_total(@Param("start") LocalDate start, @Param("end") LocalDate end, @Param("status") Integer status);
+    @Query(value = "SELECT CONCAT(weeks.weekDate, ' - ', LAST_DAY(weeks.weekDate)) AS date,\n" +
+            "                   IFNULL(SUM(cart.tax), 0) AS totalTax,\n" +
+            "                  IFNULL(SUM(cart.shipping), 0) AS totalShip,\n" +
+            "                   IFNULL(SUM(cart.discount), 0) AS totalDiscount,\n" +
+            "                  IFNULL(SUM(cart.total), 0) AS total\n" +
+            "            FROM (\n" +
+            "                    SELECT ADDDATE(:start, INTERVAL n MONTH) AS weekDate\n" +
+            "                     FROM (\n" +
+            "                              SELECT @row \\:= @row + 1 AS n\n" +
+            "                              FROM (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3) r1,\n" +
+            "                                   (SELECT @row \\:= -1) x\n" +
+            "                          ) numbers\n" +
+            "                 ) weeks\n" +
+            "                     LEFT JOIN cart ON cart.creatDate BETWEEN weeks.weekDate AND LAST_DAY(weeks.weekDate)  and cart.status=:status\n" +
+            "            WHERE weeks.weekDate BETWEEN :start AND :end\n" +
+            "            GROUP BY weeks.weekDate",nativeQuery = true)
+    List<Object[]> find_by_month_total(@Param("start") LocalDate start, @Param("end") LocalDate end, @Param("status") Integer status);
+
+
 }

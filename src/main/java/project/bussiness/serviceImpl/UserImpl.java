@@ -33,10 +33,7 @@ import project.model.entity.Users;
 import project.model.regex.RegexValidate;
 import project.model.shopMess.Message;
 import project.model.utility.Utility;
-import project.repository.CartRepository;
-import project.repository.RoleRepository;
-import project.repository.TokenLogInReposirory;
-import project.repository.UserRepository;
+import project.repository.*;
 import project.security_jwt.CustomUserDetails;
 import project.security_jwt.JwtTokenProvider;
 import java.time.LocalDate;
@@ -55,6 +52,8 @@ public class UserImpl implements UserService {
     private CartService cartService;
     private CouponService couponService;
     private TokenLogInReposirory tokenLogInReposirory;
+
+    private ProductRepository productRepository;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -412,7 +411,6 @@ public class UserImpl implements UserService {
         Users users = userRepository.findUsersByUserName(userIsLoggingIn.getUsername());
         return mapPoJoToResponse(findById(users.getUserId()));
     }
-
 
 
 
