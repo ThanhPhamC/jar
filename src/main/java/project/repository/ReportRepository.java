@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import project.model.entity.Cart;
+import project.model.entity.Product;
+import project.model.entity.Wish;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -80,6 +82,7 @@ public interface ReportRepository extends JpaRepository<Cart,Integer> {
             "WHERE weeks.weekDate BETWEEN ?1 AND ?2\n" +
             "GROUP BY weeks.weekDate, city;",nativeQuery = true)
     List<Object[]> find_by_month_address(@Param("start") LocalDate start, @Param("end") LocalDate end, @Param("city") String city, @Param("status") Integer status);
+
 
     @Query(value = "SELECT\n" +
             "    date_list.date AS date,\n" +
