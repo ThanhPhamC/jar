@@ -1,4 +1,5 @@
 package project.model.entity;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -10,23 +11,27 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Component
 public class ExcelExport {
     private Workbook workbook;
     private Sheet sheet;
     private List<Object[]> data;
+
     public ExcelExport() {
         workbook = new XSSFWorkbook();
     }
+
     public void setData(List<Object[]> data) {
         this.data = data;
     }
+
     public void export(HttpServletResponse response, Object o) throws IOException {
         sheet = workbook.createSheet("Data");
         List<Field> fields = Arrays.asList(o.getClass().getDeclaredFields());
@@ -55,6 +60,10 @@ public class ExcelExport {
                     cell.setCellValue((LocalDateTime) field);
                 } else if (field instanceof LocalDate) {
                     cell.setCellValue((LocalDate) field);
+                } else if (field instanceof Date) {
+                    cell.setCellValue(String.valueOf(field));
+                } else if (field instanceof BigDecimal) {
+                    cell.setCellValue(String.valueOf(field));
                 }
             }
         }
