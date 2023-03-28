@@ -26,7 +26,7 @@ public class ReportController {
         return reportService.reportByAddress(header,response);
     }
     @GetMapping("/proDuctByCatalog")
-    public ResponseEntity<?>finProducByCatalog(@RequestParam int id,@RequestParam String startDate,@RequestParam String endDate){
+    public ResponseEntity<?>finProductByCatalog(@RequestParam int id,@RequestParam String startDate,@RequestParam String endDate){
         try {
             LocalDateTime start=LocalDateTime.parse(startDate);
             LocalDateTime end=LocalDateTime.parse(endDate);
