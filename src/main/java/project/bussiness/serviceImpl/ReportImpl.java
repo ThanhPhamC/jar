@@ -278,4 +278,30 @@ public class ReportImpl implements ReportService {
         return response;
     }
 
+    @Override
+    public List<TopProductByRevenue> reportTopProductByRevenue(int status, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Cart>list=cartRepo.findCartByStatusAndCreatDateBetween(status,startDate,endDate);
+        List<CartDetail>detailList=cartDetailRepo.findByCartIn(list);
+        Map<Integer,TopProductByRevenue>result =detailList.stream()
+                .collect(Collectors.toMap(cartDetail -> cartDetail.getProduct().getId(),
+                        cartDetail -> new TopProductByRevenue(cartDetail.getProduct().getId(),
+                                cartDetail.getProduct().getName(),
+                                cartDetail.getQuantity(),
+                                cartDetail.getProduct().getCatalog().getName(),
+                                cartDetail.getQuantity()* cartDetail.getPrice()+cartDetail.getQuantity()* cartDetail.getDiscount(),
+                                cartDetail.getQuantity()* cartDetail.getPrice()),
+                        (p1,p2)->{
+                            p1.setQuantitySales(p1.getQuantitySales()+ p2.getQuantitySales());
+                            return p1;
+                        }));
+        List<TopProductByRevenue>top5 = new ArrayList<>(result.values());
+        List<TopProductByRevenue> topList= top5.stream().sorted(Comparator.comparing(TopProductByRevenue::getRevenue)).collect(Collectors.toList());
+        List<TopProductByRevenue> response=topList.stream()
+                .skip(Math.max(0, topList.size() - 10))
+                .filter(Objects::nonNull).collect(Collectors.toList());
+        return response;
+    }
 }
+
+
+
