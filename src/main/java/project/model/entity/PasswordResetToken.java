@@ -3,6 +3,8 @@ package project.model.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 @Data
 @Entity
@@ -14,5 +16,5 @@ public class PasswordResetToken {
     @OneToOne(targetEntity = Users.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
     private Users users;
-    private Date startDate;
+    private LocalDateTime startDate;
 }
