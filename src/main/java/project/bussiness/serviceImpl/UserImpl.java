@@ -33,10 +33,7 @@ import project.model.regex.RegexValidate;
 import project.model.sendEmail.ProvideSendEmail;
 import project.model.shopMess.Message;
 import project.model.utility.Utility;
-import project.repository.CartRepository;
-import project.repository.RoleRepository;
-import project.repository.TokenLogInReposirory;
-import project.repository.UserRepository;
+import project.repository.*;
 import project.security_jwt.CustomUserDetails;
 import project.security_jwt.CustomUserDetailsService;
 import project.security_jwt.JwtTokenProvider;
@@ -62,6 +59,8 @@ public class UserImpl implements UserService {
     private ProvideSendEmail provideSendEmail;
     private PasswordResetTokenService passResetService;
     private CustomUserDetailsService customUserDetailsService;
+
+    private ProductRepository productRepository;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
@@ -490,6 +489,5 @@ public class UserImpl implements UserService {
             }
         }
     }
-
 
 }

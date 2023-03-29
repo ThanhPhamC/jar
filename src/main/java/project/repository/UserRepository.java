@@ -25,4 +25,5 @@ public interface UserRepository extends JpaRepository<Users,Integer> {
 //    @Query(value = "select * from users  where firstName like '%' or lastName like '%'",nativeQuery = true)
 //    List<Users> searchByFirstNameOrLastName(@Param("name") String name);
 
+
 }

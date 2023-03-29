@@ -1,5 +1,14 @@
-FROM gradle:5.3.1-jdk8-alpine AS builder
+FROM gradle:7.6.1-jdk-alpine as build
 
-WORKDIR /webapi
+RUN mkdir /webapi
 
-EXPOSE 8080 5005
+ENV APP_HOME=/webapi
+WORKDIR $APP_HOME
+
+COPY --chown=gradle:gradle build.gradle settings.gradle $APP_HOME/
+COPY --chown=gradle:gradle src $APP_HOME/src
+
+# COPY . .
+# RUN gradle build --no-daemon 
+
+EXPOSE 8082
