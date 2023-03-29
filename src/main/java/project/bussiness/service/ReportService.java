@@ -18,5 +18,6 @@ public interface ReportService {
     List<ProductByCartSttCancel>reportProByCartCancel(int status ,LocalDateTime startDate, LocalDateTime endDate);
     ResponseEntity<?> reportRevenueAll(Map<String, String> header, HttpServletResponse response );
     List<TopProductSales>reportTopProductSales(int status ,LocalDateTime startDate, LocalDateTime endDate);
+    List<TopProductByRevenue>reportTopProductByRevenue(int status ,LocalDateTime startDate, LocalDateTime endDate);
 
 }
