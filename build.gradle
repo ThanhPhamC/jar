@@ -54,9 +54,7 @@ dependencies {
     implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.2.2'
     // https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
     implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.7.10'
-
 }
-
 tasks.named('test') {
     useJUnitPlatform()
 }
