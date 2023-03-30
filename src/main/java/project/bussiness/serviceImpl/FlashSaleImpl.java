@@ -31,11 +31,10 @@ public class FlashSaleImpl implements FlashSaleService {
     public FlashSaleResponse saveOrUpdate(FlashSaleRequest rq) {
         FlashSale map = mapRequestToPoJo(rq);
         FlashSale result = flashSaleRepo.save(map);
-        List<FlashSale> flashSales = findAll().stream().filter(fs -> fs.getStatus() == Constants.ONLINE).collect(Collectors.toList());
+        List<FlashSale> flashSales =flashSaleRepo.findByProduct_IdOrderByStartTimeAsc(map.getProduct().getId());
         boolean check =false;
         for (FlashSale fs : flashSales) {
-                if (fs.getProduct().getId()== map.getProduct().getId()&&fs.getEndTime().compareTo(map.getStartTime())>0){
-                    check =true;}
+
         }
         if (!check){
             FlashSaleResponse response = mapPoJoToResponse(result);

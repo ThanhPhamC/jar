@@ -14,10 +14,26 @@ configurations {
     }
 }
 
+
 repositories {
     mavenCentral()
 }
-
+//sourceSets {
+//    main {
+//        // Cấu hình đường dẫn tới các mã nguồn Java của bạn
+//        java {
+//            srcDirs = ['src/main/java']
+//        }
+//        // Cấu hình class main
+//        java {
+//            srcDirs = ['src/main/java']
+//            include 'project/OjtProject2Application.java'
+//        }
+//    }
+//}
+bootJar {
+    launchScript()
+}
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
@@ -38,9 +54,7 @@ dependencies {
     implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.2.2'
     // https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
     implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.7.10'
-
 }
-
 tasks.named('test') {
     useJUnitPlatform()
 }

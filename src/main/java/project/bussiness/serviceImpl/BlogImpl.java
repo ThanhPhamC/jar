@@ -46,7 +46,6 @@ public class BlogImpl implements BlogService {
         Blog blog1 = blogRepo.save(blog);
         BlogResponse blogResponse = mapPoJoToResponse(blog1);
 
-
         return blogResponse;
     }
 

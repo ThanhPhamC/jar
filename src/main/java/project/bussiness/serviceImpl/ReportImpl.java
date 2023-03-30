@@ -67,10 +67,11 @@ public class ReportImpl implements ReportService {
                 float totalTax = Float.parseFloat(obj[1].toString()) ;
                 float totalShip = Float.parseFloat(obj[2].toString());
                 float totalDiscount = Float.parseFloat(obj[3].toString());
-                float total = Float.parseFloat(obj[4].toString());
-                int numberOder =Integer.parseInt(obj[5].toString());
-                String address=obj[6].toString();
-                return new AddressRevenue(date, totalTax, totalShip,totalDiscount,total,numberOder,address);
+                float revenue = Float.parseFloat(obj[4].toString());
+                float realRevenue = Float.parseFloat(obj[5].toString());
+                int numberOder =Integer.parseInt(obj[6].toString());
+                String address=obj[7].toString();
+                return new AddressRevenue(date, totalTax, totalShip,totalDiscount,revenue,realRevenue,numberOder,address);
             }).collect(Collectors.toList());
             return new ResponseEntity<>(result,HttpStatus.OK);
         }catch (Exception e){
@@ -246,9 +247,10 @@ public class ReportImpl implements ReportService {
                 float totalTax = Float.parseFloat(obj[1].toString()) ;
                 float totalShip = Float.parseFloat(obj[2].toString());
                 float totalDiscount = Float.parseFloat(obj[3].toString());
-                float total = Float.parseFloat(obj[4].toString());
-                int numberOder =Integer.parseInt(obj[5].toString());
-                return new Revenue(date, totalTax, totalShip,totalDiscount,total,numberOder);
+                float revenue = Float.parseFloat(obj[4].toString());
+                float realRevenue = Float.parseFloat(obj[5].toString());
+                int numberOder =Integer.parseInt(obj[6].toString());
+                return new Revenue(date, totalTax, totalShip,totalDiscount,revenue,realRevenue,numberOder);
             }).collect(Collectors.toList());
                 return new ResponseEntity<>(result,HttpStatus.OK);
         }catch (Exception e){
