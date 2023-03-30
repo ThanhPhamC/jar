@@ -222,6 +222,7 @@ public class ProductImpl implements ProductService {
         } else {
             product.setStatus(1);
         }
+        LocalDateTime time =LocalDateTime.now();
         product.setName(productRequest.getName());
         product.setCreatDate(productRequest.getCreatDate());
         product.setDiscount(productRequest.getDiscount());
@@ -231,6 +232,8 @@ public class ProductImpl implements ProductService {
         product.setProductImg(productRequest.getProductImg());
         product.setProductQuantity(productRequest.getProductQuantity());
         product.setTitle(productRequest.getTitle());
+        product.setLocation(locationRepository.findById(productRequest.getLocationId()).get());
+        product.setCreatDate(time);
         product.setCatalog(catalogRepo.findById(productRequest.getCatalogId()).get());
         product.setBrand(brandRepo.findById(productRequest.getBrandId()).get());
         return product;

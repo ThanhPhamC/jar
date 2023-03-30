@@ -7,12 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.bussiness.service.UserService;
+import project.model.dto.request.ChangePassword;
 import project.model.dto.request.LogInRequest;
 import project.model.dto.request.UserRequest;
 import project.model.dto.response.UserResponse;
 import project.model.shopMess.Message;
 import project.model.utility.Utility;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -155,5 +157,23 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
+    }
+
+    @PostMapping("changePassword")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePassword changePassword){
+        return userService.changePassword(changePassword);
+    }
+
+    @PostMapping("forgotPassword")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> forgotPassword(@RequestParam("email") String userEmail, HttpServletRequest request){
+        return userService.forgotPassword(userEmail,request);
+    }
+
+    @PostMapping("/creatNewPass")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> creatNewPass(@RequestParam("token") String token, @RequestParam("newPassword") String newPassword) {
+        return userService.creatNewPass(token,newPassword);
     }
 }

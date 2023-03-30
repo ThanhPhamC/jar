@@ -106,6 +106,30 @@ public class ReportController {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
     }
+    @GetMapping("/topProduct")
+    public ResponseEntity<?>TopProduct(@RequestParam String startDate,@RequestParam String endDate){
+        try {
+            LocalDateTime start = LocalDateTime.parse(startDate);
+            LocalDateTime end =LocalDateTime.parse(endDate);
+            List<TopProductSales> list =reportService.reportTopProductSales(4,start,end);
+            return new ResponseEntity<>(list,HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+    @GetMapping("/topProductByRevenue")
+    public ResponseEntity<?>topProductByRevenue(@RequestParam String startDate,@RequestParam String endDate){
+        try {
+            LocalDateTime start = LocalDateTime.parse(startDate);
+            LocalDateTime end =LocalDateTime.parse(endDate);
+            List<TopProductByRevenue> list =reportService.reportTopProductByRevenue(4,start,end);
+            return new ResponseEntity<>(list,HttpStatus.OK);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+    }
+
+
 
     @GetMapping("likeProduct")
     public ResponseEntity<?> favoriteProduct() {

@@ -111,7 +111,7 @@ public class CartImpl implements CartService {
                     if (countCartDetailByProductId.size() == 1) {
                         if (!dt.getName().contains(Constants.FLASH_SALE_NAME) && dt.getQuantity() == 1) {
                             dt.setName(String.format("%s%s", dt.getName(), Constants.FLASH_SALE_NAME));
-                            dt.setDiscount(dt.getPrice()* flashSale.getDiscount()/100);
+                            dt.setDiscount(dt.getPrice() * flashSale.getDiscount() / 100);
                             dt.setPrice(dt.getPrice() * (100 - flashSale.getDiscount()) / 100);
                             cartDetailRepository.save(dt);
                         } else if (!dt.getName().contains(Constants.FLASH_SALE_NAME)) {
@@ -119,7 +119,7 @@ public class CartImpl implements CartService {
                             newFlashSale.setName(String.format("%s%s", dt.getName(), Constants.FLASH_SALE_NAME));
                             newFlashSale.setPrice(dt.getPrice() * (100 - flashSale.getDiscount()) / 100);
                             newFlashSale.setProduct(dt.getProduct());
-                            newFlashSale.setDiscount(dt.getProduct().getExportPrice()* flashSale.getDiscount()/100);
+                            newFlashSale.setDiscount(dt.getProduct().getExportPrice() * flashSale.getDiscount() / 100);
                             newFlashSale.setStatus(1);
                             newFlashSale.setCart(cart);
                             newFlashSale.setQuantity(1);
@@ -151,7 +151,7 @@ public class CartImpl implements CartService {
             }).collect(Collectors.toList());
         }
         for (CartDetailResponse rp : responseList) {
-            response.setSubTotal(response.getSubTotal()+ rp.getQuantity()* rp.getPrice());
+            response.setSubTotal(response.getSubTotal() + rp.getQuantity() * rp.getPrice());
         }
         response.setDetailResponses(responseList);
         response.setDiscount(cart.getDiscount());
@@ -167,7 +167,7 @@ public class CartImpl implements CartService {
         response.setCity(users.getCity());
         response.setCountry(users.getCountry());
         response.setState(users.getState());
-        response.setTotal(response.getSubTotal()+ response.getShipping()+ response.getTax()- response.getDiscount());
+        response.setTotal(response.getSubTotal() + response.getShipping() + response.getTax() - response.getDiscount());
         return response;
     }
 
@@ -271,6 +271,7 @@ public class CartImpl implements CartService {
     @Override
     public CartPendingResponse showCartPending() {
         couponService.findAll();
+        flashSaleService.findAll();
         CustomUserDetails customUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Cart> cartList = cartRepository.findByUsers_UserIdAndStatus(customUser.getUserId(), 0);
         List<CartDetail> cartDetailList = cartDetailRepository.findByCartIn(cartList);
@@ -280,7 +281,7 @@ public class CartImpl implements CartService {
 
         CartPendingResponse cartPendingResponse = new CartPendingResponse();
         for (CartDetailResponse rp : cartDetailResponseList) {
-            cartPendingResponse.setSummary(cartPendingResponse.getSummary()+ rp.getQuantity()* rp.getPrice());
+            cartPendingResponse.setSummary(cartPendingResponse.getSummary() + rp.getQuantity() * rp.getPrice());
         }
         cartPendingResponse.setCartDetailResponseList(cartDetailResponseList);
         return cartPendingResponse;
@@ -313,6 +314,7 @@ public class CartImpl implements CartService {
     @Override
     public CartResponse showCartCheckout(int couponId) {
         couponService.findAll();
+        flashSaleService.findAll();
         CustomUserDetails customUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Users users = userRepository.findUsersByUserName(customUser.getUsername());
         List<Cart> cartList = cartRepository.findByUsers_UserIdAndStatus(customUser.getUserId(), 0);
@@ -352,55 +354,64 @@ public class CartImpl implements CartService {
 
     @Override
     public ResponseEntity<?> checkout(CartConfirmRequest cartConfirmRequest) {
-        CustomUserDetails customUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Users users = userRepository.findUsersByUserName(customUser.getUsername());
-        productService.findAll();
-        flashSaleService.findAll();
-        CartResponse cartResponse = showCartCheckout(cartConfirmRequest.getCouponId());
-        Cart cart = cartRepository.findById(cartResponse.getId()).get();
-        cart.setFirstName(cartConfirmRequest.getFirstName());
-        cart.setLastName(cartConfirmRequest.getLastName());
-        cart.setAddress(cartConfirmRequest.getAddress());
-        cart.setCity(cartConfirmRequest.getCity());
-        cart.setCountry(cartConfirmRequest.getCountry());
-        cart.setState(cartConfirmRequest.getState());
-        cart.setEmail(cartConfirmRequest.getEmail());
-        cart.setPhone(cartConfirmRequest.getPhone());
-        cart.setNote(cartConfirmRequest.getNote());
-        cart.setDiscount(cartResponse.getDiscount());
-        cart.setTax(cartResponse.getTax());
-        cart.setShipping(cartResponse.getShipping());
-        cart.setTotal(cartResponse.getTotal());
-        cart.setUsers(cartResponse.getUsers());
-        cart.setStatus(1);
-        cart.setCreatDate(LocalDateTime.now());
-        cartRepository.save(cart);
-        Coupon coupon = couponRepository.findById(cartConfirmRequest.getCouponId()).get();
-        if (coupon.getQuantity() != 0) {
-            coupon.setQuantity(coupon.getQuantity() - 1);
-            couponRepository.save(coupon);
-        }
-        List<CartDetailResponse> cartDetailList = cartResponse.getDetailResponses();
-        Set<Integer> productId = new HashSet<>();
-        for (CartDetailResponse cdr : cartDetailList) {
-            Product product = productRepository.findById(cdr.getProductId()).get();
-            productId.add(cdr.getProductId());
-            if (product.getProductQuantity() > cdr.getQuantity()) {
-                product.setProductQuantity(product.getProductQuantity() - cdr.getQuantity());
-                productRepository.save(product);
+        try {
+            CustomUserDetails customUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Users users = userRepository.findUsersByUserName(customUser.getUsername());
+            productService.findAll();
+            flashSaleService.findAll();
+            CartResponse cartResponse = showCartCheckout(cartConfirmRequest.getCouponId());
+            Cart cart = cartRepository.findById(cartResponse.getId()).get();
+            cart.setFirstName(cartConfirmRequest.getFirstName());
+            cart.setLastName(cartConfirmRequest.getLastName());
+            cart.setAddress(cartConfirmRequest.getAddress());
+            cart.setCity(cartConfirmRequest.getCity());
+            cart.setCountry(cartConfirmRequest.getCountry());
+            cart.setState(cartConfirmRequest.getState());
+            cart.setEmail(cartConfirmRequest.getEmail());
+            cart.setPhone(cartConfirmRequest.getPhone());
+            cart.setNote(cartConfirmRequest.getNote());
+            cart.setDiscount(cartResponse.getDiscount());
+            cart.setTax(cartResponse.getTax());
+            cart.setShipping(cartResponse.getShipping());
+            cart.setTotal(cartResponse.getTotal());
+            cart.setUsers(cartResponse.getUsers());
+            cart.setStatus(1);
+            cart.setCreatDate(LocalDateTime.now());
+            List<CartDetailResponse> cartDetailList = cartResponse.getDetailResponses();
+            Set<Integer> productId = new HashSet<>();
+            for (CartDetailResponse cdr : cartDetailList) {
+                Product product = productRepository.findById(cdr.getProductId()).get();
+                productId.add(cdr.getProductId());
+                if (product.getProductQuantity() > cdr.getQuantity()) {
+                    product.setProductQuantity(product.getProductQuantity() - cdr.getQuantity());
+                    productRepository.save(product);
+                } else {
+                    return ResponseEntity.badRequest().body("Sold out");
+                }
             }
-        }
-        for (Integer element : productId){
-            FlashSale flashSale = flashSaleRepo.findByStatusAndProduct_Id(1, element);
-            if (flashSale != null) {
-                flashSale.setSold(flashSale.getSold() + 1);
-                flashSaleRepo.save(flashSale);
+
+            for (Integer element : productId) {
+                FlashSale flashSale = flashSaleRepo.findByStatusAndProduct_Id(1, element);
+                if (flashSale != null) {
+                    flashSale.setSold(flashSale.getSold() + 1);
+                    flashSaleRepo.save(flashSale);
+                }
             }
+            cartRepository.save(cart);
+
+            Coupon coupon = couponRepository.findById(cartConfirmRequest.getCouponId()).get();
+            if (coupon.getQuantity() != 0) {
+                coupon.setQuantity(coupon.getQuantity() - 1);
+                couponRepository.save(coupon);
+            }
+
+            Cart newCart = new Cart();
+            newCart.setUsers(users);
+            newCart.setStatus(0);
+            cartRepository.save(newCart);
+            return ResponseEntity.ok().body(Message.SUCCESS);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
-        Cart newCart = new Cart();
-        newCart.setUsers(users);
-        Cart response = cartRepository.save(newCart);
-        CartResponse result =mapPoJoToResponse(response);
-        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

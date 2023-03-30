@@ -1,9 +1,6 @@
 package project.bussiness.serviceImpl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -12,18 +9,20 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 import project.bussiness.service.CartService;
 import project.bussiness.service.CouponService;
+import project.bussiness.service.PasswordResetTokenService;
 import project.bussiness.service.UserService;
+import project.model.dto.request.ChangePassword;
 import project.model.dto.request.LogInRequest;
 import project.model.dto.request.UserRequest;
-import project.model.dto.response.*;
-import project.model.entity.*;
 import project.model.entity.*;
 import project.model.dto.response.CartResponse;
-import project.model.dto.response.CouponResponse;
 import project.model.dto.response.JwtResponse;
 import project.model.dto.response.UserResponse;
 import project.model.entity.Cart;
@@ -31,12 +30,17 @@ import project.model.entity.ERole;
 import project.model.entity.Roles;
 import project.model.entity.Users;
 import project.model.regex.RegexValidate;
+import project.model.sendEmail.ProvideSendEmail;
 import project.model.shopMess.Message;
 import project.model.utility.Utility;
 import project.repository.*;
 import project.security_jwt.CustomUserDetails;
+import project.security_jwt.CustomUserDetailsService;
 import project.security_jwt.JwtTokenProvider;
+
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,13 +56,16 @@ public class UserImpl implements UserService {
     private CartService cartService;
     private CouponService couponService;
     private TokenLogInReposirory tokenLogInReposirory;
+    private ProvideSendEmail provideSendEmail;
+    private PasswordResetTokenService passResetService;
+    private CustomUserDetailsService customUserDetailsService;
 
     private ProductRepository productRepository;
 
     @Override
     public Map<String, Object> getPagingAndSort(Pageable pageable) {
         Page<Users> page = userRepository.findAll(pageable);
-        Map<String,Object> result = Utility.returnResponse(page);
+        Map<String, Object> result = Utility.returnResponse(page);
         return result;
     }
 
@@ -289,7 +296,7 @@ public class UserImpl implements UserService {
     public ResponseEntity<?> logIn(LogInRequest logInRequest) {
         Users users = userRepository.findUsersByUserName(logInRequest.getUserName());
         LocalDate now = LocalDate.now();
-        if (users.getBlockedDate()!=null && now.isAfter(users.getBlockedDate())) {
+        if (users.getBlockedDate() != null && now.isAfter(users.getBlockedDate())) {
             users.setUserStatus(true);
             userRepository.save(users);
         }
@@ -306,7 +313,7 @@ public class UserImpl implements UserService {
                     .map(item -> item.getAuthority()).collect(Collectors.toList());
             Cart cart = customUserDetail.getListCart().get(customUserDetail.getListCart().size() - 1);
             CartResponse cartResponse = cartService.mapPoJoToResponse(cart);
-            List<CouponResponse> couponResponses = couponService.getAllForClient();
+//            List<CouponResponse> couponResponses = couponService.getAllForClient();
             JwtResponse response = new JwtResponse(jwt, customUserDetail.getUserId(), customUserDetail.getUsername(), customUserDetail.getFirstName(), customUserDetail.getLastName(),
                     customUserDetail.getEmail(), customUserDetail.getAddress(), customUserDetail.getState(), customUserDetail.getCity(), customUserDetail.getCounty(),
                     customUserDetail.getPhone(), customUserDetail.getAvatar(), customUserDetail.getBirtDate(), customUserDetail.isUserStatus(), customUserDetail.getRanking(),
@@ -315,8 +322,7 @@ public class UserImpl implements UserService {
             tokenLogIn.setName(jwt);
             tokenLogIn.setUsers(users);
             tokenLogIn.setStatus(1);
-            TokenLogIn tk= tokenLogInReposirory.save(tokenLogIn);
-
+            tokenLogInReposirory.save(tokenLogIn);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return ResponseEntity.badRequest().body(Message.ERROR_LOCKED_USER);
@@ -340,7 +346,7 @@ public class UserImpl implements UserService {
         Roles userRole = roleRepository.findById(3).get();
         roleUser.add(userRole);
         for (Users user : listUser) {
-            if (user.getListRoles().containsAll(roleUser)&&user.getListRoles().size()==1){
+            if (user.getListRoles().containsAll(roleUser) && user.getListRoles().size() == 1) {
                 usersForModerator.add(user);
             }
 
@@ -356,11 +362,11 @@ public class UserImpl implements UserService {
         Set<Roles> roleUser = new HashSet<>();
         Roles userRole = roleRepository.findById(3).get();
         roleUser.add(userRole);
-        if (user.getListRoles().containsAll(roleUser)&&user.getListRoles().size()==1){
+        if (user.getListRoles().containsAll(roleUser) && user.getListRoles().size() == 1) {
             user.setUserStatus(userRequest.isUserStatus());
             userRepository.save(user);
             UserResponse response = mapPoJoToResponse(user);
-            return new ResponseEntity<>(response,HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return ResponseEntity.badRequest().body(Message.ERROR_400);
         }
@@ -370,7 +376,7 @@ public class UserImpl implements UserService {
     public ResponseEntity<?> updateUserForUser(int userId, UserRequest userRequest) {
         CustomUserDetails userIsLoggingIn = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Users users = userRepository.findUsersByUserName(userIsLoggingIn.getUsername());
-        if (users.getUserId()==userId) {
+        if (users.getUserId() == userId) {
             try {
                 if (userRepository.existsByEmail(userRequest.getEmail())) {
                     return ResponseEntity.badRequest().body(Message.ERROR_EXISTED_EMAIL);
@@ -412,6 +418,76 @@ public class UserImpl implements UserService {
         return mapPoJoToResponse(findById(users.getUserId()));
     }
 
+    @Override
+    public ResponseEntity<?> changePassword(ChangePassword changePassword) {
+        try {
+            CustomUserDetails usersChangePass = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Users users = userRepository.findUsersByUserName(usersChangePass.getUsername());
 
+            String userName = changePassword.getUserName();
+            String oldPass = changePassword.getOldPass();
+            String newPass = changePassword.getNewPass();
+
+            if (!RegexValidate.checkRegexPassword(newPass)) {
+                return ResponseEntity.badRequest().body(Message.ERROR_INVALID_PASSWORD);
+            }
+
+            if (usersChangePass.getUsername().equals(userName) && BCrypt.checkpw(oldPass, usersChangePass.getPassword())) {
+                users.setPassword(encoder.encode(newPass));
+                userRepository.save(users);
+            }
+            return ResponseEntity.ok(Message.CHANGE_PASSWORD_SUCCESS);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Message.ERROR_400);
+        }
+
+    }
+
+    @Override
+    public ResponseEntity<?> forgotPassword(String userEmail, HttpServletRequest request) {
+        if (userRepository.existsByEmail(userEmail)) {
+            Users users = userRepository.findByEmail(userEmail);
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(users.getUserName());
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = UUID.randomUUID().toString();
+            PasswordResetToken myToken = new PasswordResetToken();
+            myToken.setToken(token);
+            String mess = "token is valid for 5 minutes.\n" + "Your token: " + token;
+            myToken.setUsers(users);
+            LocalDateTime now = LocalDateTime.now();
+            myToken.setStartDate(now);
+            passResetService.saveOrUpdate(myToken);
+            provideSendEmail.sendSimpleMessage(users.getEmail(),
+                    "Reset your password", mess);
+            return ResponseEntity.ok("Email sent! Please check your email");
+        } else {
+            return ResponseEntity.badRequest().body(Message.EMAIL_NOT_SENT);
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> creatNewPass(String token, String newPassword) {
+        if (!RegexValidate.checkRegexPassword(newPassword)) {
+            return ResponseEntity.badRequest().body(Message.ERROR_INVALID_PASSWORD);
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        PasswordResetToken passwordResetToken = passResetService.getLastTokenByUserId(userDetails.getUserId());
+        long date1 = passwordResetToken.getStartDate().toLocalDate().toEpochDay() + 1800000;
+        long date2 = LocalDateTime.now().toLocalDate().toEpochDay();
+        if (date2 > date1) {
+            return ResponseEntity.badRequest().body("Expired Token ");
+        } else {
+            if (passwordResetToken.getToken().equals(token)) {
+                Users users = userRepository.findById(userDetails.getUserId()).get();
+                users.setPassword(encoder.encode(newPassword));
+                userRepository.save(users);
+                return ResponseEntity.ok().body("update password successfully");
+            } else {
+                return ResponseEntity.badRequest().body("token is fail ");
+            }
+        }
+    }
 
 }

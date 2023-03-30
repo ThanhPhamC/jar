@@ -17,4 +17,5 @@ public class ProductRequest {
     private int catalogId;
     private int brandId;
     private int status;
+    private int locationId;
 }

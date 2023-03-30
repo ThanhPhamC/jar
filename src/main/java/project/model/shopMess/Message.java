@@ -22,4 +22,6 @@ public class Message {
     public static  final String DELETE_SUCCESS= "Delete success";
     public static final String ERROR_EXISTED_NAME = "Name is already";
     public static final String ERROR_EXISTED_TIME = "Sale period is still valid";
+    public static final String CHANGE_PASSWORD_SUCCESS = "Change password successfully!";
+    public static final String EMAIL_NOT_SENT = "Email is not already";
 }
