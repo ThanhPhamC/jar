@@ -11,15 +11,17 @@ public class AddressRevenue {
     private float totalTax;
     private float totalShip;
     private float totalDiscount;
-    private float total;
+    private float revenue;
+    private float realRevenue;
     private int numberOder;
    private String city;
-    public AddressRevenue(String date, float totalTax, float totalShip, float totalDiscount, float total,int numberOder,String city) {
+    public AddressRevenue(String date, float totalTax, float totalShip, float totalDiscount, float revenue,float realRevenue,int numberOder,String city) {
         this.date=date;
         this.totalTax=totalTax;
-        this.totalShip=(totalShip);
-        this.totalDiscount=(totalDiscount);
-        this.total=total;
+        this.totalShip=totalShip;
+        this.totalDiscount=totalDiscount;
+        this.revenue=revenue;
+        this.realRevenue=realRevenue;
         this.numberOder=numberOder;
         this.city=city;
     }

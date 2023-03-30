@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface FlashSaleRepository extends JpaRepository<FlashSale,Integer> {
     FlashSale findByStatusAndProduct_Id(Integer status,Integer productId);
-    List<FlashSale> findByStatus(Integer status);
+    List<FlashSale> findByProduct_IdOrderByStartTimeAsc(Integer productId);
     boolean existsByStatusAndProduct_Id(Integer status,Integer productId);
 }
